@@ -162,4 +162,57 @@ int main() { //测试
 C++11规定，当逻辑进入一个未被初始化的声明变量，所有的并发操作都必须等待该变量完成初始化。<br>
 静态变量在全局/静态区，只要在分区内，只要数据等于0，就是未被初始化的，比如`int a = 0;`，`int b;`；但是`int c = 1;`就是初始化过的变量<br>
 所以`static Singoton sn;`也是未初始化的静态局部变量，于是所有的并发操作都会被阻塞
-![image](https://github.com/arqady01/-/blob/main/%E6%97%A0%E6%A0%87%E9%A2%98%E7%BB%98%E5%9B%BE%20(2).png)
+# 简单工厂模式
+* 优点
+简单工厂的特点就是“简单粗暴”，通过一个含参的工厂方法，我们可以实例化任何产品类，上至飞机火箭，下至土豆面条，无所不能。所以简单工厂有一个别名：上帝类。
+* 缺点
+违反“封闭-开放原则”，简单工厂对于增加新的产品，无能为力，因为增加新产品只能通过修改工厂方法来实现，违反“封闭”原则
+```cpp
+#include <iostream>
+class AbstractPerson {
+public:
+	virtual void IQ() = 0;
+	virtual void EQ() = 0;
+	//动态绑定就是父类指针绑定子类对象，在delete父类指针时，若没重写，只会释放父类资源而不会释放子类资源
+	virtual ~AbstractPerson() {};
+};
+class School : public AbstractPerson {
+public:
+	void IQ() override {
+		std::cout << "学校期间涨20点IQ." << std::endl;
+	}
+	void EQ() override {
+		std::cout << "学校期间涨3点EQ." << std::endl;
+	}
+};
+class Social : public AbstractPerson {
+public:
+	void IQ() override {
+		std::cout << "社会期间降5点IQ." << std::endl;
+	}
+	void EQ() override {
+		std::cout << "社会期间涨20点EQ." << std::endl;
+	}
+};
+
+//工厂类
+enum class Type:char{Shazi,Lengzi}; //C++强类型枚举，数据类型为char型
+class Factory {
+public:
+	AbstractPerson* createPerson(Type type) {
+		AbstractPerson* ptr = nullptr;
+		if (type == Type::Shazi)
+			ptr = new School; //傻子就送去学校
+		else if (type == Type::Lengzi)
+			ptr = new Social; //愣子就送进社会
+		return ptr;
+	}
+};
+int main() {
+	Factory factory;
+	AbstractPerson* p = factory.createPerson(Type::Shazi); //父类指针指向子类对象，实现动态绑定
+	p->IQ();
+	p->EQ();
+}
+```
+# 工厂模式
