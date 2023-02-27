@@ -93,6 +93,18 @@ move是一个非常有迷惑性的函数，往往以为它能把一个变量里�
 
 ## Redis
 
+- Redis完全基于内存
+- 数据结构简单
+- 使用多路IO复用模型，非阻塞IO
+- 单线程模型，无需考虑加锁放锁操作，不会出现死锁问题
+
+### 通用命令
+- KEYS 查询
+- DEL 删除
+- EXISTS 判断key是否存在
+- EXPIRE 给key设置有效期，到期自动删除
+- TTL 查询key的有效期
+
 ### 内存淘汰策略
 
 当redis占用内存超过maxmemory时，会触发主动清理策略
@@ -108,11 +120,182 @@ move是一个非常有迷惑性的函数，往往以为它能把一个变量里�
 - 不处理
 	- noevent 不剔除任何数据，拒绝所有写入操作并返回错误信息，此时redis只响应读操作
 
-### LRU ＆ LFU
-
+#### LRU ＆ LFU
 - LRU，最近最少使用(least recently used)，以最近一次访问时间作为参考，淘汰很久没被访问过的数据
 - LFU，最不经常使用(least frequently used)，以次数作为参考，淘汰最近一段事件被访问次数最少的数据
 绝大多数情况使用LRU，但当存在大量热点缓存数据时，LFU更佳
+
+### 多路IO复用模型
+- select：利用数组存储文件描述符，容量固定，需要轮询来判断是否发生了IO事件
+- poll：链表存储文件描述符，可扩展，也需要轮询
+- epoll：红黑树存储，利用事件通知（观察者模式）模型，只有发生了IO事件，应用程序才会进行IO操作
+
+### redis对象类型
+redis是key-value类型，支持string, list, hash, set, SortedSet（有序集合）
+
+#### String
+根据字符串的格式不同，可分为三类
+| 编码类型 | 含义 |
+| :----: | :----: |
+| string | 普通字符串 |
+| int | 整数类型，可自增自减 |
+| float | 浮点类型，可自增自减 |
+
+| 底层实现 | 含义 |
+| :----: | :----: |
+| int | 字符串长度小于等于20且能够转为整数 |
+| embstr | 字符串长度小于等于44 |
+| raw | 字符串长度大于44 |
+
+为啥是44呢？因为cpu中每一个多级缓存的缓存行 为64字节，其他额外数据占据19，转义字符占1字节
+
+- SET 添加或删除string类型的键值对
+- GET 根据key获取值
+- MSET 批量添加多个string型的键值对
+- MGET 根据多个key获取值
+- INCR 让int型数据自增1
+- INCRBY 让int型自增指定步长
+- INCRBYFLOAT 让float型自增指定步长
+- SETNX 添加一个string型的键值对，前提是此key不存在，否则不添加
+- SETEX 添加一个string型的键值对，并指定有效期
+
+#### key结构
+Redis允许有多个单词形成层级结构，多个单词之间用'：'隔开，比如：<br>
+项目名：业务名：类型：id<br>
+再将值序列化成json对象存储<br>
+```cpp
+SET Apple:iphone:A2022_1 '{"id":1, "name":"13pro", "color":"blue"}'
+SET Apple:iphone:A2022_2 '{"id":2, "name":"13pro", "color":"white"}'
+```
+
+#### List
+
+```
+两种底层数据结构：
+- quicklist 双向链表
+- ziplist 压缩列表
+```
+
+- LPUSH key element 向列表左侧插入一个或多个元素
+- LPOP key 移除并返回左侧的第一个元素，没有则返回nil
+- RPUSH key element 向列表右侧插入一个或多个元素
+- RPOP key 移除并返回右侧的第一个元素
+- LRANGE key start end 返回一段角标范围内的所有元素
+- BLPOP和BRPOP 与LPOP类似，只不过在没有元素时等待指定时间，而不是直接返回nil
+
+
+#### Hash
+值是无序字典（规定字典为 field-value对）
+
+```
+实现方式：
+dict - 字典（节点数量大于512或字符串长度大于64）
+ziplist - 压缩列表（节点数量小于等于512且字符串长度小于等于64）
+```
+
+- HSET key field value：添加或修改key的field值
+- HGET key field：获取hash类型key的field的值
+- HMSET：批量添加多个hash类型key的field的值
+- HMGET：批量获取多个hash类型key的field的值
+- HGETALL：获取hash类型的key中的所有的field和value
+- HKEYS：获取一个hash类型的key中的所有的field
+- HVALS：获取一个hash类型的key中的所有的value
+- HINCRBY：让一个hash类型key的字段值自增并指定步长
+- HSETNX：添加一个hash类型的key的field值，前提是这个field不存在，否则不执行
+
+#### set
+类似于一个没有value的无序字典
+
+```
+intset - 整数数组（元素都为整数且节点数量小于等于512）
+dict - 字典（元素有一个不为整数或者数量大于512）
+```
+
+- SADD key member 向set中添加一个或多个元素
+- SREM key member 移除set中的指定元素
+- SCARD key 返回set中元素的个数
+- SISMEMBER key member 判断一个元素是否存在于set中
+- SMEMBERS 获取set中的所有元素
+- SINTER key1 key2 求key1与key2的交集
+- SDIFF key1 key2 求key1与key2的差集
+- SUNION key1 key2 求key1和key2的并集
+
+#### SortedSet（weight是权值）
+
+```
+skiplist - 跳表（数量大于128或者有一个字符串长度大于64）
+ziplist - 压缩列表
+```
+
+- ZADD key weight member 添加一个或多个元素到SortedSet，若存在就更新权值
+- ZREM key member 单次删除SortedSet中指定元素
+- ZSCORE key member 获取SortedSet的指定元素的权值
+- ZRANK key member 获取SortedSet的指定元素的排名
+- ZCARD key 获取SortedSet中元素个数
+- ZCOUNT key left right 统计权值在区间内所有元素的个数
+- ZINCRBY key increment member 让SortedSet中的指定元素自增，步长为指定的increment值 
+- ZRANGE key num1 num2 排序后获取指定排名范围内的元素（比如第2名-第10名）
+- ZRANGEBYSCORE key min max 排序后，获取指定权值范围内的元素
+
+### 相同数量情况下，分析hash和zset占用情况
+- 如果节点数据≤128，hash和zset底层实现都是压缩列表
+- 如果节点数据∈(128,512)，hash使用压缩列表，zset使用跳表，跳表时间复杂度O(log2n)，压缩列表O(n)，但跳表空间占用更高
+- 如果节点数据>512，hash使用字典，zset使用跳表
+
+### 备份如何执行
+Rdis会单独创建(fork)一个子进程来进行持久化，先将数据写入到一个临时文件中，等持久化过程都结束了，再用这个临时文件替换上次持久化好的文件
+
+### 持久化
+Rdis是内存数据库，如果不将内存中的数据库状态保存到磁盘，那么一旦服务器进程退出，服务器中的数据库状态也会消失。所以Redis提供了持久化功能
+
+#### RDB
+redis将快照snapshot保存在dump.rdb文件中
+
+##### RDB触发机制
+- 满足config文件中save规则
+- 执行flushall命令
+- 退出redis
+
+##### RDB优缺点
+- 优点
+    - dump.rdb是某一时间点上的数据快照，非常适合大规模数据恢复
+    - 对数据完整性要求不高，可以复制到任何地方并加载，对灾难恢复、数据迁移很友好
+    - 相比AOF性能更高，数据恢复速度更快
+- 缺点
+    - 需要一定的时间间隔进程操作，如果redis意外宕机，将丢失最近写入但未保存到快照中的那些数据
+    - fork进程时，会占用一定的内存空间；而且父进程越多，fork时间也越长
+    - 高并发时可能会频繁命中config中的save规则，导致fork操作和备份的频率变得不可控
+
+#### AOF
+将执行过的所有写入动作以日志形式记录下来（因为只有写才会对数据库发生改变），只许追加文件但不可以改写文件，redis启动之初会读取appendonly.aof文件重新构建数据
+
+##### AOF优缺点
+- 优点
+    - 可以选择no， every second， always三种策略
+        - always每次修改都会同步，文件完整性更好
+        - every second是默认的策略，每秒同步一次，性能更优，但可能会丢失一秒的数据
+        - no，从不同步，效率最高
+- 缺点
+    - aof文件通常比rdb文件更大，修复速度也更慢
+    - 因为aof是写入操作，效率比rdb低，所以redis默认是用RDB做持久化
+
+### 主从复制
+将一台Redis服务器的数据（主节点master，写为主），复制到其他的Redis服务器（从节点slave，读为主），数据的复制只能由主节点到从节点（单向）
+
+- 数据冗余：主从复制实现了数据的热备份，是持久化之外的一种数据冗余方式
+- 故障恢复：当主节点出现问题时，可以由从节点提供服务，实现快速的故障恢复
+- 负载均衡：在主从复制的基础上，配合读写分离，可以大大提高Redis服务器的并发量
+- 高可用基石：除了上述作用以外，主从复制还是哨兵和集群能够实施的基础，因此主从复制是redis高可用的基础
+
+#### 复制原理
+slave连接到master后会发送一个sync同步命令，master启动后台的存盘进程，同时收集所有接收到的用于修改数据集命令，在后台进程执行完毕之后，master将传送整个数据文件到slave，并完成一次完全同步<br>
+
+- 全量复制：salve在接收到数据库文件数据后，将其存盘并加载到内存中。
+- 增量复制：master继续将新的所有收集到的修改命令依次传给slave,完成同步
+
+### 哨兵模式
+当master宕机后，需要手动把一台slave切换为主服务器，费事费力，还会造成一段时间内服务不可用，所以优先考虑哨兵模式<br>
+哨兵作为一个独立的进程，通过哨兵发送命令，等待各redis服务器响应，从而监控多个redis实例
 
 <h1 id="1">设计模式</h1>
 <h2 id="1.1">单例模式</h2>
