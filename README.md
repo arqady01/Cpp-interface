@@ -301,6 +301,9 @@ slave连接到master后会发送一个sync同步命令，master启动后台的�
 
 ![image](https://github.com/arqady01/cpp-interview/blob/main/database/image/%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F.png)
 
+### 缓存雪崩
+
+
 <h1 id="1">设计模式</h1>
 <h2 id="1.1">单例模式</h2>
 
