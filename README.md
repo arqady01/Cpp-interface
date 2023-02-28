@@ -339,11 +339,15 @@ redis缓存和数据库中**没有相关数据**（比如id < 0 的请求），r
 
 先更新数据库，再更新缓存（有缺陷）
 
+![image](https://github.com/arqady01/cpp-interview/blob/main/database/image/%E5%85%88%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%86%8D%E6%9B%B4%E6%96%B0%E7%BC%93%E5%AD%98.png)
+
 先删除缓存，再更新数据库（有缺陷）
 
-先更新缓存，再更新数据库（有缺陷）
+![image](https://github.com/arqady01/cpp-interview/blob/main/database/image/%E5%85%88%E5%88%A0%E7%BC%93%E5%AD%98%E5%86%8D%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93.png)
 
-**先更新数据库，再删除缓存**
+先更新缓存，再更新数据库（有缺陷）<br>
+
+**先更新数据库，再删除缓存**（合适的方案）
 
 
 <h1 id="1">设计模式</h1>
