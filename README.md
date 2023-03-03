@@ -908,216 +908,24 @@ C++11规定，当逻辑进入一个未被初始化的声明变量，所有的并
 所以`static Singoton sn;`也是未初始化的静态局部变量，于是所有的并发操作都会被阻塞
 
 <h2>简单工厂模式</h2>
+
 * 优点
+
 简单工厂的特点就是“简单粗暴”，通过一个含参的工厂方法，我们可以实例化任何产品类，上至飞机火箭，下至土豆面条，无所不能。所以简单工厂有一个别名：上帝类。
+
 * 缺点
-违反“封闭-开放原则”，简单工厂对于增加新的产品，无能为力，因为增加新产品只能通过修改工厂方法来实现，违反“封闭”原则。
 
-```cpp
-#include <iostream>
-class AbstractPerson {
-public:
-	virtual void IQ() = 0;
-	virtual void EQ() = 0;
-	//动态绑定就是父类指针绑定子类对象，在delete父类指针时，若没重写，只会释放父类资源而不会释放子类资源
-	virtual ~AbstractPerson() {};
-};
-class School : public AbstractPerson {
-public:
-	void IQ() override {
-		std::cout << "学校期间涨20点IQ." << std::endl;
-	}
-	void EQ() override {
-		std::cout << "学校期间涨3点EQ." << std::endl;
-	}
-};
-class Social : public AbstractPerson {
-public:
-	void IQ() override {
-		std::cout << "社会期间降5点IQ." << std::endl;
-	}
-	void EQ() override {
-		std::cout << "社会期间涨20点EQ." << std::endl;
-	}
-};
+违反“封闭-开放原则”，简单工厂对于增加新的产品，无能为力，因为增加新产品只能通过修改工厂方法来实现，违反“封闭”原则<br>
 
-//工厂类
-enum class Type:char{Shazi,Lengzi}; //C++强类型枚举，数据类型为char型
-class Factory {
-public:
-	AbstractPerson* createPerson(Type type) {
-		AbstractPerson* ptr = nullptr;
-		if (type == Type::Shazi)
-			ptr = new School; //傻子就送去学校
-		else if (type == Type::Lengzi)
-			ptr = new Social; //愣子就送进社会
-		return ptr;
-	}
-};
-int main() {
-	Factory factory;
-	AbstractPerson* p = factory.createPerson(Type::Shazi); //父类指针指向子类对象，实现动态绑定
-	p->IQ();
-	p->EQ();
-}
-```
+[简单工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E7%AE%80%E5%8D%95%E5%B7%A5%E7%A8%8B%E7%A4%BA%E4%BE%8B.cpp)
 
 <h2>工厂模式</h2>
 
-```cpp
-#include <iostream>
-class AbstractPerson {
-public:
-	virtual void IQ() = 0;
-	virtual void EQ() = 0;
-	//动态绑定就是父类指针绑定子类对象，在delete父类指针时，若没重写，只会释放父类资源而不会释放子类资源
-	virtual ~AbstractPerson() {};
-};
-class School : public AbstractPerson {
-public:
-	void IQ() override {
-		std::cout << "学校期间涨20点IQ." << std::endl;
-	}
-	void EQ() override {
-		std::cout << "学校期间涨3点EQ." << std::endl;
-	}
-};
-class Social : public AbstractPerson {
-public:
-	void IQ() override {
-		std::cout << "社会期间降5点IQ." << std::endl;
-	}
-	void EQ() override {
-		std::cout << "社会期间涨20点EQ." << std::endl;
-	}
-};
-
-enum class Type:char{Shazi,Lengzi}; //C++强类型枚举，数据类型为char型
-//不同职责工厂的父类类
-class AbstractFactory {
-public:
-	virtual AbstractPerson* createPerson() = 0;
-	virtual ~AbstractFactory() {}
-};
-//加IQ的工厂类
-class IQFactory : public AbstractFactory {
-public:
-	AbstractPerson* createPerson() {
-		return new School;
-	}
-};
-//加EQ的工厂类
-class EQFactory : public AbstractFactory {
-public:
-	AbstractPerson* createPerson() {
-		return new Social;
-	}
-};
-int main() {
-	AbstractFactory* af = new IQFactory;
-	AbstractPerson* p = af->createPerson();
-	p->IQ();
-	p->EQ();
-}
-```
+[工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%A4%BA%E4%BE%8B)
 
 <h2>抽象工厂模式</h2>
 
-```cpp
-#include <iostream>
-#include <string>
-//船体
-class shipBody {
-public:
-	virtual std::string getBody() = 0;
-	virtual ~shipBody() {}; //虚析构函数
-};
-//钢制船
-class steelBoot : public shipBody {
-public:
-	std::string getBody() override {
-		return std::string("钢铁船身.");
-	}
-};
-//合金船
-class alloyBoot : public shipBody {
-public:
-	std::string getBody() override {
-		return std::string("合金船身.");
-	}
-};
-
-//引擎
-class engine {
-public:
-	virtual std::string getEngine() = 0;
-	virtual ~engine() {};
-};
-//柴油动力
-class oilEngine : public engine {
-public:
-	std::string getEngine() override {
-		return std::string("柴油动力.");
-	}
-};
-//核动力
-class atomicEngine : public engine {
-public:
-	std::string getEngine() override {
-		return std::string("核动力.");
-	}
-};
-
-//船
-class ship {
-public:
-	ship(shipBody* s, engine* e) : m_shipBody(s), m_engine(e) {}
-	~ship() {
-		delete m_shipBody;
-		delete m_engine;
-		m_shipBody = nullptr;
-		m_engine = nullptr;
-	}
-	std::string getInfo() {
-		std::string info = m_shipBody->getBody() + m_engine->getEngine();
-		return info;
-	}
-private:
-	shipBody* m_shipBody;
-	engine* m_engine;
-};
-
-//抽象工厂类
-class AbstractFactory {
-public:
-	virtual ship* createShip() = 0;
-	virtual ~AbstractFactory() {};
-};
-//造最基本的船
-class basicShip : public AbstractFactory {
-public:
-	ship* createShip() override {
-		ship* sp = new ship(new steelBoot, new oilEngine);
-		return sp;
-	}
-};
-//造最先进的船
-class ultraShip : public AbstractFactory {
-public:
-	ship* createShip() override {
-		ship* sp = new ship(new alloyBoot, new atomicEngine);
-		return sp;
-	}
-};
-int main() {
-	//我要买最先进的船！
-	AbstractFactory* asf = new basicShip;
-	ship* sip = asf->createShip();
-	std::cout << sip->getInfo() << std::endl;
-	delete sip;
-	delete asf;
-}
-```
+[抽象工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%A4%BA%E4%BE%8B)
 
 <h1 id="2">GDB调试</h1>
 
