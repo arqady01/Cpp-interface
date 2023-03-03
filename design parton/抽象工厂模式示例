@@ -1,0 +1,93 @@
+#include <iostream>
+#include <string>
+//船体
+class shipBody {
+public:
+	virtual std::string getBody() = 0;
+	virtual ~shipBody() {}; //虚析构函数
+};
+//钢制船
+class steelBoot : public shipBody {
+public:
+	std::string getBody() override {
+		return std::string("钢铁船身.");
+	}
+};
+//合金船
+class alloyBoot : public shipBody {
+public:
+	std::string getBody() override {
+		return std::string("合金船身.");
+	}
+};
+
+//引擎
+class engine {
+public:
+	virtual std::string getEngine() = 0;
+	virtual ~engine() {};
+};
+//柴油动力
+class oilEngine : public engine {
+public:
+	std::string getEngine() override {
+		return std::string("柴油动力.");
+	}
+};
+//核动力
+class atomicEngine : public engine {
+public:
+	std::string getEngine() override {
+		return std::string("核动力.");
+	}
+};
+
+//船
+class ship {
+public:
+	ship(shipBody* s, engine* e) : m_shipBody(s), m_engine(e) {}
+	~ship() {
+		delete m_shipBody;
+		delete m_engine;
+		m_shipBody = nullptr;
+		m_engine = nullptr;
+	}
+	std::string getInfo() {
+		std::string info = m_shipBody->getBody() + m_engine->getEngine();
+		return info;
+	}
+private:
+	shipBody* m_shipBody;
+	engine* m_engine;
+};
+
+//抽象工厂类
+class AbstractFactory {
+public:
+	virtual ship* createShip() = 0;
+	virtual ~AbstractFactory() {};
+};
+//造最基本的船
+class basicShip : public AbstractFactory {
+public:
+	ship* createShip() override {
+		ship* sp = new ship(new steelBoot, new oilEngine);
+		return sp;
+	}
+};
+//造最先进的船
+class ultraShip : public AbstractFactory {
+public:
+	ship* createShip() override {
+		ship* sp = new ship(new alloyBoot, new atomicEngine);
+		return sp;
+	}
+};
+int main() {
+	//我要买最先进的船！
+	AbstractFactory* asf = new basicShip;
+	ship* sip = asf->createShip();
+	std::cout << sip->getInfo() << std::endl;
+	delete sip;
+	delete asf;
+}
