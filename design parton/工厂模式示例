@@ -1,0 +1,54 @@
+#include <iostream>
+class AbstractPerson {
+public:
+	virtual void IQ() = 0;
+	virtual void EQ() = 0;
+	//动态绑定就是父类指针绑定子类对象，在delete父类指针时，若没重写，只会释放父类资源而不会释放子类资源
+	virtual ~AbstractPerson() {};
+};
+class School : public AbstractPerson {
+public:
+	void IQ() override {
+		std::cout << "学校期间涨20点IQ." << std::endl;
+	}
+	void EQ() override {
+		std::cout << "学校期间涨3点EQ." << std::endl;
+	}
+};
+class Social : public AbstractPerson {
+public:
+	void IQ() override {
+		std::cout << "社会期间降5点IQ." << std::endl;
+	}
+	void EQ() override {
+		std::cout << "社会期间涨20点EQ." << std::endl;
+	}
+};
+
+enum class Type:char{Shazi,Lengzi}; //C++强类型枚举，数据类型为char型
+//不同职责工厂的父类类
+class AbstractFactory {
+public:
+	virtual AbstractPerson* createPerson() = 0;
+	virtual ~AbstractFactory() {}
+};
+//加IQ的工厂类
+class IQFactory : public AbstractFactory {
+public:
+	AbstractPerson* createPerson() {
+		return new School;
+	}
+};
+//加EQ的工厂类
+class EQFactory : public AbstractFactory {
+public:
+	AbstractPerson* createPerson() {
+		return new Social;
+	}
+};
+int main() {
+	AbstractFactory* af = new IQFactory;
+	AbstractPerson* p = af->createPerson();
+	p->IQ();
+	p->EQ();
+}
