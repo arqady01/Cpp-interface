@@ -1013,17 +1013,30 @@ C++11规定，当逻辑进入一个未被初始化的声明变量，所有的并
 
 * 缺点
 
-违反“封闭-开放原则”，简单工厂对于增加新的产品，无能为力，因为增加新产品只能通过修改工厂方法来实现，违反“封闭”原则<br>
+简单工厂对于增加新的产品无能为力（不容易拓展），因为增加新产品只能通过修改工厂方法来实现，违反“封闭-开放”原则
 
 [简单工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E7%AE%80%E5%8D%95%E5%B7%A5%E7%A8%8B%E7%A4%BA%E4%BE%8B.cpp)
 
 <h2>工厂模式</h2>
 
+- 优点：遵循开闭原则，实现了可扩展和更复杂的层次结构。明确了职责，具有多态性
+- 缺点：如果业务增加，会使得系统中类的个数成倍增加，提高了代码的复杂度
+
 [工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%A4%BA%E4%BE%8B)
 
 <h2>抽象工厂模式</h2>
 
+- 优点：增加分组比较容易，能大大减少工厂类的数量
+- 缺点：因为分组，所以分组中的产品扩展就比较困难，比如再新增一个Product3，就需要改动AbstractFactory、FactoryA和FactoryB几乎所有工厂类
+
 [抽象工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%A4%BA%E4%BE%8B)
+
+[vptr对象模型](https://github.com/arqady01/cpp-interview/blob/main/cpp/%E8%99%9A%E8%A1%A8%E8%99%9A%E6%8C%87%E9%92%88.png)
+
+## 观察者模式
+
+包含抽象、具体的观察者和被观察者<br>
+当一个对象状态发生改变时，所有依赖他的对象都会得到事件通知
 
 <h1 id="2">GDB调试</h1>
 
