@@ -3,7 +3,7 @@
 * [💾 数据库](#database)
 * [📏 设计模式](#1)
 * [&#x1F527; GDB](#2)
-* [&#x1F3A1; GDsB](#3)
+* [&#x1F3A9; Boost::chrono](#chrono)
 
 <h1 id="c/c++">C/C++</h1>
 
@@ -1088,3 +1088,88 @@ C++11规定，当逻辑进入一个未被初始化的声明变量，所有的并
 - killall根据名称终止正在运行的进程，而kill根据进程ID号（PID）终止进程
 - pidof a.out：找到进程的PID，或者`ps -ef|grep a.out`
 - kill -9 2551 2514 ：中止PID为2511和2514的进程，或者`killall -9 a.out`
+
+
+
+
+<h1 id="chrono">boost::chrono</h1>
+
+系统时间：`std::chrono::system_clock`<br>
+获取当前系统时间：
+`std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();`
+time_point代表这是一个时间点类型，模板参数使用system_lock表明这个时间点是基于system_lock来计时的<br>
+
+## 类型转换函数
+
+- 时间点类型：`time_point_cast<>`
+- 时长类型：`duration_cast<>`
+
+## 时钟
+
+- system_clock：实时时钟的挂钟时间
+- steady_clock：绝不会调整的单位时钟
+- high_resolution_clock：拥有可用的最短嘀嗒周期的时钟
+
+### 共同成员
+
+| 成员 | 说明 |
+| :----: | :----: |
+| now() | 返回当前时间，类型为clock::time_point |
+| time_point | 当前时钟的时间点类型 |
+| duration | 时钟的时长类型 |
+| is_ready | 是否稳定时钟，对于steady_clock该值一定为true |
+
+## 时长类型
+
+- 纳秒：std::chrono::nanoseconds
+- 微秒：std::chrono::microseconds
+- 毫秒：std::chrono::milliseconds
+- 秒：std::chrono::seconds
+- 分：std::chrono::minutes
+- 小时：std::chrono::hours
+
+调用count()函数来获取具体数值
+
+## 时长运算
+
+- 向下取整：floor
+- 向上取整：ceil
+- 取绝对值：abs
+
+```cpp
+void translate() {
+	std::chrono::hours h(2);
+	std::chrono::minutes m(5);
+	auto time = h + m;
+
+	auto sec = std::chrono::duration_cast<std::chrono::seconds>(time);
+	std::cout << sec.count() << std::endl;
+}
+```
+
+#### 描述时长
+
+C++14支持`std::chrono_literals`中的字面量来描述，h-小时，min-分钟，s-秒，ms-毫秒，us-微秒，ns-纳秒，示例中的2小时5分也可以这样表述：
+
+```cpp
+using namespace std::chrono_literals;
+auto time = 2h + 5min;
+```
+
+## 时间点
+
+时间点包含两个类型：时钟和时长。时间点 + 时长 = 时间点
+
+```cpp
+int main() {
+	//计算程序运行时长
+	auto start = std::chrono::steady_clock::now();
+	double sum = 0;
+	for (int i = 0; i < 1000000; i++) {
+		sum += sqrt(i);
+	}
+	auto end = std::chrono::steady_clock::now();
+	auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+	std::cout << diff.count() << std::endl;
+}
+```
