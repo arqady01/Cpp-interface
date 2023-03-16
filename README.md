@@ -18,14 +18,6 @@
     - 没有const reference，因为引用只是别名，不是对象，不能用 const 修饰
 - 修饰成员函数，说明该成员函数内不能修改成员变量
 
-```mysql
-select * from s;
-```
-
-```sql
-select * from s where s = 0;
-```
-
 
 ## 左值&右值
 
