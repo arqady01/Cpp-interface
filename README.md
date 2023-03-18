@@ -101,13 +101,98 @@ move是一个非常有迷惑性的函数，往往以为它能把一个变量里�
 
 ## 内存管理
 
-###内存分区
+### 内存分区
 
 - 代码区：存放程序的二进制代码
 - 堆区：调用new函数在堆区分配内存
 - 栈区：存储函数的返回地址、参数、局部变量、返回值，程序结束后自动释放
 - BSS段（全局/静态区）：程序编译就已经存在，生命周期为整个程序，存放静态和全局变量
 - 常量储存区：存放常量字符串和静态常量
+
+## std::function
+
+函数包装器支持四种类型
+
+- 普通函数
+- 匿名函数
+- 成员函数
+- 仿函数
+
+1.普通函数
+
+```cpp
+#include <functional>
+#include <iostream>
+int add(int x, int y) {
+	return x + y;
+}
+int main() {
+	std::function<int(int, int)> f = &add; // "=add" is okay
+	std::cout << "两数相加等于" << f(3.14, 2) << std::endl;
+}
+```
+
+2.匿名函数
+
+```cpp
+int main() {
+	std::function<int(int, int)> fu = [](int a, int b)->int {
+		return a + b;
+	};
+	std::cout << fu(8, 12) << std::endl;
+}
+```
+
+3.成员函数
+
+```cpp
+#include <functional>
+#include <iostream>
+#include <string>
+class test {
+public:
+	test() = default;
+	std::string addString(std::string str, int x) {
+		return str + std::to_string(x);
+	}
+};
+int main() {
+	//test::addString()需要取地址，唯一的变化就是需要将类的this指针传递给包装器
+	std::function<std::string(test*, std::string, int)> fun = &test::addString;
+	test t; //实例化
+	std::cout << fun(&t, "Messi", 10);
+}
+```
+
+4.仿函数
+
+```cpp
+class test {
+public:
+	test() = default;
+	//因为返回的对象还未构造，所以返回值类型不能是引用
+	std::string operator()(std::string str, int x) {
+		return str.append(std::to_string(x));
+	}
+};
+int main() {
+	std::function<std::string(test*, std::string, int)> func = &test::operator();
+	test t;
+	std::cout << func(&t, "messi", 10) << std::endl;
+}
+```
+
+### bind机制
+
+```cpp
+int append(int a, int b, int c) {
+	return a * 100 + b * 10 + c;
+}
+int main() {
+	auto add = std::bind(append, 3, 4, 5);
+	std::cout << add() << std::endl;
+}
+```
 
 <h1 id="internet">计算机网络</h1>
 
