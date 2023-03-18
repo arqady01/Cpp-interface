@@ -5,7 +5,7 @@
 * [&#x1F527; GDB](#2)
 * [&#x1F3A9; Boost::chrono](#chrono)
 
-<h1 id="c/c++">C/C++</h1>
+<h1 id="c/c++">➕ C/C++</h1>
 
 ## const
 
@@ -194,7 +194,7 @@ int main() {
 }
 ```
 
-<h1 id="internet">计算机网络</h1>
+<h1 id="internet">☁️ 计算机网络</h1>
 
 ## 输入网址后发生了什么？
 
@@ -617,7 +617,7 @@ session是另一种记录服务器和客户端会话状态的机制。session基
 
 
 
-<h1 id="database">数据库</h1>
+<h1 id="database">💾 数据库</h1>
 
 ## Redis
 
