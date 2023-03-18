@@ -901,6 +901,7 @@ redis缓存和数据库中**没有相关数据**（比如id < 0 的请求），r
 **先更新数据库，再删除缓存**（合适的方案）
 
 ## ⚙️ mysql
+(mysql)[https://github.com/arqady01/mysql-linux]
 
 <h1 id="1">设计模式</h1>
 
