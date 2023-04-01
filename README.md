@@ -200,8 +200,6 @@ int main() {
 
 ## 萃取
 
-利用自动推导来省略写模板类型，但是array2也被推断为int，导致数据丢失，所以需要指定一个模板参数
-
 ```cpp
 #include <iostream>
 template <typename T>
@@ -220,6 +218,8 @@ int main() {
     std::cout << sum(array2, &array2[2]) << std::endl;
 }
 ```
+
+利用自动推导来省略写模板类型，但是array2也被推断为int，导致数据丢失，所以需要指定一个模板参数：
 
 ```cpp
 #include <iostream>
@@ -240,7 +240,7 @@ int main() {
 }
 ```
 
-还是不通用，可利用模板中的萃取
+还是不通用，可利用模板中的萃取：
 
 ```cpp
 #include <iostream>
