@@ -1,6 +1,6 @@
 * [➕ C/C++](#c/c++)
+* [📡 模板元编程](#template)
 * [☁️ 计算机网络](#internet)
-* [🔌 数据结构与算法](#algorithm)
 * [💾 数据库](#database)
 * [📏 设计模式](#1)
 * [&#x1F527; GDB](#2)
@@ -194,6 +194,89 @@ int main() {
 	std::cout << add() << std::endl;
 }
 ```
+
+
+<h1 id="template">📡 模板元编程</h1>
+
+## 萃取
+
+利用自动推导来省略写模板类型，但是array2也被推断为int，导致数据丢失，所以需要指定一个模板参数
+
+```cpp
+#include <iostream>
+template <typename T>
+T sum(const T* begin, const T* end) {
+    T sum{}; //零初始化，如果整型变量就初始化为0，指针型初始化为nullptr，bool型初始化false....
+    while (begin <= end) {
+        sum += *begin;
+        begin++;
+    }
+    return sum;
+}
+int main() {
+    int array1[] = { 30, 40, 50 };
+    char array2[] = "abc"; //97,98,99
+    std::cout << sum(array1, &array1[2]) << std::endl;
+    std::cout << sum(array2, &array2[2]) << std::endl;
+}
+```
+
+```cpp
+#include <iostream>
+template <typename U, typename T>
+U sum(const T* begin, const T* end) {
+    U sum{}; //零初始化，如果整型变量就初始化为0，指针型初始化为nullptr，bool型初始化false....
+    while (begin <= end) {
+        sum += *begin;
+        begin++;
+    }
+    return sum;
+}
+int main() {
+    int array1[] = { 30, 40, 50 };
+    char array2[] = "abc"; //97,98,99
+    std::cout << sum<int>(array1, &array1[2]) << std::endl;
+    std::cout << sum<int>(array2, &array2[2]) << std::endl;
+}
+```
+
+还是不通用，可利用模板中的萃取
+
+```cpp
+#include <iostream>
+//traits模板泛化
+template <typename T>
+struct sumTraits;
+
+//traits模板特化
+template <>
+struct sumTraits<int> {
+    using sumT = int;
+};
+template <>
+struct sumTraits<char> {
+    using sumT = int;
+};
+
+template <typename T>
+auto sum(const T* begin, const T* end) {
+    using my_sumT = typename sumTraits<T>::sumT; //给进来T类型，返回sumT类型
+    my_sumT sum{};
+    while (begin <= end) {
+        sum += *begin;
+        begin++;
+    }
+    return sum;
+}
+int main() {
+    int array1[] = { 30, 40, 50 };
+    char array2[] = "abc"; //97,98,99
+    std::cout << sum(array1, &array1[2]) << std::endl;
+    std::cout << sum(array2, &array2[2]) << std::endl;
+}
+```
+
+
 
 <h1 id="internet">☁️ 计算机网络</h1>
 
@@ -614,7 +697,8 @@ session是另一种记录服务器和客户端会话状态的机制。session基
 * poll：利用链表存储文件描述符，容量不固定，需要轮询来判断是否发生了IO事件
 * epoll：红黑树存储，事件通知（观察者模式）模型，只有发生了IO事件，应用程序才会进行IO操作
 
-<h1 id="algorithm">🔌 数据结构与算法</h1>
+
+
 
 
 <h1 id="database">💾 数据库</h1>
