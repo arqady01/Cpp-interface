@@ -60,8 +60,6 @@ int &ref_a = 5; //左值引用指向右值，编译失败
 
 `const int &ref_a = 5; //编译通过`
 
-事实上，
-
 const左值引用不会修改指向值，因此可以指向右值，这也是为什么要使用`const &`作为函数参数的原因之一，如`std::vector`的`push_back`：
 
 `void push_back (const value_type& val);`
