@@ -19,16 +19,12 @@
     - 没有const reference，因为引用只是别名，不是对象，不能用 const 修饰
 - 修饰成员函数，说明该成员函数内不能修改成员变量
 
-
-## 左值&右值
-
-### 什么是左值、右值
+## 左值 & 右值
 
 不考虑引用以减少干扰：左值可以取地址、位于等号左边；而右值没法取地址，位于等号右边<br>
 左右值的概念很清晰，有地址的变量就是左值，没有地址的字面值、临时值就是右值
 
 `int a = 5;`
-
 
 - a可以通过&取地址，位于等号左边，所以a是左值
 - 5位于等号右边，5没法通过&取地址，所以5是个右值
@@ -45,6 +41,11 @@ A a = A();
 
 - a可以通过&取地址，位于等号左边，所以a是左值
 - A()是个临时值，没法通过&取地址，位于等号右边，所以A()是个右值
+
+右值可分两种：
+
+- 纯右值：非引用返回的临时变量、字面常量、lambda表达式等
+- 将亡值：与右值引用相关的表达式，比如T&&类型函数的返回值、std::move的返回值
 
 ### 左值引用
 
@@ -65,6 +66,8 @@ const左值引用不会修改指向值，因此可以指向右值，这也是为
 `void push_back (const value_type& val);`
 
 如果没有const，`vec.push_back(5)`这样的代码就无法编译通过
+<br>
+另一方面，const 主要为了延长将亡值的生命周期
 
 ### 右值引用
 
@@ -81,14 +84,123 @@ ref_a_right = 6; //右值引用的用途：可以修改右值
 
 ```cpp
 int a = 5; // a是个左值
-int &ref_a_left = a; //左值引用指向左值
-int &&ref_a_right = std::move(a); //通过move将左值转为右值，可以被右值引用指向
-cout << a; //打印结果：5
+int &a_left = a; //左值引用指向左值
+int &&a_right = std::move(a); //通过move将左值转为右值，可以被右值引用指向
+cout << a; //输出：5。why？看上去左值a通过move()移动到了右值a_right中
+//那是不是a就没有值了？并不是，a的值仍然是5
 ```
 
-看上去是左值a通过std::move移动到了右值ref_a_right中，那是不是a里边就没有值了？并不是，打印出a的值仍然是5
+move()是一个非常有迷惑性的函数，往往以为它能把一个变量里的内容移动到另一个变量，但事实上move()移动不了什么，唯一的功能是把左值强制转化为右值，让右值引用可以指向左值。其实现等同于一个类型转换，所以，单纯的move不会有性能提升
 
-move是一个非常有迷惑性的函数，往往以为它能把一个变量里的内容移动到另一个变量，但事实上std::move移动不了什么，唯一的功能是把左值强制转化为右值，让右值引用可以指向左值。其实现等同于一个类型转换，所以，单纯的move不会有性能提升
+### 完美转发 forward
+
+保证右值引用在传递的过程中类型不发生变化，不会变为左值引用
+
+- 当模板类型为左值引用，类型会被推导为左值
+- 当模板类型不是左值引用类型，一律推导为右值
+
+```cpp
+#include <iostream>
+template <typename T>
+void print(T& t) { //A函数，左值引用
+    std::cout << "left_reference：" << t << std::endl;
+}
+//重写print函数
+template <typename T>
+void print(T&& t) { //B函数，右值引用
+    std::cout << "right_reference：" << t << std::endl;
+}
+
+template <typename T>
+void task(T&& v) { //未定义的引用类型，需要根据传参来实时判断
+    print(v); //（1）
+    print(std::move(v)); //（2）
+    print(std::forward<T>(v)); //（3）
+    std::cout << std::endl;
+}
+
+int main() {
+    //task(8); //Ⅰ
+    int num = 1024;
+    //task(num); //Ⅱ
+    //task(std::forward<int>(num)); //Ⅲ
+    //task(std::forward<int&>(num)); //Ⅳ
+    task(std::forward<int&&>(num)); //Ⅴ
+}
+/*
+ Ⅰ：8是个纯右值，进入task函数，未定义的引用类型推导出来为右值引用
+ （1）：右值引用发生传递变为左值引用，进入A函数
+ （2）：右值引用发生传递变成左值引用后，move成右值，右值引用进入B函数
+ （3）：forward<T>的类型是T，是右值，forward将右值传递给B函数
+ 
+ Ⅱ：num可取地址，是左值进入task函数，未定义的引用类型推导出来为左值引用
+ （1）：毫无疑问左值，由A函数执行
+ （2）：左值move为右值，由B函数执行
+ （3）：T为左值类型，forward成左值引用推出去，进入A函数
+ 
+ Ⅲ：std::forward<int>(num)，模板类型是int，forward中不是左值引用，就会被推导成右值
+ （1）：右值引用发生传递，变成左值，进入A函数
+ （2）：右值引用传递变成左值，再move成右值，进入B函数
+ （3）：T是右值类型，完美转发成右值引用，进入B函数
+ 
+ Ⅳ：std::forward<int&>(num)，模板类型是int&，forward中是左值引用就会被推导成左值
+ （1）：左值，进入A函数
+ （2）：左值move成右值，进入B函数
+ （3）：T为左值类型，forward转发成左值引用，进入A函数
+ 
+ Ⅴ：std::forward<int&&>(num)，模板类型是int&&，forward中不是左值引用则被推导成右值
+ （1）：右值引用，发生传递变成左值，进入A函数
+ （2）：右值引用发生传递变成左值，再move成右值，进入B函数
+ （3）：T为右值类型，forward转发为右值引用，进入B函数
+ */
+```
+
+## 二级指针
+
+矩阵举例
+
+```
+#include <iostream>
+class Matrix {
+public:
+    Matrix(int _row, int _col): row(_row), col(_col) {
+        data = new float*[row]; //申请row行，类型匹配：data是二级指针，new需要再配一个指针
+        for (int i = 0; i < row; i++) { //遍历行
+            data[i] = new float[col]; //类型匹配：data[i]是一级指针，直接new出来就是一个一级指针
+            for (int j = 0; j < col; j++) {
+                data[i][j] = 0; //初始化为0
+            }
+        }
+    }
+    Matrix(const Matrix& mx) {
+        row = mx.row;
+        col = mx.col;
+        data = new float*[row]; //类型：二级指针
+        for (int i = 0; i < row; i++) {
+            data[i] = new float[col]; //类型：一级指针
+            for (int j = 0; j < col; j++) {
+                data[i][j] = mx.data[i][j]; //拷贝
+            }
+        }
+    }
+    ~Matrix() {
+        if (nullptr != data) {
+            for (int i = 0; i < row; i++) {
+                if (data[i]) {
+                    delete[] data[i];
+                    data[i] = nullptr; //释放二级指针
+                }
+            }
+            delete[] data;
+            data = nullptr; //释放一级指针
+        }
+    }
+private:
+    int row; //行
+    int col; //列
+    float** data = nullptr; //二维数组
+};
+```
 
 ## 函数指针&指针函数
 
