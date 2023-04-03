@@ -159,7 +159,7 @@ int main() {
 
 矩阵举例
 
-```
+```cpp
 #include <iostream>
 class Matrix {
 public:
