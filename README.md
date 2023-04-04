@@ -402,7 +402,25 @@ int main() {
 }
 ```
 
+## 模板递归
 
+```cpp
+//计算n的累和
+#include <iostream>
+//泛化
+template <size_t n>
+struct plus {
+    static const int val = plus<n - 1>::val + n;
+};
+//特化
+template <>
+struct plus<0> {
+    static const int val = 0;
+};
+int main() {
+    std::cout << plus<100>::val << std::endl; //5050
+}
+```
 
 
 <h1 id="internet">☁️ 计算机网络</h1>
