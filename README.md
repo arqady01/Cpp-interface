@@ -404,6 +404,8 @@ int main() {
 
 ## 模板递归
 
+很类似于递归函数
+
 ```cpp
 //计算n的累和
 #include <iostream>
