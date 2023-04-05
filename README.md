@@ -404,23 +404,23 @@ int main() {
 
 ## 模板递归
 
-很类似于递归函数
+鼠标放在函数实现处可以直接在编译器看到结果
 
 ```cpp
 //计算n的累和
 #include <iostream>
 //泛化
-template <size_t n>
-struct plus {
-    static const int val = plus<n - 1>::val + n;
+template <int n>
+struct sum {
+    static const int val = sum<n - 1>::val + n;
 };
 //特化
 template <>
-struct plus<0> {
-    static const int val = 0;
+struct sum<1> {
+    static const int val = 1;
 };
 int main() {
-    std::cout << plus<100>::val << std::endl; //5050
+    std::cout << sum<100>::val << std::endl;
 }
 ```
 
