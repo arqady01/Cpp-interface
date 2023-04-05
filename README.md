@@ -404,7 +404,7 @@ int main() {
 
 ## 模板递归
 
-鼠标放在函数实现处可以直接在编译器看到结果
+模板元编程的好处之一就是可以直接在编译期执行
 
 ```cpp
 //计算n的累和
@@ -424,6 +424,28 @@ int main() {
 }
 ```
 
+## constexpr
+
+```cpp
+#include <iostream>
+constexpr auto sum(int n) {
+    if (1 == n) {
+        return n;
+    }
+    return n + sum(n - 1);
+}
+int main() {
+    constexpr auto ans = sum(100); //(1)
+    sum(100);
+}
+```
+
+可以在编译期执行就在编译期执行(1)，不能的话就放到运行期执行：
+
+```cpp
+int args = 10;
+auto ans = sum(args);
+```
 
 <h1 id="internet">☁️ 计算机网络</h1>
 
