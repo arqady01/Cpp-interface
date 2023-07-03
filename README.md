@@ -324,28 +324,7 @@ int main() {
 
 ## 固定萃取
 
-给定一个类型，萃取另外一种类型，因为关系固定（模板特化），所以也称固定萃取
-
-```cpp
-#include <iostream>
-template <typename T>
-T sum(const T* begin, const T* end) {
-    T sum{}; //零初始化，如果整型变量就初始化为0，指针型初始化为nullptr，bool型初始化false....
-    while (begin <= end) {
-        sum += *begin;
-        begin++;
-    }
-    return sum;
-}
-int main() {
-    int array1[] = { 30, 40, 50 };
-    char array2[] = "abc"; //97,98,99
-    std::cout << sum(array1, &array1[2]) << std::endl;
-    std::cout << sum(array2, &array2[2]) << std::endl;
-}
-```
-
-利用自动推导来省略写模板类型，但是array2也被推断为int，导致数据丢失，所以需要指定一个模板参数：
+给定一个类型，萃取另外一种类型，因为关系固定（模板特化），所以也称固定萃取。因为array2被推断为int，导致数据丢失，所以需要指定一个模板参数U让其：
 
 ```cpp
 #include <iostream>
@@ -386,7 +365,7 @@ struct sumTraits<char> {
 
 template <typename T>
 auto sum(const T* begin, const T* end) {
-    using my_sumT = typename sumTraits<T>::sumT; //给进来T类型，返回sumT类型
+    using my_sumT = typename sumTraits<T>::sumT;
     my_sumT sum{};
     while (begin <= end) {
         sum += *begin;
@@ -399,6 +378,34 @@ int main() {
     char array2[] = "abc"; //97,98,99
     std::cout << sum(array1, &array1[2]) << std::endl;
     std::cout << sum(array2, &array2[2]) << std::endl;
+}
+```
+
+### 例子2
+
+```
+template<typename T>
+struct GetElem {};
+template<>
+struct GetElem<char> {
+    using type = char;
+};
+template<>
+struct GetElem<int> {
+    using type = int;
+};
+template<>
+struct GetElem<double> {
+    using type = double;
+};
+template<typename T, std::size_t n>
+struct GetElem<T[n]> {
+    using type = T;
+    static constexpr size_t size = n;
+};
+int main() {
+    std::cout << typeid(GetElem<double>::type).name() << std::endl;
+    std::cout << GetElem<int[10]>::size << std::endl;
 }
 ```
 
