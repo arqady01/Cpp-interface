@@ -60,13 +60,11 @@ int &ref_a = 5; //左值引用指向右值，编译失败
 
 `const int &ref_a = 5; //编译通过`
 
-const左值引用不会修改指向值，因此可以指向右值，这也是为什么要使用`const &`作为函数参数的原因之一，如`std::vector`的`push_back`：
+const左值引用不会修改指向值，因此可以指向右值，这也是为什么要使用`const &`作为函数参数的原因之一，比如 vector 中的
 
 `void push_back (const value_type& val);`
 
-如果没有const，`vec.push_back(5)`这样的代码就无法编译通过
-<br>
-另一方面，const 主要为了延长将亡值的生命周期
+如果没有const，`vec.push_back(5)`这样的代码就无法编译通过。另一方面，const 主要为了延长将亡值的生命周期
 
 ### 右值引用
 
