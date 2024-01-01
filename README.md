@@ -37,11 +37,12 @@
 
 ## this指针
 
-this指针隐含于每一个非静态成员函数中，指向调用者，谁调用函数，this就指向它
-当用一个对象调用成员函数时，例如，obj.func()；此时对象地址作为隐藏的this参数传递给函数func，所以成员函数应该视为：`func(ObjType* const this)`
-this 不是常规变量，而是个右值，所以不能取得 this 的地址（不能 &this）
-this 只能在成员函数中使用，全局函数和静态成员函数中无法使用
-友元函数因为不是类成员，所以它没有this指针，自然友元函数也无法使用this指针
+- this指针隐含于每一个非静态成员函数中，指向调用者，谁调用函数，this就指向它
+- 当用一个对象调用成员函数时，例如，obj.func()；此时对象地址作为隐藏的this参数传递给函数func，所以成员函数应该视为：`func(ObjType* const this)`
+- this 不是常规变量，而是个右值，所以不能取得 this 的地址（不能 &this）
+- this 只能在成员函数中使用，全局函数和静态成员函数中无法使用
+- 友元函数因为不是类成员，所以它没有this指针，自然友元函数也无法使用this指针+
+- ***************************************************************************************************
 
 经常需要显式引用 this 指针的场景：
 
@@ -65,7 +66,7 @@ complex& complex::operator+=(const complex& r) {
 //链式使用：c3 += c2 += c1;
 ```
 
-- 为避免对同一对象进行赋值操作，比如深浅拷贝
+- 避免对同一对象进行赋值操作，比如深浅拷贝时判断两个对象是否相同
 
 ```cpp
 struct String {
@@ -83,6 +84,14 @@ String& String::operator=(const String& str) {
 ```
 
 - 在实现一些数据结构时，如 单/双向链表
+
+### 类中非静态成员函数如何寻址
+
+问题描述如图：
+
+
+
+举个例子，在complex的设计中，包含两个非静态成员：实部和虚部，当实例化三个对象后，this指针就派上用场了，如下图所示：
 
 ## inline 内联
 
@@ -409,13 +418,56 @@ int main() {
 
 因为局部变量在函数的栈区中分配内存，当函数执行完毕，栈区内存自动回收，包括其中的局部变量。假如这时返回了局部变量的引用（或者说该局部变量在栈上的地址），该地址指向的内存区域已经被释放了，所以它是一个无效的引用，指向一片未定义的内存，有很大的安全隐患
 
+## new/delete 和 malloc/free
+
+- malloc需要手动计算分配空间大小，new不需要
+- malloc/free需要库文件支持，new/delete不需要
+- new是类型安全的，malloc不是
+- malloc仅分配内存空间，free仅回收空间；new和delete除了分配和释放外，还能调用构造函数和析构函数
+- new底层调用 operator new 分配空间并执行构造函数，而operator new又封装了malloc。delele先运行析构函数，之后运行operator delete
+
 ## 堆 和 栈
 
 ![堆vs栈](https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/hoop.png)
 
-## new/delete 和 malloc/free
+生命周期对比
 
+- 栈
 
+```cpp
+class complex {};
+class Other {
+	complex c1; //c1就是栈对象，其生命周期在作用域结束后自动结束
+};
+```
+
+```cpp
+class complex {};
+int main() {
+	static complex c2; //c2就是静态栈对象，作用域结束后仍然存活，直到整个程序结束
+}
+```
+
+```cpp
+class complex {};
+complex c3; //c3就是全局对象，生命在整个程序结束后才释放
+int main() { }
+```
+
+- 堆
+
+```cpp
+class complex {};
+int main() {
+	complex* p = new complex;
+	......
+	delete p;
+}
+```
+
+p指向的就是堆对象，生命周期在被delete后结束。
+
+如果不delete就会发生内存泄漏，因为当作用域结束，p所指的堆对象仍然存在，但指针p生命周期却结束了，作用域之外再也看不到指针p，也没机会delete p了
 
 ## std::function
 
