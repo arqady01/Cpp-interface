@@ -88,9 +88,11 @@ String& String::operator=(const String& str) {
 
 问题描述如图：
 
-
+![q](https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/howtoloopaddress.png)
 
 举个例子，在complex的设计中，包含两个非静态成员：实部和虚部，当实例化三个对象后，this指针就派上用场了，如下图所示：
+
+![a](https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/takingprogress.png)
 
 ## inline 内联
 
