@@ -409,6 +409,14 @@ int main() {
 
 因为局部变量在函数的栈区中分配内存，当函数执行完毕，栈区内存自动回收，包括其中的局部变量。假如这时返回了局部变量的引用（或者说该局部变量在栈上的地址），该地址指向的内存区域已经被释放了，所以它是一个无效的引用，指向一片未定义的内存，有很大的安全隐患
 
+## 堆 和 栈
+
+![堆vs栈](https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/hoop.png)
+
+## new/delete 和 malloc/free
+
+
+
 ## std::function
 
 函数包装器支持四种类型
