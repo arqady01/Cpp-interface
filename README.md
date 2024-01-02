@@ -94,6 +94,8 @@ String& String::operator=(const String& str) {
 
 ![a](https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/takingprogress.png)
 
+## delete this【未编辑】
+
 ## inline 内联
 
 - 内联发生在编译期，虚函数的多态性在运行期，所有对虚函数的调用都会使inline落空
@@ -178,9 +180,18 @@ mutable 允许在不改变对象状态的情况下修改数据成员。这在一
 
 虚析构函数是为了解决基类的指针指向派生类对象，并用基类的指针删除派生类对象。但是析构函数绝不能是纯虚函数
 
-## delete this
+## RTTI运行时类型信息
 
+typeid
 
+- typeid 运算符允许在运行时确定对象的类型
+- type_id 返回一个 type_info 对象的引用
+- 如果想通过基类的指针获得派生类的数据类型，基类必须带有虚函数
+- 只能获取对象的实际类型
+
+type_info
+
+提供了一种在运行时获取类型信息的方法
 
 ## 左值 & 右值
 
