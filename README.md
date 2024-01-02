@@ -8,12 +8,6 @@
 
 <h1 id="c/c++">➕ C/C++ ☃️</h1>
 
-## 内存泄漏
-
-## 智能指针
-
-[智能指针使用](https://github.com/arqady01/Cpp-interface/blob/main/src/smart%20pointer/smart_pointer.md)
-
 ## const
 
 - 修饰变量，该变量不可被改变，但在定义之初就必须初始化（否则再也没机会赋值）
@@ -539,7 +533,7 @@ ptr = new int; //原来的内存泄漏
 
 如何解决或预防？
 
-- 使用智能指针
+- 使用[智能指针](https://github.com/arqady01/Cpp-interface/blob/main/src/smart%20pointer/smart_pointer.md)
 
 - 可以使用宏和预定义宏来定位内存泄漏。通过定义一个名为DEBUG_NEW的宏，并结合预定义的__FILE__和__LINE__宏，可以跟踪内存泄漏发生的文件和行号，从而帮助定位
 
