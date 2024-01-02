@@ -12,9 +12,9 @@
 
 ## 智能指针
 
-![sp](src/smart pointer/smart_pointer.md)
+[sp](https://github.com/arqady01/Cpp-interface/edit/main/README.md)
 
-![sp](../src/smart pointer/smart_pointer.md)
+![sp](https://github.com/arqady01/Cpp-interface/edit/main/README.md)
 
 ## const
 
