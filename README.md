@@ -14,6 +14,8 @@
 
 [sp](src/smart pointer/smart_pointer.md)
 
+[sp](../src/smart pointer/smart_pointer.md)
+
 ## const
 
 - 修饰变量，该变量不可被改变，但在定义之初就必须初始化（否则再也没机会赋值）
