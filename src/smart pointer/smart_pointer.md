@@ -1,4 +1,4 @@
-`#include <memory>`
+头文件：`#include <memory>`
 
 智能指针的使用方式和普通指针几乎没有区别，无论是指针的使用、判空还是解引用，都一样，但是却比普通指针多了自动释放资源的功能。
 
@@ -100,6 +100,8 @@ int main() {
 
 # shared_ptr
 
+共享型智能指针
+
 ## 创建对象
 
 - 使用make_shared创建，`std::shared_ptr<int> ptr1 = std::make_shared<int>(42);`
@@ -140,6 +142,8 @@ get()方法
 `std::shared_ptr<int> sptr(new int[10], std::default_delete<int[]>());`
 
 # weak_ptr
+
+弱引用智能指针，用来监控共享型智能指针，它不共享指针，也无法操作资源
 
 ## 初始化
 
