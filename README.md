@@ -12,9 +12,9 @@
 
 ## 智能指针
 
-[sp](src/smart pointer/smart_pointer.md)
+![sp](src/smart pointer/smart_pointer.md)
 
-[sp](../src/smart pointer/smart_pointer.md)
+![sp](../src/smart pointer/smart_pointer.md)
 
 ## const
 
