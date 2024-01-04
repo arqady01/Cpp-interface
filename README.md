@@ -158,8 +158,11 @@ mutable 允许在不改变对象状态的情况下修改数据成员。这在一
 ## struct & class
 
 1.访问权限不同，struct默认public属性，class默认private属性
+
 2.struct没有构造函数，更不能用列表初始化；struct只能用函数指针不能定义函数；
+
 3.struct必须定义别名才能使用`typedef struct {} stu;`
+
 4.继承相关
 
 
