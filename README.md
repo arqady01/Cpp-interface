@@ -157,13 +157,13 @@ mutable 允许在不改变对象状态的情况下修改数据成员。这在一
 
 ## struct & class
 
-1.访问权限不同，struct默认public属性，class默认private属性
+以下说的struct都是C语言的结构体，不是C++的！
 
-2.struct没有构造函数，更不能用列表初始化；struct只能用函数指针不能定义函数；
-
-3.struct必须定义别名才能使用`typedef struct {} stu;`
-
-4.继承相关
+- 访问权限不同，struct默认public属性，class默认private属性
+- struct没有构造函数，更不能用列表初始化；struct只能用函数指针不能定义函数；
+- struct必须定义别名才能使用`typedef struct {} stu;`
+- 继承相关
+- 类能够实现类模板
 
 
 ## 面向对象特性
