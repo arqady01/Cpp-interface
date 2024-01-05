@@ -270,7 +270,7 @@ public:
 输入一个整数n，求斐波那契数列的第 n 项
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/21.jpg" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/21.jpg" style="width:40%;">
 </p>
 
 **动态规划**
