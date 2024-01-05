@@ -559,7 +559,7 @@ int minSubArrayLen(int target, vector<int>& nums) {
 如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/sameTree.png" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/sameTree.jpg" style="width:70%;">
 </p>
 
 特殊判断：
