@@ -426,3 +426,30 @@ double Power(double base, int exponent) {
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/27.jpg" style="width:60%;">
 </p>
 
+# 28 删除链表结点
+
+删除单向链表中值为val的节点。假设链表一定存在，且链表中节点值不重复
+
+🎶两种情况：
+case1：
+4->NULL，删除4；直接返回cur的下一个节点，即nullptr
+case2：
+4->8->NULL，删除4；直接返回cur的下一节点，即8
+
+```cpp
+ListNode* deleteNode(ListNode* head, int val) {
+    if (head == nullptr) return nullptr;
+    ListNode* cur = head;
+    ListNode* p = cur->next;
+    if (cur->val == val) return cur->next; //包含两种情况🎶
+    while (p->val != val) {
+        p = p->next;
+        cur = cur->next;
+    } //end_while，此时p指针指向待删除节点
+    cur->next = p->next;
+    p->next = nullptr; //接下来的三步都是让p彻底湮灭
+    delete p;
+    p = nullptr;
+    return head;
+}
+```
