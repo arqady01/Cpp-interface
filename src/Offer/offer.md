@@ -430,10 +430,12 @@ double Power(double base, int exponent) {
 
 删除单向链表中值为val的节点。假设链表一定存在，且链表中节点值不重复
 
-🎶两种情况：
 case1：
+
 4->NULL，删除4；直接返回cur的下一个节点，即nullptr
+
 case2：
+
 4->8->NULL，删除4；直接返回cur的下一节点，即8
 
 ```cpp
@@ -441,7 +443,7 @@ ListNode* deleteNode(ListNode* head, int val) {
     if (head == nullptr) return nullptr;
     ListNode* cur = head;
     ListNode* p = cur->next;
-    if (cur->val == val) return cur->next; //包含两种情况🎶
+    if (cur->val == val) return cur->next; //包含两种情况
     while (p->val != val) {
         p = p->next;
         cur = cur->next;
@@ -451,5 +453,256 @@ ListNode* deleteNode(ListNode* head, int val) {
     delete p;
     p = nullptr;
     return head;
+}
+```
+
+# 32 调整数组顺序使奇数位于偶数前面
+
+输入一个整数数组，调换位置让所有的奇数位于数组的前半部分，偶数位于后半部分
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/32.png" style="width:80%;">
+</p>
+
+```cpp
+void reOrderArray(vector<int> &array) {
+    int left = 0;
+    int right = array.size() - 1;
+    while (left < right) {
+        while (left < right && (array[left] % 2) == 1) {
+            left++;
+        }
+        while (left < right && (array[right] % 2) == 0) {
+            right--;
+        }
+        int temp = array[left];
+        array[left] = array[right];
+        array[right] = temp;
+    }
+}
+```
+
+# LCR006 两数之和
+
+给定一个升序数组numbers和目标数target，请返回数组中和等于target的两个数。
+
+方法1:两次遍历，时间复杂度O(n2)
+
+方法2:哈希表，用空间换时间。但是没用到升序数组这个条件
+
+时间复杂度O(n), 空间复杂度O(n)
+
+方法3:双指针
+
+双指针分别指向一头一尾，如果左右指针之和等于目标数，那么就找到了符合条件的两个数字。
+
+如果左右指针之和小于目标数，我们希望两数之和再大些，由于数组已经排好序，因此可以考虑把左指针向右移动。
+
+同样，当两数的和大于目标数时，可以把右指针向左移动，因为在排序数组中左边的数字要小一些。
+
+时间复杂度O(n)，空间复杂度O(1)
+
+```cpp
+vector<int> twoSum(vector<int>& numbers, int target) {
+    std::vector<int> ans;
+    int left = 0;
+    int right = numbers.size() - 1;
+    while (left <= right) {
+        int sum = numbers[left] + numbers[right];
+        if (sum > target) {
+            right--;
+        } else if (sum < target) {
+            left++;
+        } else if (sum == target) {
+            ans.push_back(left);
+            ans.push_back(right);
+            break;
+        }
+    }
+    return ans;
+}
+```
+
+# LCR008 长度最小的子数组
+
+给定一个全是正数的数组和一个正整数target，找出该数组中满足其和大于等于target的连续子数组，并要求子数组长度最短，并返回其长度。如果不存在符合条件的子数组，返回0
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/LCR008.png" style="width:80%;">
+</p>
+
+如果双指针之间所有数字之和小于k，那么把指针P2向右移动（每向右移动一步就相当于在子数组的右边添加一个新的数字），由于数组中都是正数，因此子数组之和只会变大。
+
+如果双指针之间所有数字之和大于等于k，那么把指针P1向右移动（每向右移动一步，相当于从子数组的最左边删除一个数字），由于数组中都是正数，从子数组中删除一个数就能减小子数组之和。因此一直向右移动指针P1，直到子数组的和小于k为止。
+
+```cpp
+int sum = 0;
+int left = 0;
+int ans = INT_MAX;
+int minSubArrayLen(int target, vector<int>& nums) {
+    for (int right = 0; right < nums.size(); right++) {
+        sum += nums[right];
+        while (left <= right && sum >= target) {
+            //sum超标，但可能超标太大，就需要右移left，一个个排出，直到sum不超标
+            ans = min(ans, right - left + 1);
+            sum -= nums[left++]; //先left，再left++
+        }
+    }
+    return (ans == INT_MAX) ? 0 : ans;
+}
+```
+
+# 相同的树
+
+给你两棵二叉树的根节点 p 和 q ，编写一个函数来检验这两棵树是否相同。
+
+如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/sameTree.png" style="width:70%;">
+</p>
+
+特殊判断：
+
+- 若都是空树那么必然相同；
+- 若两棵树其中只有一棵树为空树那么必不同；
+- 若节点值不同则必不相同
+
+返回值：递归节点的左子节点 && 递归节点的右子节点
+
+```cpp
+bool isSameTree(TreeNode* p, TreeNode* q) {
+    if (p == nullptr && q == nullptr) {
+        return true;
+    }
+    if (p == nullptr || q == nullptr) {
+        return false;
+    }
+    if (p->val != q->val) { //已经判空过了不需要再判了
+        return false;
+    }
+    return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+}
+```
+
+# 37 树的子结构
+
+给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树
+
+```cpp
+class Solution {
+public:
+    //辅助函数
+    bool sameTree(TreeNode* p, TreeNode* q) {
+        if (p == nullptr && q == nullptr) {
+            return true;
+        }
+        if (p == nullptr || q == nullptr) {
+            return false;
+        }
+        if (p->val != q->val) { //已经判空过了不需要再判了
+            return false;
+        }
+        return sameTree(p->left, q->left) && sameTree(p->right, q->right);
+    }
+    //主函数
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        if (root == nullptr || subRoot == nullptr) return false;
+        if (sameTree(root, subRoot)) return true;
+        return isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot);
+    }
+};
+```
+
+# 33 链表中倒数第k个节点
+
+输入一个链表，输出该链表中倒数第k个结点，如果k大于链表长度，则返回NULL
+
+```cpp
+ListNode* findKthToTail(ListNode* pListHead, int k) {
+    ListNode* cur = pListHead; //当前节点指针
+    ListNode* fast = pListHead; //快指针
+    for (int i = 0; i < k; i++) {
+        //若fast指针在拉开步长之时就出界，那么说明k值非法
+        if (fast == nullptr) return nullptr;
+        fast = fast->next; //快满指针拉开k个步长
+    }
+    while (fast != nullptr) {
+        cur = cur->next;
+        fast = fast->next;
+    }
+    return cur;
+}
+```
+
+# 环形链表
+
+判断链表中是否有环
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/circleList.png" style="width:70%;">
+</p>
+
+```cpp
+bool hasCycle(ListNode *head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) {
+            return true;
+        }
+    }
+    return false;
+}
+```
+
+# 34 环形链表的入口结点
+
+给定一个链表的头节点  head ，返回链表开始入环的第一个节点
+
+```cpp
+ListNode* detectCycle(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) {
+            ListNode* s1 = slow; //fast也一样
+            ListNode* s2 = head;
+            while (s1 != s2) {
+                s1 = s1->next;
+                s2 = s2->next;
+            }
+            return s1;
+        }
+    }
+    return nullptr;
+}
+```
+
+# 36 合并两个有序链表
+
+将两个升序链表合并为一个新的 升序 链表并返回
+
+```cpp
+ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+    ListNode* dump = new ListNode(0); //不能是nullptr
+    ListNode* cur = dump;
+    while (list1 != nullptr && list2 != nullptr) {
+        if (list1->val < list2->val) {
+            cur->next = list1;
+            list1 = list1->next;
+        } else {
+            cur->next = list2;
+            list2 = list2->next;
+        }
+        cur = cur->next; //总的一个步骤
+    }
+    //如果还有剩余，直接拉过去
+    cur->next = (list1 == nullptr) ? list2 : list1;
+    return dump->next;
 }
 ```
