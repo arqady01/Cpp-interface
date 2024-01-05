@@ -340,3 +340,89 @@ public:
     }
 };
 ```
+
+# 26 二进制中1的个数
+
+输入一个32位整数，输出该数二进制表示中1的个数
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/26.jpg" style="width:65%;">
+</p>
+
+```cpp
+class Solution {
+public:
+    int NumberOf1(int n) {
+        int ans = 0;
+        while (n != 0) {
+            n = n & (n - 1);
+            ans += 1;
+        }
+        return ans;
+    }
+};
+```
+
+# 只出现一次的数字
+
+给你一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
+异或运算有如下三个性质：
+
+1. 任何数和0做异或运算，结果仍然是原来的数，即 a ⊕ 0 = a
+
+2. 任何数和其自身做异或运算，结果是0，即 a ⊕ a = 0
+
+3. 异或运算满足交换律和结合律，即 a ⊕ b ⊕ a = b ⊕ a ⊕ a = b ⊕ (a ⊕ a) = b ⊕ 0 = b
+
+所以，a1 ⊕ a1 ⊕ a2 ⊕ a2 ⊕ a... ⊕ a... ⊕ an ⊕ an ⊕ ak = ak!
+
+```cpp
+int singleNumber(vector<int>& nums) {
+    int ans = 0;
+    for (int i = 0; i < nums.size(); i++) {
+        ans = ans ^ nums[i];
+    }
+    return ans;
+}
+```
+
+# 27 数值的整数次方
+
+实现Pow(x, y)库函数，求x的y次方，注意要考虑负数的负次方
+
+```cpp
+//正数次幂
+double PW(double base, int exp) {
+    //终止函数
+    if (exp == 0) return 1;
+    if (exp == 1) return base;
+    double ans = PW(base, exp >> 1);
+    ans = ans * ans;
+    if ((exp & 0x1) == 1) { //exp是奇数
+        ans = ans * base;
+    }
+    return ans;
+}
+//主函数
+double Power(double base, int exponent) {
+    if (base == 0 && exponent < 0)
+        return 0;
+    //无论如何都让指数变成无符号整数，因为负次方就是次方的倒数而已
+    int exp = exponent;
+    if (exponent < 0) exp = -exponent;
+    
+    double result = PW(base, exp);
+    if (exponent < 0) { //负数次幂就取倒数
+        result = 1 / result;
+    }
+    return result;
+}
+```
+
+整数的正数次幂的递归流程演示：
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/27.jpg" style="width:80%;">
+</p>
+
