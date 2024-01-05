@@ -220,3 +220,123 @@ public:
     }
 };
 ```
+
+# 19 二叉树的下一个节点
+
+给定一棵二叉树的其中一个节点，请找出中序遍历序列的下一个节点
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/19.png" style="width:100%;">
+</p>
+
+```cpp
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode *father;
+    TreeNode(int x) : val(x), left(NULL), right(NULL), father(NULL) {}
+};
+class Solution {
+public:
+    TreeNode* inorderSuccessor(TreeNode* p) {
+        TreeNode* ans = nullptr;
+        //case1，p有右子树，那么下一个节点就是右子树的最左叶子节点
+        if (p->right != nullptr) {
+            ans = p->right;
+            while (ans->left != nullptr) {
+                ans = ans->left;
+            }
+            return ans;
+        }
+        //case2 + 3，p没有右子树，且p是其父节点的左/右节点
+        if (p->father != nullptr) {
+            TreeNode* pCurrent = p;
+            TreeNode* pParent = p->father;
+            //1️⃣: pParent != nullptr, 2️⃣: pCurrent == pParent->right
+            while (pParent != nullptr && pCurrent == pParent->right) {
+                pCurrent = pParent;
+                pParent = pParent->father;
+            }
+            ans = pParent;
+        }
+        return ans;
+    }
+};
+```
+
+# 21 斐波那契数列
+
+输入一个整数n，求斐波那契数列的第 n 项
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/21.jpg" style="width:70%;">
+</p>
+
+**动态规划**
+
+```cpp
+class Solution {
+public:
+    int Fibonacci(int n) {
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        int dp[n];
+        dp[0] = 0;
+        dp[1] = 1;
+        //i = 0和1，并不在考虑范围内
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i - 2] + dp[i - 1];
+        }
+        return dp[n];
+    }
+};
+```
+
+# 21 田鸡跳台阶问题
+
+
+# 22 旋转数组的最小数字
+
+把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。
+
+输入一个升序的数组的一个旋转，输出旋转数组的最小元素。
+
+前面有提到，数组初始是递增的，总是把前面若干个元素搬到数组的末尾，所以第一个数字总是比最后一个数字要大，所以不会出现
+3 4 5 1 8 
+基于此约束，如果nums[mid]比nums[high]大，那么nums[mid]落在前一个递增子数组，并且最小数字在mid之后，应该让low向右移动，常识说low+1；
+如果nums[mid] < nums[high]，因为nums[low] > nums[high] > nums[mid]，那么nums[mid]落在后一个递增子数组，并且最小数字在mid之前，应该让high向左移动，常识说high = mid
+
+
+```cpp
+class Solution {
+public:
+    int findMin(std::vector<int>& nums) {
+        int left = 0;
+        int right = nums.size() - 1;
+        int mid = (left + right) / 2;
+        //从一开始就是有序数组
+        if(nums[left] < nums[right]){
+            return nums[left];
+        }
+
+        while(left <= right){
+            if(nums[left] < nums[right]){
+                return nums[left]; //终止条件
+            }
+            if(nums[left] < nums[mid]) { //若最左小于mid，则最左到mid是严格递增的，那么最小元素必定在mid之后
+                left = mid + 1;          //不可能出现7 8 9 10 11
+                mid = (left + right) / 2;
+            } else if(nums[left] > nums[mid]){ //第一段和第二段都递增，且第一段的最左元素>第二段最右元素
+                right = mid; //若最左大于mid，则最小元素必定在最左到mid之间，比如 7 8 9 1 2 3 4 5 6
+                left++;
+                mid = (left + right) / 2;
+            }else if(nums[left] == nums[mid]){
+                left++;
+                mid = (left + right) / 2;
+            }
+        }
+        return nums[mid];
+    }
+};
+```
