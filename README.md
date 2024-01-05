@@ -1,5 +1,6 @@
 * [➕ C/C++ ☃️](#c/c++)
 * [📡 模板元编程](#template)
+* [🧭 STL](#STL)
 * [☁️ 计算机网络](#internet)
 * [💾 数据库](#database)
 * [📏 设计模式](#1)
@@ -332,12 +333,6 @@ int &ref_a = 5; //左值引用指向右值，编译失败
 const左值引用不会修改指向值，因此可以指向右值，这也是为什么要使用`const &`作为函数参数的原因之一，比如 vector 中的
 
 `void push_back (const value_type& val);` 如果没有const，`vec.push_back(5)`这样的代码就无法编译通过。另一方面，const 主要为了延长将亡值的生命周期。
-
-#### emplace_back 和 push_back 的区别
-
-假如用push_back给vector插入临时对象（右值）时，首先会调用ctor构造这个临时对象，然后调用copy ctor将临时对象插入vector中，原先的临时变量释放，这太繁琐了。
-
-而emplace_back会在插入时在vector的末尾原地构造，不触发ctor和copy ctor
 
 ### 右值引用
 
@@ -878,6 +873,20 @@ int main() {
 int args = 10;
 auto ans = sum(args);
 ```
+
+<h1 id="STL">🧭 STL</h1>
+
+## emplace_back 和 push_back 的区别
+
+假如用push_back给vector插入临时对象（右值）时，首先会调用ctor构造这个临时对象，然后调用copy ctor将临时对象插入vector中，原先的临时变量释放，这太繁琐了。
+
+而emplace_back会在插入时在vector的末尾原地构造，不触发ctor和copy ctor
+
+## resize 和 reserver 的区别
+
+resize改变容器含有元素的数量，比如：resize(15),原来的大小是10，那么使用resize之后就会增加5个为0的元素
+
+reserver改变容器的最大容量capacity，不会生成元素
 
 <h1 id="internet">☁️ 计算机网络</h1>
 
