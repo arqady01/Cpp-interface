@@ -155,3 +155,68 @@ public:
     }
 };
 ```
+
+# 17 从尾到头打印链表
+
+输入一个链表的头结点，从尾到头反过来打印出每个节点的值。返回的结果用数组存储。
+
+```cpp
+class Solution {
+public:
+    //反转链表函数
+    ListNode* reversal(ListNode* head) {
+        ListNode* prev = nullptr;
+        ListNode* p = head;
+        while (p != nullptr) {
+            ListNode* temp = p->next; //防止断链
+            p->next = prev; //重定向
+            prev = p; //perv往后移动
+            p = temp; //p往后移动
+        }
+        return prev;
+    }
+    //主函数
+    vector<int> printListReversingly(ListNode* head) {
+        std::vector<int> ans;
+        for (ListNode* p = reversal(head); p != nullptr; p = p->next) {
+            ans.emplace_back(p->val);
+        }
+        return ans;
+    }
+};
+```
+
+# 18 重建二叉树
+
+输入一棵二叉树前序遍历和中序遍历的结果，请恢复该二叉树
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/18.png" style="width:70%;">
+</p>
+
+```cpp
+class Solution {
+public:
+    std::map<int,int> m;//其实放入makeTree做参数也可以，但会提升时间复杂度
+    //辅助函数
+    TreeNode* makeTree(std::vector<int> preorder, int l1, int r1, std::vector<int> inorder, int l2, int r2) {
+        if(l1 > r1 || l2 > r2) return nullptr;
+        //从先序遍历中找到最左边的元素，即根节点
+        std::map<int, int>::iterator iter = m.find(preorder[l1]);
+        int i = iter->second; //i是根节点在中序遍历中的下标
+        //开始构造
+        TreeNode* root = new TreeNode(preorder[l1]); //建立根节点
+        root->left = makeTree(preorder, l1 + 1, l1 + (i - l2), inorder, l2, i - 1); //递归
+        root->right = makeTree(preorder, l1 + (i - l2) + 1, r1, inorder, i + 1, r2);//递归
+        return root;
+    }
+    //主函数
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        //通过中序遍历构造出数值和下标的map，比如 [9,3,15,20,7]构建出的map为
+        //{(9,1),(3,2),(15,3),(20,4),(7,5)}
+        for (int i = 0; i < inorder.size(); i++)
+            m.insert(std::make_pair(inorder[i], i));
+        return makeTree(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1);
+    }
+};
+```
