@@ -706,3 +706,82 @@ ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
     return dump->next;
 }
 ```
+
+# 37 判断对称二叉树
+
+请设计一个函数判断一棵二叉树是否沿轴对称
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Question_images/37.png" style="width:60%;">
+</p>
+
+解：
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/37.jpg" style="width:85%;">
+</p>
+
+```cpp
+//BFS
+bool checkSymmetricTree(TreeNode* root) {
+    std::queue<TreeNode*> q;
+    if (root != nullptr) {
+        q.push(root->left);
+        q.push(root->right);
+    }
+    while (!q.empty()) {
+        TreeNode* leftNode = q.front();
+        q.pop();
+        TreeNode* rightNode = q.front();
+        q.pop();
+        //左、右子节点为空，说明对称，直接往后遍历
+        if (leftNode == NULL && rightNode == NULL) continue;
+        if (leftNode == NULL || rightNode == NULL || leftNode->val != rightNode->val) {
+            //leftNode为空 或 rightNode为空 或 两个值不相等
+            return false;
+        }
+        //先进先出，所以需要保证入队时左右俩俩入队
+        q.push(leftNode->left);
+        q.push(rightNode->right);
+        q.push(leftNode->right);
+        q.push(rightNode->left);
+    }
+    return true;
+}
+```
+
+# 38 反转二叉树
+
+给你一棵二叉树的根节点root，翻转这棵二叉树，并返回其根节点，示例：
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Question_images/38.png" style="width:82%;">
+</p>
+
+和上面那题很像
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/38.jpg" style="width:80%;">
+</p>
+
+```cpp
+TreeNode* invertTree(TreeNode* root) {
+    if(root == nullptr)
+        return root;
+    std::queue<TreeNode*> q;
+    q.push(root);
+    while(!q.empty()){
+        int len = q.size();
+        while(len-- > 0){
+            TreeNode* root = q.front();
+            swap(root->left,root->right);
+            q.pop();
+            if(root->left != nullptr)
+                q.push(root->left);
+            if(root->right != nullptr)
+                q.push(root->right);
+        }
+    }
+    return root;
+}
+```
