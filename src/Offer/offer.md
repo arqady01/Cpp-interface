@@ -461,7 +461,7 @@ ListNode* deleteNode(ListNode* head, int val) {
 输入一个整数数组，调换位置让所有的奇数位于数组的前半部分，偶数位于后半部分
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/32.png" style="width:80%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/32.png" style="width:50%;">
 </p>
 
 ```cpp
