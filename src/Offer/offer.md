@@ -423,6 +423,6 @@ double Power(double base, int exponent) {
 整数的正数次幂的递归流程演示：
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/27.jpg" style="width:80%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/27.jpg" style="width:60%;">
 </p>
 
