@@ -173,7 +173,7 @@ TreeNode* convertBST(TreeNode* root) {
 - 函数hasNext：返回二叉搜索树是否还有下一个节点。
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/BSTIterator.png" style="width:80%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/BSTIterator.png" style="width:60%;">
 </p>
 
 ```cpp
