@@ -1542,6 +1542,68 @@ void bfs(TreeNode* root) {
 
 [二叉树题库](https://github.com/arqady01/Cpp-interface/blob/main/src/BinaryTree.md#L150)
 
+## 动态规划
+
+解题步骤
+
+- 确定dp数组及下标的含义
+- 确定递推公式
+- dp数组如何初始化
+- 确定遍历顺序
+- 举例推导dp数组
+
+
+## 单调栈
+
+# 每日温度
+
+数组temperatures表示每天的温度，返回一个数组answer，其中answer[i]是指对于第i天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用0来代替。
+
+输入: temperatures = [35,31,33,36,34]
+
+输出: [3,1,1,0,0]
+
+输入: temperatures = [30,60,90]
+
+输出: [1,1,0]
+
+单调栈思想，寻找右边第一个比自己大的元素
+
+i = 0时，还不清楚后面有没有出现比35℃更高的温度，所以0（35℃）入栈
+
+i = 1时，下标index = top() = 0，31℃比它低，即31℃没有遇到更热的天，1（31℃）入栈
+
+i = 2时，index = top() = 1，对应的31℃遇到了更热的33℃，更新ans为i - index，并让1出栈；继续对比，35℃不需要更新。2（33℃）入栈
+
+i = 3时，index = top() = 2，对应的33℃遇到了更热的36℃，更新ans，让2出栈；对比35℃，更新ans，并让0出栈。最后3（36℃）入栈
+
+i = 4时，4（34℃）入栈
+
+```cpp
+vector<int> dailyTemperatures(vector<int>& temperatures) {
+    std::vector<int> ans(temperatures.size(), 0);
+    //单调栈中记录的是遍历过的元素的下标，所以不管当前遍历元素比栈顶元素大还是小，
+    //栈顶元素都是要入栈的，代表当前元素被遍历过了
+    std::stack<int> s; //栈中不是存放温度，而是下标
+    for (int i = 0; i < temperatures.size(); i++) {
+        //第一次运行时，因为栈为空，top()在&&后并不会报错，同时while跳过先把0入栈
+        //当遍历元素大于栈顶元素，说明栈顶元素找到比自己大的元素了，就可以更新ans并且
+        //弹出栈顶元素，弹出的原因是因为自己找到更大的了，自己没必要再留在单调栈中了
+        while (!s.empty() && temperatures[i] > temperatures[s.top()]) {
+            int index = s.top();
+            //index处的结果找到了，栈中没必要继续保存了，可以弹出
+            s.pop();
+            ans[index] = i - index;
+        }
+        //不管遍历元素比栈顶元素大还是小，都需要入栈
+        //这里包含了另一种情况，当遍历元素比栈顶元素小，说明栈顶元素没找到比自己更大的元素
+        //需要继续往后走，但是当前遍历元素的下标请入栈表示自己被遍历过了
+        s.push(i);
+    }
+    return ans;
+}
+```
+
 <h1 id="database">💾 数据库</h1>
 
 ## 🔩 Redis
