@@ -27,7 +27,7 @@ private:
     vector<vector<int>> result;
     vector<int> path;
     void backtracking(int n, int k, int index) {
-		//终止条件
+        //终止条件
         if (path.size() == k) {
             result.push_back(path);
             return;
