@@ -1308,6 +1308,8 @@ session是另一种记录服务器和客户端会话状态的机制。session基
 * poll：利用链表存储文件描述符，容量不固定，需要轮询来判断是否发生了IO事件
 * epoll：红黑树存储，事件通知（观察者模式）模型，只有发生了IO事件，应用程序才会进行IO操作
 
+
+
 <h1 id="algorithm">🎀 剑指offer</h1>
 
 ## 回溯法backtraveling
@@ -1341,6 +1343,186 @@ void backtracking(参数) {
 ```
 
 [回溯法题库](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/backtravel.md)
+
+## 二叉树
+
+## 先序遍历递归法
+
+```cpp
+void preOrder(TreeNode* root) { 
+    if (root == nullptr) return; //①递归终止条件
+    visit(root); //访问当前节点，自行定义
+    //②单层递归逻辑
+    if (root->left != nullptr)
+        preOrder(root->left);
+    if (root->right != nullptr)
+        preOrder(root->right);
+}
+```
+
+## 先序遍历迭代法
+
+借助栈来实现，孩子节点从右至左依次入栈
+
+```cpp
+void preOrder(TreeNode* root) {
+    if (root == nullptr)
+        return; //空树，直接返回
+    TreeNode* cur = root; //操作节点
+    std::stack<TreeNode*> s;
+    s.push(cur); //头节点入栈
+    while (!s.empty()) {
+        cur = s.top(); //step1.取出栈顶元素
+        visit(cur); //对元素处理，比如打印cur->val
+        s.pop(); //step2.访问完毕抛出栈顶元素
+        //step3.孩子节点从右至左入栈
+        if (cur->right != nullptr) {
+            s.push(cur->right);
+        }
+        if (cur->left != nullptr) {
+            s.push(cur->left);
+        }
+    }
+}
+```
+
+## 中序遍历递归法
+
+```cpp
+void midOrder(TreeNode* root) { 
+    if (root == nullptr) return; //①递归终止条件
+    //②单层递归逻辑
+    if (root->left != nullptr) {
+        preOrder(root->left);
+    }
+    visit(root); //访问当前节点，自行定义
+    if (root->right != nullptr) {
+        preOrder(root->right);
+    }
+}
+```
+
+## 中序遍历迭代法
+
+借助栈，先把左子树入栈，再回退去处理右子节点
+
+```cpp
+void midOrder(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    std::stack<TreeNode*> s;
+    TreeNode* cur = root; //操作节点
+    while (!s.empty() || cur != nullptr) {
+        //左子树不停的入栈
+        if (cur != nullptr) {
+            s.push(cur);
+            cur = cur->left; //走左边
+        } else {
+            cur = s.top(); //cur为空时，就回退到栈顶元素
+            visit(cur); //对元素处理，比如打印cur->val
+            s.pop();
+            cur = cur->right; //走右边，走完之后继续搞左边
+        }
+    }
+}
+```
+
+或者改造一下，这个改造也必须要会
+
+```cpp
+void midOrder(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    std::stack<TreeNode*> s;
+    TreeNode* cur = root; //操作节点
+    while (!s.empty() || cur != nullptr) {
+        //左子树不停的入栈
+        while (cur != nullptr) {
+            s.push(cur);
+            cur = cur->left; //走左边
+        }
+        cur = s.top(); //cur为空时，就回退到栈顶元素
+        visit(cur); //对元素处理，比如打印cur->val
+        s.pop();
+        cur = cur->right; //走右边，走完之后继续搞左边
+    }
+}
+```
+
+需要补充的是，对于二叉搜索树，使用中序遍历会得到一个从小到大的序列，但是如果改变入栈的顺序将会得到一个从大到小的序列：
+
+```cpp
+void midOrder(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    std::stack<TreeNode*> s;
+    TreeNode* cur = root; //操作节点
+    while (!s.empty() || cur != nullptr) {
+        //左子树不停的入栈
+        while (cur != nullptr) {
+            s.push(cur);
+            cur = cur->right; //走右边 //改动一
+        }
+        cur = s.top(); //cur为空时，就回退到栈顶元素
+        visit(cur); //对元素处理，比如打印cur->val
+        s.pop();
+        cur = cur->left; //走左边，走完之后继续搞右边 //改动二
+    }
+}
+```
+
+## 后续遍历递归法
+
+```cpp
+void posOrder(TreeNode* root) { 
+    if (root == nullptr) return; //①递归终止条件
+    //②单层递归逻辑
+    if (root->left != nullptr) {
+        posOrder(root->left);
+    }
+    if (root->right != nullptr) {
+        posOrder(root->right);
+    }
+    visit(root); //访问当前节点，自行定义
+}
+```
+
+## 后续遍历迭代法
+
+借助栈
+
+```cpp
+std::stack<TreeNode*> posOrder(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    TreeNode* cur = root; //操作节点
+    std::stack<TreeNode*> s1;
+    std::stack<TreeNode*> s2; //收集栈
+    s1.push(cur); //首先将根节点入栈
+    while (!s1.empty()) {
+        cur = s1.top(); //取出s1栈顶元素
+        //对比先序遍历，visit动作换成了压入收集栈动作
+        //同时从右至左也换成了从左至右
+        s2.push(cur);
+        s1.pop(); //弹出s1栈顶元素
+        if (cur->left != nullptr) {
+            s1.push(root->left);
+        }
+        if (cur->right != nullptr) {
+            s2.push(root->right);
+        }
+    }
+    return s2; //读出收集栈中数据，就是后序遍历序列
+}
+```
+
+## 广度优先遍历
+
+【未完成】
 
 <h1 id="database">💾 数据库</h1>
 
