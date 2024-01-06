@@ -1310,7 +1310,7 @@ session是另一种记录服务器和客户端会话状态的机制。session基
 
 <h1 id="algorithm">🎀 剑指offer</h1>
 
-![回溯法](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/backtravel.md)
+[## 回溯法](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/backtravel.md)
 
 回溯法一般用于解决以下这五类问题
 
