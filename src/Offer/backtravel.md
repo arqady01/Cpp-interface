@@ -237,9 +237,9 @@ public:
             ans.push_back(path);
             return;
         }
-		//sum + candidates[i] <= target为剪枝操作
+        //sum + candidates[i] <= target为剪枝操作
         for (int i = index; i < candidates.size() && sum + candidates[i] <= target; i++) {
-			//i - 1可能越界，要保证i>0；同时去重发生在树层上
+            //i - 1可能越界，要保证i>0；同时去重发生在树层上
             if (i > 0 && candidates[i] == candidates[i - 1] && used[i - 1] == false) continue;
             sum += candidates[i];
             path.push_back(candidates[i]);
