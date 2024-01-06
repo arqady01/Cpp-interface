@@ -1555,7 +1555,7 @@ void bfs(TreeNode* root) {
 
 ## 单调栈
 
-# 每日温度
+#### 每日温度
 
 数组temperatures表示每天的温度，返回一个数组answer，其中answer[i]是指对于第i天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用0来代替。
 
@@ -1603,6 +1603,50 @@ vector<int> dailyTemperatures(vector<int>& temperatures) {
     return ans;
 }
 ```
+
+#### 42 接雨水
+
+给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Question_images/rainwatertrap.png" style="width:80%;">
+</p>
+
+输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]，输出：6
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/42ans.jpg" style="width:80%;">
+</p>
+
+```cpp
+int trap(vector<int>& height) {
+    stack<int> s;
+    int ans = 0;
+    for (int i = 0; i < height.size(); i++) {
+        while (!s.empty() && height[i] > height[s.top()]) {
+            //栈顶元素的右边第一个比栈顶元素大的就是height[i]
+            int mid = s.top(); //记录下栈顶元素的下标
+            //现在需要在栈顶元素左边，寻找比栈顶元素大的元素
+            s.pop(); //弹出自己后，新的栈顶元素就是要寻找的
+            //防卫式写法
+            if (!s.empty()) {
+                int mid_leftBig = s.top();
+                //mid的左右两边比自己大的中取一个最矮的（但也比自己高）
+                int h = min(height[mid_leftBig], height[i]);
+                h = h - height[mid]; //高度差
+                int w = i - mid_leftBig - 1;
+                ans += h * w;
+            }
+        }
+        s.push(i); //将下标入栈
+    }
+    return ans;
+}
+```
+
+《接雨水》求的是基准数字左、右两边第一个比自己大的元素；《柱状图中最大的矩形》求的是基准数字左右两边第一个比自己小的元素。
+
+记忆方法：《接雨水》：递增栈，递增对应大。递减栈，递减对应小
 
 <h1 id="database">💾 数据库</h1>
 
