@@ -319,6 +319,7 @@ public:
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/78ans.png" style="width:80%;">
 </p>
 
+```cpp
 class Solution {
 public:
     vector<vector<int>> subsets(vector<int>& nums) {
@@ -338,6 +339,7 @@ public:
     std::vector<std::vector<int>> ans;
     std::vector<int> path;
 };
+```
 
 # 90 子集Ⅱ
 
