@@ -219,7 +219,11 @@ public:
 
 > 问：同一树层上的使用过数字需要去重，如何判断同一树层上元素（相同的元素）是否使用过了呢？
 
-答：首先排序后，如果candidates[i] == candidates[i - 1]，就说明和之前的元素相同。当used[i - 1] == true，说明同一树枝下candidates[i - 1]是使用过的，不管向下发展了几层都是如此；因为向上回溯的原因，原本true的位置会被回设为false，当used[i - 1] == false，说明同一层之前的元素candidates[i - 1]被使用过，因为虽然它是0，但是for循环往后走了一次，i - 1 处必然是被用过的
+答：首先排序后，如果candidates[i] == candidates[i - 1]，就说明和之前的元素相同。
+
+当used[i - 1] == true，说明同一树枝下candidates[i - 1]是使用过的，不管向下发展了几层都是如此；因为向上回溯的原因，原本true的位置会被回设为false，
+
+当used[i - 1] == false，说明同一层之前的元素candidates[i - 1]被使用过，因为虽然它是0，但是for循环往后走了一次，i - 1 处必然是被用过的
 
 ```cpp
 class Solution {
@@ -250,6 +254,326 @@ public:
             used[i] = false;
             
         }
+    }
+};
+```
+
+# 131 分割回文串
+
+给你一个字符串s，将s分割成一些子串，使每个子串都是回文串（正反读都一样的字符串）。返回所有的分割方案。
+
+输入：s = "aab"，
+
+输出：[["a","a","b"],["aa","b"]]
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/131ans.png" style="width:80%;">
+</p>
+
+```cpp
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        fx(s, 0);
+        return ans;
+    }
+    void fx(string s, int index) {
+        if (index == s.size()) {
+            ans.push_back(path);
+            return;
+        }
+        for (int i = index; i < s.size(); i++) {
+            if (isPalindrome(s, index, i)) {
+                string str = s.substr(index, i - index + 1);
+                path.push_back(str);
+            } else {
+                continue;
+            }
+            fx(s, i + 1);
+            path.pop_back();
+        }
+    }
+    //判断字符串是否是回文的
+    bool isPalindrome(const string& s, int start, int end) {
+        for (int i = start, j = end; i < j; i++, j--) {
+            if (s[i] != s[j]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    std::vector<std::vector<string>> ans;
+    std::vector<string> path;
+};
+```
+
+# 78 求子集
+
+整数数组nums中，元素互不相同。返回该数组所有可能的子集。
+
+输入：nums = [1,2,3]
+
+输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/78ans.png" style="width:80%;">
+</p>
+
+class Solution {
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        ans.push_back(path); //先加一个空的进去满足题目要求
+        fx(nums, 0);
+        return ans;
+    }
+    void fx(std::vector<int> nums, int index) {
+        if (index >= nums.size()) return;
+        for (int i = index; i < nums.size(); i++) {
+            path.push_back(nums[i]); //处理
+            ans.push_back(path); //每个节点都要纳入结果集
+            fx(nums, i + 1);
+            path.pop_back(); //回溯
+        }
+    }
+    std::vector<std::vector<int>> ans;
+    std::vector<int> path;
+};
+
+# 90 子集Ⅱ
+
+整数数组nums中，元素可以相同。返回该数组所有可能的子集。
+
+输入：nums = [1,2,2]，
+
+输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/90ans.png" style="width:80%;">
+</p>
+
+本题中出现重复元素，而且求取的子集要去重，所以是树层剪枝而非树枝剪枝。
+
+参考之前两道题的解法，融合一下。
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        ans.push_back(path);
+        std::vector<bool> used(nums.size(), false);
+        sort(nums.begin(), nums.end()); //去重需要排序
+        fx(nums, 0, used);
+        return ans;
+    }
+    void fx(std::vector<int> nums, int index, std::vector<bool> used) {
+        if (index >= nums.size()) return;
+        for (int i = index; i < nums.size(); i++) {
+            //used[i - 1] == true，说明同一树枝candidates[i - 1]使用过
+            //used[i - 1] == false，说明同一树层candidates[i - 1]使用过
+            //要对同一树层使用过的元素进行跳过
+            if (i > 0 && nums[i] == nums[i - 1] && used[i - 1] == false) {
+                continue;    
+            }
+            path.push_back(nums[i]);
+            ans.push_back(path);
+            used[i] = true;
+            fx(nums, i + 1, used);
+            path.pop_back();
+            used[i] = false;
+        }
+    }
+    std::vector<std::vector<int>> ans;
+    std::vector<int> path;
+};
+```
+
+# 491 递增子序列
+
+一个整数数组nums，返回所有该数组中不同的递增子序列，递增子序列中至少有两个元素。
+
+输入：nums = [4,7,6,7]
+
+输出：[[4,7],[4,7,7],[4,6],[4,6,7],[7,7],[6,7]]
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> findSubsequences(vector<int>& nums) {
+        fx(nums, 0);
+        return ans;
+    }
+    void fx(std::vector<int> nums, int index) {
+        std::unordered_set<int> us;
+        if (path.size() >= 2) {
+            ans.push_back(path);
+            //不要加return
+        }
+        for (int i = index; i < nums.size(); i++) {
+            //在同一层中，不能重复使用元素，但是又不能像之前排序后在做，所以借助unordered_set
+            //用过的元素加入容器中，如果使用过就会在容器中找到。如果重复使用，直接跳过
+            //如果不满足递增条件也直接跳过，path不为空是为了防止调用back()函数段错误
+            if (!path.empty() && nums[i] < path.back() || us.find(nums[i]) != us.end()) {
+                continue;
+            }
+            path.push_back(nums[i]);
+            us.insert(nums[i]); //标记次元素在树层用过了，本层后面不能再用
+            fx(nums, i + 1);
+            path.pop_back();
+        }
+    }
+    std::vector<std::vector<int>> ans;
+    std::vector<int> path;
+};
+```
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/491ans.jpg" style="width:80%;">
+</p>
+
+# 46 全排列
+
+给定一个不含重复数字的数组nums，返回所有可能的全排列。
+
+输入：nums = [1,2,3]
+
+输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+
+洒洒水啦
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        //代表nums中数字都没有使用过
+        std::vector<bool> used(nums.size(), false);
+        fx(nums, used);
+        return ans;
+    }
+    void fx(std::vector<int>& nums, std::vector<bool>& used) {
+        if (path.size() == nums.size()) {
+            ans.push_back(path);
+            return;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            if (used[i] == true) {
+                //使用过的元素就跳过
+                continue;
+            }
+            path.push_back(nums[i]);
+            used[i] = true;
+            fx(nums, used);
+            path.pop_back();
+            used[i] = false;
+        }
+    }
+    std::vector<std::vector<int>> ans;
+    std::vector<int> path;
+};
+```
+
+# 47 全排列Ⅱ
+
+给定一个可包含重复数字的序列nums，按任意顺序返回所有不重复的全排列
+
+输入：nums = [1,1,2]
+
+输出：[ [1,1,2], [1,2,1], [2,1,1] ]
+
+洒洒水啦
+
+不需要用到index变量，但是要先排序
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        std::vector<bool> used(nums.size(), false);
+        fx(nums, used);
+        return ans;
+    }
+    void fx(std::vector<int>& nums, std::vector<bool>& used) {
+        if (path.size() == nums.size()) {
+            ans.push_back(path);
+            return;
+        }
+        for(int i = 0; i < nums.size(); i++) {
+            //树层去重，树枝也要做判断
+            if (i > 0 && nums[i - 1] == nums[i] && used[i - 1] == false || used[i] == true) {
+                continue;
+            }
+            path.push_back(nums[i]);
+            used[i] = true;
+            fx(nums, used);
+            path.pop_back();
+            used[i] = false;
+        }
+    }
+    std::vector<std::vector<int>> ans;
+    std::vector<int> path;
+};
+```
+
+# 51 N皇后
+
+将n个皇后放置在 n×n 的棋盘上，并且皇后之间不能互相攻击（上下左右斜向攻击）
+
+输入：n = 4
+
+输出：[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/51ans.PNG" style="width:80%;">
+</p>
+
+```cpp
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        std::vector<std::string> path(n, std::string(n, '.'));
+        fx(n, 0, path);
+        return ans;
+    }
+    //row是第几行
+    void fx(int n, int row, std::vector<std::string>& path) {
+        if (n == row) {
+            ans.push_back(path);
+            return;
+        }
+        //col是列的意思，不过还是用i来表示
+        for (int i = 0; i < n; i++) {
+            if (isValid(path, row, i, n) == false) {
+                continue;
+            }
+            path[row][i] = 'Q';
+            fx(n, row + 1, path);
+            path[row][i] = '.';
+        } 
+    }
+    std::vector<std::vector<string>> ans;
+private:
+    //下面的判断我当时没有写出来，尤其注意
+    bool isValid(vector<string>& chessboard, int row, int col,  int n) {
+        // 行不需要检查，看图中的说明
+        // 检查列
+        for (int i = 0; i < row; i++) { // 这是一个剪枝
+            if (chessboard[i][col] == 'Q') {
+                return false;
+            }
+        }
+        // 检查 45度角是否有皇后
+        for (int i = row - 1, j = col - 1; i >=0 && j >= 0; i--, j--) {
+            if (chessboard[i][j] == 'Q') {
+                return false;
+            }
+        }
+        // 检查 135度角是否有皇后
+        for(int i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
+            if (chessboard[i][j] == 'Q') {
+                return false;
+            }
+        }
+        return true;
     }
 };
 ```
