@@ -44,3 +44,41 @@ public: //主函数
     }
 };
 ```
+
+# 216 组合总和 III
+
+找出所有相加之和为 n 的 k 个数的组合。组合中只允许含有 1 - 9 的正整数，并且每种组合中不存在重复的数字。
+
+示例 1: 输入: k = 3, n = 7 输出: [[1,2,4]]
+
+示例 2: 输入: k = 3, n = 9 输出: [[1,2,6], [1,3,5], [2,3,4]]
+
+==插入图片==
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        fx(k, n, 1, 0);
+        return ans;
+    }
+    void fx(int k, int n, int index, int sum) {
+        //终止条件
+        if (sum == n && path.size() == k) {
+            ans.push_back(path);
+            return;
+        }
+        //单层递归的逻辑
+        for (int i = index; i <= 9; i++) {
+            path.push_back(i);
+            sum += i; //sum是已收集元素和，即path的和
+            fx(k, n, i + 1, sum);
+            sum -= i; //回溯；处理过程和回溯过程是对应的，处理加，回溯就要减
+            path.pop_back(); //path也要回退
+        }
+    }
+private:
+    std::vector<std::vector<int>> ans; //存放结果集合
+    std::vector<int> path; //符合条件的结果
+};
+```
