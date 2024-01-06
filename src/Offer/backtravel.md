@@ -4,7 +4,9 @@
 
 示例: 输入: n = 4, k = 2 输出: [ [2,4], [3,4], [2,3], [1,2], [1,3], [1,4], ]
 
-==插入图片==
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/77.jpg" style="width:60%;">
+</p>
 
 引入index的目的是防止出现重复的组合，因为用过的数字就不能再用了，下一层递归要怎么知道从哪里开始就需要靠index。
 
@@ -53,7 +55,9 @@ public: //主函数
 
 示例 2: 输入: k = 3, n = 9 输出: [[1,2,6], [1,3,5], [2,3,4]]
 
-==插入图片==
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/216.jpg" style="width:60%;">
+</p>
 
 ```cpp
 class Solution {
