@@ -630,8 +630,6 @@ ptr = new int; //原来的内存泄漏
 - 数组对象的释放需要用delete[]
 - 借助Valgrind工具来帮助识别内存泄漏
 
-[二叉树专题](https://github.com/arqady01/Cpp-interface/blob/main/src/BinaryTree.md#L150)
-
 ## 内存对齐
 
 内存对齐是指在为结构体的成员分配内存时，确保每个成员相对于结构体起始地址的偏移量是该成员类型大小的整数倍
@@ -1541,6 +1539,8 @@ void bfs(TreeNode* root) {
     }
 }
 ```
+
+[二叉树题库](https://github.com/arqady01/Cpp-interface/blob/main/src/BinaryTree.md#L150)
 
 <h1 id="database">💾 数据库</h1>
 
