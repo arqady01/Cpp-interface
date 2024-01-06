@@ -1522,7 +1522,23 @@ std::stack<TreeNode*> posOrder(TreeNode* root) {
 
 ## 广度优先遍历
 
-【未完成】
+```cpp
+void bfs(TreeNode* root) {
+    if (root == nullptr)
+        return;
+    std::queue<TreeNode*> q;
+    q.push(root);
+    while (!q.empty()) {
+        root = q.front();
+        visit(root->val); //访问
+        q.pop();
+        if (root->left != nullptr)
+            q.push(root->left);
+        if (root->right != nullptr)
+            q.push(root->right);
+    }
+}
+```
 
 <h1 id="database">💾 数据库</h1>
 
