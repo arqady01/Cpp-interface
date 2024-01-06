@@ -56,7 +56,7 @@ public: //主函数
 示例 2: 输入: k = 3, n = 9 输出: [[1,2,6], [1,3,5], [2,3,4]]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/216.jpg" style="width:60%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/216.jpg" style="width:80%;">
 </p>
 
 ```cpp
