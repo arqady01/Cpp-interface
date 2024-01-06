@@ -166,11 +166,15 @@ TreeNode* convertBST(TreeNode* root) {
 
 # 二叉搜索树的迭代器BSTIterator
 
-题目：请实现二叉搜索树的迭代器BSTIterator，它主要有如下3个函数：
+请实现二叉搜索树的迭代器BSTIterator，它主要有如下3个函数：
 
 - 构造函数：输入二叉搜索树的根节点初始化该迭代器。
 - 函数next：返回二叉搜索树中下一个最小的节点的值。
 - 函数hasNext：返回二叉搜索树是否还有下一个节点。
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/BSTIterator.png" style="width:80%;">
+</p>
 
 ```cpp
 class BSTIterator {
