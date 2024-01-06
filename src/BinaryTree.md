@@ -133,7 +133,7 @@ TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
 给定一个二叉搜索树，请将它的每个节点的值替换成树中大于或者等于 该节点值的所有节点的值之和
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/LCR54.png" style="width:80%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/LCR54.png" style="width:60%;">
 </p>
 
 自然想到中序遍历，值从小到大，也就是当遍历到某个节点时，比该节点的值小的节点都已经遍历过，因此也就知道了所有比该节点的值小的所有节点，相加得到sum。可是题目要求把每个节点的值替换成大于或等于该节点的值的所有节点的值之和，而不是小的。因此，可以先遍历一遍求出所有节点值的总和total，再用total减去sum即可。时间复杂度O(n2)。
