@@ -40,7 +40,7 @@ TreeNode* pruneTree(TreeNode* root) {
 
 因此，数字总和 = 495 + 491 + 40 = 1026
 
-==LCR049==
+[==LCR049==](https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/LCR049.png)
 
 每遍历到一个节点时都计算从根节点到当前节点的路径表示的数字。如果这个节点还有子节点，就接着继续遍历它的子节点。
 
