@@ -250,3 +250,180 @@ public:
     }
 };
 ```
+
+# 124 二叉树中的最大路径和
+
+字节、快手、虾皮、蔚来校招题目
+
+给定一个非空二叉树，返回其最大路径和。
+
+本题中，路径被定义为一条从树中任意节点出发，达到任意节点的序列。该路径至少包含一个节点，且不一定经过根节点。
+
+输入：root = [1,2,3]，
+输出：6，
+解释：最优路径是 2 -> 1 -> 3 ，路径和为 2 + 1 + 3 = 6
+
+输入：root = [-10,9,20,null,null,15,7]，
+输出：42，
+解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
+
+```cpp
+class Solution {
+public:
+    int Sum = INT_MIN; //全局变量，记录最大路径和
+    //辅助函数计算任意节点的最大贡献值
+    int maxGain(TreeNode* root) {
+        if (root == nullptr) return 0; //终止条件
+        int leftGain = max(maxGain(root->left), 0);
+        int rightGain = max(maxGain(root->right), 0);
+        //自我更新，万万不可写成int Sum = ....
+        //当前路径和就是当前节点值+左右子树的最大路径和
+        Sum = max(Sum, root->val + leftGain + rightGain);
+        return root->val + max(leftGain, rightGain); //选择走左边还是右边
+    }
+    //主函数
+    int maxPathSum(TreeNode* root) {
+        maxGain(root);
+        return Sum;
+    }
+};
+```
+
+# 二叉树的层序遍历
+
+给你二叉树的根节点 root ，返回其节点值的层序遍历
+
+输入：root = [8,17,21,18,null,null,6]
+
+输出：[8,17,21,18,6]
+
+下面的解法就是模板，bfs的模板，利用此模板可以快速解下面的那两道题
+
+```cpp
+vector<int> decorateRecord(TreeNode* root) {
+    std::vector<int> v;
+    std::queue<TreeNode*> q;
+    if (root != nullptr) q.push(root);
+    while (!q.empty()) {
+        int length = q.size();
+        while (length-- > 0) {
+            TreeNode* temp = q.front();
+            q.pop();
+            v.push_back(temp->val);
+            if (temp->left != nullptr) {
+                q.push(temp->left);
+            }
+            if (temp->right != nullptr) {
+                q.push(temp->right);
+            }
+        }
+    }
+    return v;
+}
+```
+
+# 二叉树的层序遍历I
+
+输入：root = [8,17,21,18,null,null,6]
+
+输出：[[8],[17,21],[18,6]]
+
+```cpp
+vector<vector<int>> decorateRecord(TreeNode* root) {
+    vector<vector<int>> vv;
+    vector<int> stl;
+    std::queue<TreeNode*> q;
+    if (root != nullptr) q.push(root);
+    while (!q.empty()) {
+        int length = q.size();
+        while (length-- > 0) {
+            TreeNode* temp = q.front();
+            q.pop();
+            stl.push_back(temp->val);
+            if (temp->left != nullptr) {
+                q.push(temp->left);
+            }
+            if (temp->right != nullptr) {
+                q.push(temp->right);
+            }
+        }
+        vv.push_back(std::vector<int>(stl.begin(), stl.end()));
+        stl.resize(0); //清空
+    }
+    return vv;
+}
+```
+
+# 二叉树的层序遍历II
+
+锯齿状层序遍历，第一层从左到右，第二层为从右到左，以此类推。
+
+解：
+
+和之前的区别在于多了一个标志位control、vector换成了deque，因为需要用到deque的两端插入特点
+
+```cpp
+vector<vector<int>> decorateRecord(TreeNode* root) {
+    vector<vector<int>> vv;
+    deque<int> stl;
+    std::queue<TreeNode*> q;
+    int control = 0;
+    if (root != nullptr) q.push(root);
+    while (!q.empty()) {
+        int length = q.size();
+        while (length-- > 0) {
+            TreeNode* temp = q.front();
+            q.pop();
+            if (control % 2 == 0) { //偶数
+                stl.push_back(temp->val);
+            }
+            if (control % 2 == 1) { //奇数
+                stl.push_front(temp->val);
+            }
+            if (temp->left != nullptr) {
+                q.push(temp->left);
+            }
+            if (temp->right != nullptr) {
+                q.push(temp->right);
+            }
+        }
+        vv.push_back(std::vector<int>(stl.begin(), stl.end()));
+        control++;
+        stl.resize(0); //清空
+    }
+    return vv;
+}
+```
+
+# 验证二叉搜索树的后序遍历序列
+
+请实现一个函数来判断整数数组 postorder 是否为二叉搜索树的后序遍历结果
+
+```cpp
+class Solution{
+public:
+    bool verifyPostorder(std::vector<int>& postorder){
+        return assist_func(postorder, 0, postorder.size() - 1);
+    }
+    bool assist_func(std::vector<int> array,int left,int right){
+        //若left == right，说明只剩一个节点，无需判断，若left > right，说明没有节点
+        if(left >= right) return true;
+        //数组的最后一个数array[right]就是二叉树的根结点值，从左往右找出第一个比根结点值大的元素
+        //找出来的元素后面的数都是二叉树的右子节点(左闭右开，因为左边要包含当前值，右边要剔除根结点)
+        //找出来的元素前面的数都是二叉树的左子节点
+        int pos = left;
+        int root = array[right]; //根结点值
+        while(array[pos] < root){
+            pos++;//此举是为了找到第一个比根结点值还大的值的坐标,记为pos
+        }
+        //找到了pos后，array[pos]前的值都是比root小的，还需要在确定array[pos]后是否还存在小于root的值
+        //有就说明不是二叉搜索树，没有就继续
+        int temp = pos;
+        while(temp < right){
+            if(array[temp] < root) return false;
+            temp++; //temp++继续往后判断是否还有小于root的值
+        }
+        return assist_func(array,left,pos - 1) && assist_func(array,pos,right - 1);//递归
+    }
+};
+```
