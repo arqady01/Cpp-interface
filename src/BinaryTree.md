@@ -2,12 +2,6 @@
 
 输入一棵二叉树前序遍历和中序遍历的结果，请恢复该二叉树
 
-> 如果某个子树 dfs 结果为负，收益不增反减，所以不应走入，直接返回0（壮士断腕）
-
-> 第三方收益不增
-
-> 收益不增
-
 <p align="center"> 
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/18.png" style="width:70%;">
 </p>
@@ -352,24 +346,37 @@ public:
 输出：42，
 解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
 
+> 如果某个子树 dfs 结果为负，收益不增反减，所以不应走入，直接返回0（壮士断腕）
+
+```cpp
+int leftGain = max(0, dfs(root->left));
+int rightGain = max(0, dfs(root->right));
+```
+
+- 从父节点延伸下来的路径，可以在子树中获取的最大收益。分三种情况
+    - 左右孩子节点都是负数，取自己：root->val
+    - 走左子树，从左子树获取收益：root->val + dfs(root->left)
+    - 走右子树，从右子树获取收益：root->val + dfs(root->right)
+- 从节点走下来的路径，不能走入左子树又掉头走右子树，即不能两头都收益
+
+返回值就是最大收益，即三者取最大的：`return root->val + max(0, dfs(root->left), dfs(root->right));`
+
 ```cpp
 class Solution {
 public:
-    int Sum = INT_MIN; //全局变量，记录最大路径和
-    //辅助函数计算任意节点的最大贡献值
-    int maxGain(TreeNode* root) {
-        if (root == nullptr) return 0; //终止条件
-        int leftGain = max(maxGain(root->left), 0);
-        int rightGain = max(maxGain(root->right), 0);
-        //自我更新，万万不可写成int Sum = ....
-        //当前路径和就是当前节点值+左右子树的最大路径和
-        Sum = max(Sum, root->val + leftGain + rightGain);
-        return root->val + max(leftGain, rightGain); //选择走左边还是右边
+    int sum = INT_MIN; //全局变量，记录最大路径和
+    int maxPathSum(TreeNode* root) { //计算任意节点的最大贡献值
+        dfs(root);
+        return sum;
     }
-    //主函数
-    int maxPathSum(TreeNode* root) {
-        maxGain(root);
-        return Sum;
+    int dfs(TreeNode* root) {
+        if (root == nullptr) return 0;
+        int leftGain = max(0, dfs(root->left));
+        int rightGain = max(0, dfs(root->right));
+        //某子树内部最大收益 = 左子树最大收益 + 根节点值 + 右子树最大收益
+        //自我更新，万万不可写成int Sum = ....
+        sum = max(sum, root->val + leftGain + rightGain);
+        return root->val + max(leftGain, rightGain); //要么走左边要么右边，不能两边都收益
     }
 };
 ```
