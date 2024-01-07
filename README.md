@@ -1319,6 +1319,10 @@ session是另一种记录服务器和客户端会话状态的机制。session基
 
 <h1 id="algorithm">🎀 剑指offer</h1>
 
+## 剑指Offer
+
+[题库](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/offer.md)
+
 ## 回溯法backtraveling
 
 回溯法一般用于解决以下这五类问题
@@ -1333,7 +1337,7 @@ session是另一种记录服务器和客户端会话状态的机制。session基
 
 回溯法都可以抽象为树形结构；集合的大小即树的宽度，递归的深度就是树的深度，递归必须有终止条件，所以此树是一颗高度有限的N叉树。
 
-## 回溯法模板
+#### 回溯法模板
 
 ```cpp
 void backtracking(参数) {
@@ -1351,9 +1355,13 @@ void backtracking(参数) {
 
 [回溯法题库](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/backtravel.md)
 
+## 链表
+
+[链表题库](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/ListNode.md)
+
 ## 二叉树
 
-## 先序遍历递归法
+#### 先序遍历递归法
 
 ```cpp
 void preOrder(TreeNode* root) { 
@@ -1367,7 +1375,7 @@ void preOrder(TreeNode* root) {
 }
 ```
 
-## 先序遍历迭代法
+#### 先序遍历迭代法
 
 借助栈来实现，孩子节点从右至左依次入栈
 
@@ -1393,7 +1401,7 @@ void preOrder(TreeNode* root) {
 }
 ```
 
-## 中序遍历递归法
+#### 中序遍历递归法
 
 ```cpp
 void midOrder(TreeNode* root) { 
@@ -1409,7 +1417,7 @@ void midOrder(TreeNode* root) {
 }
 ```
 
-## 中序遍历迭代法
+#### 中序遍历迭代法
 
 借助栈，先把左子树入栈，再回退去处理右子节点
 
@@ -1481,7 +1489,7 @@ void midOrder(TreeNode* root) {
 }
 ```
 
-## 后续遍历递归法
+#### 后续遍历递归法
 
 ```cpp
 void posOrder(TreeNode* root) { 
@@ -1497,7 +1505,7 @@ void posOrder(TreeNode* root) {
 }
 ```
 
-## 后续遍历迭代法
+#### 后续遍历迭代法
 
 借助栈
 
@@ -1527,7 +1535,7 @@ std::stack<TreeNode*> posOrder(TreeNode* root) {
 }
 ```
 
-## 广度优先遍历
+#### 广度优先遍历
 
 ```cpp
 void bfs(TreeNode* root) {
