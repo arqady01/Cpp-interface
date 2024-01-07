@@ -156,6 +156,115 @@ public:
 };
 ```
 
+# 343 整数拆分
+
+给定一个正整数n，将其拆分为至少两个正整数的和，并返回这些整数的最大化乘积
+
+输入: n = 10
+
+输出: 36；10 = 3 + 3 + 2 + 2，相乘为36
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/343ans.jpg" style="width:80%;">
+</p>
+
+int integerBreak(int n) {
+    //上述的所有分析仅在n∈[3,+∞]有效，[2,3]要单独处理
+    if (n <= 3) {
+        return n - 1;
+    }
+    int shang = n / 3; //n除3的商
+    int yushu = n % 3; //n除3的余数
+    if (yushu == 0) {
+        return pow(3, shang);
+    } else if (yushu == 1) {
+        return pow(3, shang - 1) * 4;
+    } else if (yushu == 2) {
+        return pow(3, shang) * 2;
+    }
+    return 0;
+}
+
+# 值和下标之差都在给定的范围内
+
+给定整数数组nums和两个正数k和t，请判断是否存在两个不同的下标i和j，满足i和j之差的绝对值不大于k，并且两个数值nums[i]和nums[j]的差的绝对值不大于t。
+
+- 解法一：红黑树实现的set容器，时间复杂度O(nlogn)
+
+暴力解法自然不可行，可以借助红黑树实现的set容器 ，我们知道对于每个nums[i]，应该从它前面的k个数字中找出小于等于nums[i]的最大数字，如果这个数字与nums[i]的差的绝对值不大于t，那么就找到了符合条件的两个数字。
+
+否则，再从它前面的k个数字中找出大于等于nums[i]的最小数字，如果这个数字与nums[i]的差的绝对值不大于t，也就找到了。
+
+需要从一个大小为k的容器中找到小于等于某个数字的最大值 或 找到大于等于某个数字的最小值，这正是Set的使用场景
+
+bool containsNearbyAlmostDuplicate(vector<int>& nums, int k, int t) {
+    set<int> rec;
+    for (int i = 0; i < nums.size(); i++) {
+        auto iter = rec.lower_bound(max(nums[i], INT_MIN + t) - t);
+        if (iter != rec.end() && *iter <= min(nums[i], INT_MAX-t) + t) {
+            return true;
+        }
+        rec.insert(nums[i]);
+        if (i >= k) {
+            rec.erase(nums[i-k]);
+        }
+    }
+    return false;
+}
+
+- 解法二：，时间复杂度O(n)
+
+此题关心的是差的绝对值小于等于t的两个数，因此可以将数字放入若干大小为t+1的桶中（假如t为4，那么一个桶内可以放入12、13、14、15、16， t+1=5个数字）。例如，将从0到t的数字放入0号桶中，从t+1到2t+1的数字放入1号桶中，以此类推。这样做的好处是如果同一个
+桶中存在两个数字，那么这两个数的差的绝对值一定小于或等于t。
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/tong.jpg" style="width:80%;">
+</p>
+
+```cpp
+class Solution {
+public:
+    bool containsNearbyAlmostDuplicate(vector<int>& nums, int k, int t) {
+        int Size = t + 1ll;
+        for (int i = 0; i < nums.size(); i++) {
+            long n = nums[i];
+            int id = get_id(n, Size); //数字n应该放入几号桶
+            
+            //因为map的键不允许重复，所以一旦在桶中存在键为id的元素，直接返回true
+            std::map<int, int>::iterator it = m.find(id);
+            if (it != m.end()) { //map中存在key为id的键值对，也就是说桶中存放着数字
+                return true;
+            }
+            //判断map容器中是否存在id+1的键，存在就说明id + 1号桶中存放着数字
+            std::map<int, int>::iterator it2 = m.find(id + 1);
+            if (it2 != m.end() && it2->second - t <= n) {
+                return true;
+            }
+            //判断map容器中是否存在id-1的键，存在就说明id - 1号桶中存放着数字
+            std::map<int, int>::iterator it3 = m.find(id - 1);
+            if (it3 != m.end() && it3->second + t >= n) {
+                return true;
+            }
+
+            m.insert(std::make_pair(id, n));
+            if (i >= k) { //k是约束两个数字的下标差的范围
+                m.erase(get_id(nums[i - k], Size));
+            }
+        }
+        return false;
+    }
+    //数字应该放入哪个编号的桶
+    int get_id(int num, long Size) {
+        if (num >= 0) {
+            return num / Size;
+        } else { //负数
+            return (num + 1ll) / Size - 1;
+        }
+    }
+    std::map<int, int> m;
+};
+```
+
 # 21 斐波那契数列
 
 输入一个整数n，求斐波那契数列的第 n 项
