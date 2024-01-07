@@ -1,3 +1,33 @@
+# 17 从尾到头打印链表
+
+输入一个链表的头结点，从尾到头反过来打印出每个节点的值。返回的结果用数组存储。
+
+```cpp
+class Solution {
+public:
+    //反转链表函数
+    ListNode* reversal(ListNode* head) {
+        ListNode* prev = nullptr;
+        ListNode* p = head;
+        while (p != nullptr) {
+            ListNode* temp = p->next; //防止断链
+            p->next = prev; //重定向
+            prev = p; //perv往后移动
+            p = temp; //p往后移动
+        }
+        return prev;
+    }
+    //主函数
+    vector<int> printListReversingly(ListNode* head) {
+        std::vector<int> ans;
+        for (ListNode* p = reversal(head); p != nullptr; p = p->next) {
+            ans.emplace_back(p->val);
+        }
+        return ans;
+    }
+};
+```
+
 # LCR23 相交链表
 
 给定两个单链表的头节点 headA 和 headB ，请找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。
