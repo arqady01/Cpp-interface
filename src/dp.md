@@ -1139,3 +1139,136 @@ int maxProfit(vector<int>& prices, int fee) {
 	return dp[prices.size() - 1][1];
 }
 ```
+
+## 300 最长递增子序列
+
+给你一个整数数组 nums ，找到其中最长递增子序列的长度
+
+输入：nums = [10,9,2,5,3,7,101,18] 输出：4，最长递增子序列是 [2,3,7,101]，长度为4
+
+int lengthOfLIS(vector<int>& nums) {
+	if(nums.size() == 1) return 1; //防卫式
+	//dp[i]表示下标0~i内，最长递增子序列的长度
+	//比如序列为(0,2,1,3,5)，最长递增子序列为(1,3,5)，dp[4]就是3
+	vector<int> dp(nums.size(), 1);
+	dp[0] = 1;
+	int result = 0;
+	for (int i = 1; i < nums.size(); i++) {
+		//j从0到i全部遍历一遍，取得在i之前的最长递增子序列的长度
+		//比如到i的最长子序列为(1,3,8)，那么到j为止的最长子序列为(1,3)
+		//所以dp[j]只要加一就可以得到dp[i]
+		for (int j = 0; j < i; j++) {
+			if (nums[i] > nums[j]) {
+				dp[i] = max(dp[i], dp[j] + 1);
+			}
+		}
+		//因为dp[i]是到i为止，最长递增子序列的长度
+		//在i的每个阶段，都需要记录最大长度，并不是最后一个才是最大的
+		//所以是取dp[i]里的最大值
+		if (dp[i] > result) result = dp[i];
+	}
+	return result;
+}
+
+# 674 最长连续递增序列
+
+给定一个未经排序的整数数组，找到最长且连续递增的子序列，并返回该序列的长度
+
+dp[i]：以下标i为结尾的连续递增的子序列长度为dp[i]。
+
+如果 nums[i] > nums[i - 1]，那么以i为结尾的连续递增的子序列长度一定等于以i - 1为结尾的连续递增的子序列长度加一。而不像上题那样去比较nums[j]与nums[i]（j是在0到i之间遍历）
+
+```cpp
+int findLengthOfLCIS(vector<int>& nums) {
+	if (nums.size() == 1) return 1;
+	vector<int> dp(nums.size(), 1);
+	int ans = 0;
+	for (int i = 1; i < nums.size(); i++) {
+		if (nums[i] > nums[i - 1]) {
+			dp[i] = dp[i - 1] + 1;
+		}
+		//这里要取dp[i]里的最大值
+		if (dp[i] > ans) ans = dp[i];
+	}
+	return ans;
+}
+```
+
+## 718 最长重复子数组
+
+给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 
+
+输入：nums1 = [1,2,3,2,1], nums2 = [3,2,1,4,7]，输出：3，长度最长的公共子数组是 [3,2,1] 。
+
+第一步：确定dp数组和下标的含义
+
+dp[i][j]：以下标i为结尾的A，和以下标j为结尾的B，最长重复子数组长度为dp[i][j]
+
+第二步：确定递推公式
+
+因为是连续相同的数组，所以dp[i][j]的状态可由dp[i - 1][j - 1]得来，只要nums1[i] == nums2[j]，就说明前一个状态（以下标i-1结尾的A和以下标j-1结尾的B是相同的），只需要加一，就可以推出后一个状态。
+
+打个比方，[1,2,7]和[1,2,7]一定可以由[1,2]和[1,2]推出
+
+第三步：dp数组的初始化
+
+dp[i][0]表示以下标i结尾的数组一和以下标0结尾的数组二最长重复数组长度，比如[1,2,3]和[1]，dp[i][0]就是1，[2,3]和[1]，dp[i][0]就是0
+
+dp[0][j]表示以下标0结尾的数组一和以下标j结尾的数组二最长重复数组长度，比如[1]和[1,2,3]，dp[0][j]就是1，[3]和[1,2]，dp[0][j]就是0
+
+```cpp
+int findLength(vector<int>& nums1, vector<int>& nums2) {
+	vector<vector<int>> dp (nums1.size() + 1, vector<int>(nums2.size() + 1, 0));
+	for (int i = 0; i < nums1.size(); i++) {
+		if (nums1[i] == nums2[0])
+			dp[i][0] = 1;
+	}
+	for (int j = 0; j < nums2.size(); j++) {
+		if (nums1[0] == nums2[j])
+			dp[0][j] = 1;
+	}
+	int result = 0;
+	for (int i = 0; i < nums1.size(); i++) {
+		for (int j = 0; j < nums2.size(); j++) {
+			if (i > 0 && j > 0 && nums1[i] == nums2[j]) {
+				dp[i][j] = dp[i - 1][j - 1] + 1;
+			}
+			if (dp[i][j] > result) result = dp[i][j];
+		}
+	}
+	return result;
+}
+```
+
+## 53 最大子数组和
+
+给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组是数组中的一个连续部分，且最少包含一个元素），返回其最大和。
+
+输入：nums = [-2,1,-3,4,-1,2,1,-5,4]，输出：6，连续子数组 [4,-1,2,1] 的和最大为6 
+
+第一步：确定dp数组和下标的含义
+
+dp[i]表示到下标i为止的最大子数组和
+
+第二步：确定递推公式
+
+假如数组为[1,4,6]，加上8组成[1,4,6,8]，那么dp[i]其实就是dp[i - 1] + 1，dp[i - 1]是什么？是到i - 1为止的最大子数组和
+
+还有一个方向可以得出dp[i]，假如数组为[1,4]，加上数字后组成[1,4,-3,-8,8]，那么求dp，下标i就需要另起炉灶
+
+```cpp
+dp[i] = max(dp[i - 1] + nums[i], nums[i]);
+```
+
+```cpp
+int maxSubArray(vector<int>& nums) {
+	vector<int> dp(nums.size() + 1, 0);
+	dp[0] = nums[0];
+	int ans = dp[0];
+	for (int i = 1; i < nums.size(); i++) {
+		dp[i] = max(dp[i - 1] + nums[i], nums[i]);
+		if (dp[i] > ans) ans = dp[i];
+	}
+	return ans;
+}
+```
