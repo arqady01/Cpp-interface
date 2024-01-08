@@ -1612,7 +1612,7 @@ void bfs(TreeNode* root) {
 - 确定dp数组及下标的含义
 - 确定递推公式
 - dp数组如何初始化
-- 确定遍历顺序
+- 确定遍历顺序（背包问题和排列组合数问题尤其重要）
 - 举例推导dp数组
 
 [动态规划题库](https://github.com/arqady01/Cpp-interface/blob/main/src/dp.md)
