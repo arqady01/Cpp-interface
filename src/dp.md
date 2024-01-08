@@ -812,3 +812,330 @@ int coinChange(std::vector<int>& coins,int amount){
 	return dp[amount];
 }
 ```
+
+# 打家劫舍
+
+你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。给定一个代表每个房屋存放金额的非负整数数组，计算你不触动警报装置的情况下 ，一夜之内能够偷窃到的最高金额。
+
+输入：[2,7,9,3,1]，输出：12 解释：偷1号，偷3号，偷5号，总金额为2+9+1=12
+
+> 第一步：确定dp数组和下标的含义
+
+dp[i]表示到i号房屋为止，所偷盗的最大金额
+
+> 第二步：确定递推公式
+
+因为第i号房屋我有“偷”和“不偷”两种选择；
+
+- 偷第i号，因为相邻房屋不能偷，所以需要计算之前偷到的最大金额加上即将偷到的钱
+
+```cpp
+dp[i] = dp[i - 2] + nums[i]
+```
+
+- 放过第i家，不用管我之前怎么偷的，我只知道到 i - 1 家我偷到的最大金额，为dp[i - 1]
+
+所以递推公式为 `dp[i] = max(dp[i - 1], dp[i - 2] + nums[i]);`
+
+> 第三步：dp数组的初始化
+
+从递推公式看出，公式的基础是dp[0]和dp[1]，dp[0]一定是nums[0]，dp[1]是前两间房的最大值,即dp[1] = max(nums[0] , nums[1]);
+
+> 第四步：确定遍历顺序
+
+从前往后
+
+```cpp
+int rob(vector<int>& nums) {
+	if (nums.size() == 0) {
+		return 0; //没有人可以打劫
+	}
+	if (nums.size() == 1) {
+		return nums[0]; //只有一个人可以打劫
+	}
+	std::vector<int> dp(nums.size() + 1, 0);
+	dp[0] = nums[0]; //初始化
+	dp[1] = max(nums[0], nums[1]); //初始化
+	for (int i = 2; i < nums.size(); i++) {
+		dp[i] = max(dp[i - 1], dp[i - 2] + nums[i]);
+	}
+	return dp[nums.size() - 1];
+}
+```
+
+# 打家劫舍Ⅱ
+
+还是之前的房屋，不过今天加强了安保，把房子首尾相连，那么现在去打劫，在不触发警报的情况下最大的收获多少钱？
+
+因为首尾相连，所以偷了第一家就不能偷最后一家，偷了最后一家就不能偷第一家，或者首尾两家都不偷。
+
+- 情况一：偷第一家放过最后一家（包含了首尾两家都不偷的情况）
+- 情况二：偷最后一家放过第一家
+
+```cpp
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if (nums.size() == 1) return nums[0]; //只有一家就偷他
+        int case1 = rob_aux(nums, 0, nums.size() - 2); //对应情况1
+        int case2 = rob_aux(nums, 1, nums.size() - 1); //对应情况2
+        return case1 > case2 ? case1 : case2;
+    }
+    int rob_aux(vector<int>& nums, int start, int end) {
+        if (start == end) return nums[start]; //说明只有两家
+        std::vector<int> dp(nums.size() + 1, 0);
+        dp[start] = nums[start];
+        dp[start + 1] = max(nums[start], nums[start + 1]);
+        for (int i = start + 2; i < nums.size(); i++) {
+            //偷第i家,最大盗窃金额为dp[i] = dp[i - 2] + nums[i]
+            //不偷第i家,可盗窃最大金额为dp[i] = dp[i - 1]
+            dp[i] = max(dp[i - 1], dp[i - 2] + nums[i]);
+        }
+        return dp[end];
+    }
+};
+```
+
+# 买卖股票的最佳时机Ⅰ
+
+数组prices[i]表示股票第i天的开盘价，你只能选择选择一天买入并在某天卖出，请返回你能获得的最大利润。如果市场不能让你赚钱就返回0。
+
+输入：[7,1,5,3,6,4]，输出：5，第2天（股票价格 = 1）买入，第5天（股票价格 = 6）卖出，最大利润为5，但不能是7-1 = 6
+
+> 第一步：确定dp数组和下标的含义
+
+如果用dp[0]或dp[1]来表示的话，没法获知是第几天，所以用dp[i][]来表示第i天的最大利润
+
+- dp[i][0]表示第i天持有股份的最大现金
+- dp[i][1]表示第i天不持有股份的最大现金
+
+> 第二步：确定递推公式
+
+第i天持有股份的最大利润dp[i][0]可由“前一天为止就持有股票，今天保持现状”和“前一天没有股票，今天买入”两个状态得来
+
+```cpp
+dp[i][0] = max(dp[i - 1][0], 0 - prices[i]);
+```
+
+第i天不持有股票的最大利润dp[i][1]可有“前一天就不持有，今天保持现状”和“前一天有，今天卖出”两个状态得来
+
+```cpp
+dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] + prices[i]);
+```
+
+> 第三步：dp数组的初始化
+
+由递推公式可知，第i天依赖于前一天的状态，一直到第一天，所以需要初始化第一天的两种状态
+
+> 第四步：确定遍历顺序
+
+由递推公式可知，第i天依赖于前一天的状态，所以从后往前
+
+> 第五步：举例推导
+
+略
+
+```cpp
+int maxProfit(vector<int>& prices) {
+	vector<vector<int>> dp(prices.size(), vector<int>(2, 0));
+	dp[0][0] = -prices[0]; //初始化第0天持有股票所得的最多现金
+	dp[0][1] = 0; //第0天不持有股票所得的最多现金，第0天不能卖出
+	for (int i = 1; i < prices.size(); i++) {
+		dp[i][0] = max(dp[i - 1][0], 0 - prices[i]);
+		dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] + prices[i]);
+	}
+	//为什么不是返回dp[len - 1][0]?
+	//因为不持有股票时所得现金 一定比持有股票时所得现金 要多
+	return dp[prices.size() - 1][1];
+}
+```
+
+# 买卖股票的最佳时机Ⅱ
+
+还是之前的题意，不过可以多次买卖，但是手上最多只有一支股票
+
+输入: [7,1,5,3,6,4]，输出: 7，第2天（股票价格 = 1）买入，第3天（股票价格 = 5）卖出，获益4。随后第4天（股票价格 = 3）买入，第5天（股票价格 = 6）卖出，获益3，总收益7。
+
+> 第一步：确定dp数组和下标的含义
+
+- dp[i][0]表示第i天持有股票所得的最多现金
+- dp[i][1]表示第i天不持有股票所得最多现金
+
+> 第二步：确定递推公式
+
+第i天持有股票，状态为dp[i][0]，可以由“前一天持有股票，今天保持现状” 和 “前一天没有股票，今天买入”两种状态得来
+
+前一天没有股票，这个在本题中有两种含义，“前面从来买卖的今天没有股票” 和 “已经完成买卖交易后今天恰好没有”。因为dp数组是所持最多现金，所以dp[][1]是手上不持有股票的最多现金（利润），我不关心有没有买卖过。
+
+```cpp
+dp[i][0] = max(dp[i - 1][0], dp[i - 1][1] - prices[i]);
+```
+
+第i天不持有股票，状态为dp[i][1]，可以由“前一天不持有股票今天保持现状” 和 “前一天持有股票，今天卖出”两种状态得来
+
+```cpp
+dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] + prices[i]);
+```
+
+> 第三步：dp数组的初始化
+
+需要初始化dp[0][0]和dp[0][1]两种状态
+
+```cpp
+int maxProfit(vector<int>& prices) {
+	vector<vector<int>> dp(prices.size(), vector<int>(2, 0));
+	dp[0][0] = -prices[0];
+	dp[0][1] = 0;
+	for (int i = 1; i < prices.size(); i++) {
+		dp[i][0] = max(dp[i - 1][0], dp[i - 1][1] - prices[i]); //唯一的区别
+		dp[i][1] = max(dp[i][1], dp[i][0] + prices[i]);
+	}
+	return dp[prices.size() - 1][1];
+}
+```
+
+# 买卖股票的最佳时机Ⅲ
+
+还是之前的题目，限制股民最多完成两笔交易，同时限制手上最多只能有一只股票
+
+至多买卖两次，这意味着可以买卖一次，可以买卖两次，也可以不买卖。
+
+> 第一步：确定dp数组和下标的含义
+
+每天一共有五种状态：
+
+- 什么都没操作
+- 第一次持有状态
+- 第一次不持有状态
+- 第二次持有状态
+- 第二次不持有状态
+
+dp[i][j](j∈[0,4]) 表示第i天j状态下所持最多现金
+
+> 第二步：确定递推公式
+
+- 要达到dp[][1]状态，有“之前就持有” 和 “之前不持有，今天是第一次买入”两种方法，取最大价值，所以递归公式为：
+
+dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] - prices[1]);
+
+- 要达到dp[][2]状态，有“之前就不持有” 和 “之前持有，今天是第一次卖出”两种方法，所以
+
+dp[i][2] = max(dp[i - 1][2], dp[i - 1][1] + prices[i]);
+
+- 要达到dp[][3]状态，有“之前就持有” 和 “之前不持有，今天是第二次买入”两种方法，所以
+
+dp[i][3] = max(dp[i - 1][3], dp[i - 1][2] - prices[i]);
+
+- 要达到dp[][4]状态，有“之前就不持有” 和 “之前持有，今天是第二次卖出”两种方法，所以
+
+dp[i][4] = max(dp[i - 1][4], dp[i - 1][3] + prices[i]);
+
+> 第三步：dp数组的初始化
+
+- dp[0][0]：第0天什么也没做的状态，所以dp应该为0，即dp[0][0] = 0
+- dp[0][1]：第0天第一次买入的状态，dp[0][1] = -prices[0];
+- dp[0][2]：第0天第一次卖出的状态，相当于买入后卖出，不赚不亏，即dp[0][2] = 0;
+- dp[0][3]：第0天第二次买入的状态，相当于买卖完一轮后又买入了，即dp[0][3] = -prices[0];
+- dp[0][4]：第0天第二次卖出的状态，买卖完两轮了，最大现金为0，即dp[0][4] = 0;
+
+```cpp
+int maxProfit(vector<int>& prices) {
+	std::vector<vector<int>> dp(prices.size(), vector<int>(5, 0));
+	dp[0][0] = 0;
+	dp[0][1] = -prices[0];
+	dp[0][2] = 0;
+	dp[0][3] = -prices[0];
+	dp[0][4] = 0;
+	for (int i = 1; i < prices.size(); i++) {
+		//dp[i][0] = dp[i - 1][0];
+		dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+		dp[i][2] = max(dp[i - 1][2], dp[i - 1][1] + prices[i]);
+		dp[i][3] = max(dp[i - 1][3], dp[i - 1][2] - prices[i]);
+		dp[i][4] = max(dp[i - 1][4], dp[i - 1][3] + prices[i]);
+	}
+	return dp[prices.size() - 1][4];
+}
+```
+
+上面那个递推公式有规律，总结这个规律来看第四题
+
+# 买卖股票的最佳时机Ⅳ
+
+还是第三道题，不过现在只允许股民买卖k轮，但依旧只能最多持有一支股票
+
+```cpp
+int maxProfit(vector<int>& prices) {
+	//k = 2，5 == 2*2+1
+	std::vector<vector<int>> dp(prices.size(), vector<int>(5, 0));
+	//初始化
+	dp[0][0] = 0;
+	dp[0][1] = -prices[0];
+	dp[0][2] = 0;
+	dp[0][3] = -prices[0];
+	dp[0][4] = 0;
+	for (int i = 1; i < prices.size(); i++) {
+		//观察规律
+		dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+		dp[i][2] = max(dp[i - 1][2], dp[i - 1][1] + prices[i]);
+		dp[i][3] = max(dp[i - 1][3], dp[i - 1][2] - prices[i]);
+		dp[i][4] = max(dp[i - 1][4], dp[i - 1][3] + prices[i]);
+	}
+	return dp[prices.size() - 1][4];
+}
+```
+
+总结规律，改写一下
+
+```cpp
+class Solution {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+        //k = 2，5 == 2*2+1
+        //std::vector<vector<int>> dp(prices.size(), vector<int>(5, 0));
+        std::vector<vector<int>> dp(prices.size(), vector<int>(k * 2 + 1, 0));
+        //初始化
+        /*dp[0][0] = 0;
+        dp[0][1] = -prices[0];
+        dp[0][2] = 0;
+        dp[0][3] = -prices[0];
+        dp[0][4] = 0;改写：*/
+        for (int i = 1; i <= k; i++) {
+            dp[0][2 * i] = 0;
+            dp[0][2 * i - 1] = -prices[0];
+        }/*
+        for (int i = 1; i < prices.size(); i++) {
+            //观察规律
+            dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+            dp[i][2] = max(dp[i - 1][2], dp[i - 1][1] + prices[i]);
+            dp[i][3] = max(dp[i - 1][3], dp[i - 1][2] - prices[i]);
+            dp[i][4] = max(dp[i - 1][4], dp[i - 1][3] + prices[i]);
+        }改写：*/
+        for (int i = 1; i < prices.size(); i++) {
+            for (int j = 1; j <= k; j++) {
+                dp[i][2 * j - 1] = max(dp[i - 1][2*j-1], dp[i - 1][2*j-2] - prices[i]);
+                dp[i][2 * j] = max(dp[i - 1][2 * j], dp[i - 1][2*j - 1] + prices[i]);
+            }
+        }
+        return dp[prices.size() - 1][2*k];
+    }
+};
+```
+
+# 买卖股票的最佳时机Ⅶ
+
+根据Ⅱ改编，依旧可以无限次的买卖股票，但手上最多持有一只股，但是每次买卖都要扣除手续费
+
+```cpp
+int maxProfit(vector<int>& prices, int fee) {
+	//[i][0]:第i天持有股票所获的最大现金
+	//[i][1]:第i天不持有所获的最大现金
+	vector<vector<int>> dp(prices.size(), vector<int>(2, 0));
+	dp[0][0] = 0 - prices[0];
+	dp[0][1] = 0;
+	for (int i = 1; i < prices.size(); i++) {
+		dp[i][0] = max(dp[i - 1][0], dp[i - 1][1] - prices[i]);
+		dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] + prices[i] - fee);
+	}
+	return dp[prices.size() - 1][1];
+}
+```
