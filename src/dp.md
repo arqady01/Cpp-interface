@@ -594,7 +594,7 @@ dp[j]其他下标对应的数值应该初始化为0
 class Solution{
 public:
 	int findTargetSumWays(std::vector<int>& nums,int target){
-		int sum = 0;
+        int sum = 0;
 		for(int i = 0;i < nums.size();i++){
 			sum += nums[i];
 		}
