@@ -1615,6 +1615,7 @@ void bfs(TreeNode* root) {
 - 确定遍历顺序
 - 举例推导dp数组
 
+[动态规划题库](https://github.com/arqady01/Cpp-interface/blob/main/src/dp.md)
 
 ## 单调栈
 
