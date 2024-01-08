@@ -89,7 +89,7 @@ dp[i][j]表示机器人从(0,0)移动到(i,j)处有dp[i][j]种不同的走法
 > 第五步：举例推导dp数组
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/62ans.png" style="width:60%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/62ans.png" style="width:60%;">
 </p>
 
 ```cpp
@@ -168,7 +168,7 @@ dp[i]：i个不同元素节点组成的二叉搜索树的个数
 > 第二步：确定递推公式
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/96ans.jpg" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/96ans.jpg" style="width:70%;">
 </p>
 
 注意布局只是位置差异，不关心数值的差异。二叉搜索树为 “左 < 根 < 右”
