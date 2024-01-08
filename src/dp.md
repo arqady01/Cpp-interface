@@ -27,7 +27,7 @@ dp[i] = min(dp[i - 1] + dp[i - 2]) + cost[i]；
 > 第五步：举例推导dp数组
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/746ans.png" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/746ans.png" style="width:70%;">
 </p>
 
 ```cpp
