@@ -717,3 +717,98 @@ int change(int amount, vector<int>& coins) {
     return dp[amount];
 }
 ```
+
+## 377 组合总和Ⅳ
+
+给你一个由不同整数组成的数组nums，和一个目标整数target。请你从nums中找出并返回总和为target的元素组合的个数，元素可以重复选取。
+
+输入：nums = [1, 2, 3] target = 4，输出：7，所有可能的排列为：(1, 1, 1, 1) (1, 1, 2) (1, 2, 1) (1, 3) (2, 1, 1) (2, 2) (3, 1)
+
+> 第一步：确定dp数组和下标的含义
+
+凑成目标和为j有dp[j]种排列个数
+
+> 第二步：确定递推公式
+
+求装满背包有多少种方法的递推公式：`dp[j] += dp[j - nums[i]];`
+
+> 第三步：dp数组的初始化
+
+dp[0]初始化为1，虽然没有意义，但是为了以后的推导不然后续全是0，非0下标的dp[j]初始化为0，这样才不会影响到其他的dp
+
+> 第四步：确定遍历顺序
+
+求组合数，先遍历物品再遍历背包
+
+求排列数，先遍历背包再遍历物品
+
+```cpp
+int combinationSum4(vector<int>& nums, int target) {
+	std::vector<int> dp(target + 1, 0); //初始化为0才不会影响到后面的dp
+	dp[0] = 1; //不初始化为1后续将全部是0
+	for (int j = 0; j <= target; j++) { //遍历背包
+		for (int i = 0; i < nums.size(); i++) { //遍历物品
+			if (j >= nums[i] && dp[j] < INT_MAX - dp[j - nums[i]]) {
+				dp[j] += dp[j - nums[i]]; //求装满背包有几种方法
+			}
+		}
+	}
+	return dp[target];
+}
+```
+
+## 322 零钱兑换
+
+给定不同面额的硬币coins和一个总金额amount。试计算可以凑成总金额所需的最少硬币个数。如果没有方案就返回-1
+
+输入：coins = [1, 2, 5], amount = 11 输出：3，11 = 5 + 5 + 1
+
+分析：用coins凑成总金额amount，相当于往容量为amount的包里装物品，硬币可以重复选取，完全背包问题
+
+> 第一步：确定dp数组和下标的含义
+
+dp[j]表示可以凑成金钱为j的所需最少硬币数
+
+> 第二步：确定递推公式
+
+dp[j - coins[i]]表示凑成j - coins[i]所需的最少硬币数，加上coins[i]个钱，就能凑成j个钱，且方法为dp[j - coins[i]] + 1。
+
+所以dp[j] = dp[j - coins[i]] + 1，因为要去最小的，所以需要min()函数去比较，比如原本是5，新数字是3，那么一对比最小数字为3。所以10001大小就可以了
+
+```cpp
+dp[j] = min(dp[j - coins[i]] + 1, dp[j]);
+```
+
+> 第三步：dp数组的初始化
+
+dp[0]初始化为0而不再是1，因为凑成金额为0的最小方法为0而不是1.
+
+dp其他下标处初始化为INT_MAX，否则会在min(dp[j],dp[j - coin[i]] + 1)的过程中被覆盖，因为是取最小值，假如还是初始化为0，那么min函数肯定会取0啊
+
+第四步：确定遍历顺序
+
+求组合数，先遍历物品再遍历背包
+
+求排列数，先遍历背包再遍历物品
+
+本题求组合数，所以先物品再背包
+
+```cpp
+int coinChange(std::vector<int>& coins,int amount){
+	std::vector<int> dp(amount + 1,INT_MAX); //非0下标初始化为极大值
+	dp[0] = 0;//下标为0初始化为0，因为装满容量为0的背包只有0种方法
+	for(int i = 0;i < coins.size();i++){ //遍历物品
+		//j从coins[i]开始，是为了保证背包一开始就装得下物品
+		for(int j = coins[i];j <= amount;j++){ //遍历背包
+			//若dp[j - coins[i]]是初始值说明凑不成j - coins[i]
+			if(dp[j - coins[i]] != INT_MAX){
+				dp[j] = min(dp[j - coins[i]] + 1,dp[j]);
+			}
+		}
+	}
+	if(dp[amount] == INT_MAX){
+		return -1;
+	}
+	return dp[amount];
+}
+```
