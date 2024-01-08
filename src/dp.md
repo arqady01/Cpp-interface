@@ -316,7 +316,7 @@ for(int j = 0; j <= bagweight; j++) { //遍历背包容量
 | 物品2 | 4    | 30   |
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/bag.png" style="width:50%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/bag.png" style="width:30%;">
 </p>
 
 最终的答案就在dp数组的右下角
