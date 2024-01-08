@@ -630,3 +630,90 @@ public:
 <p align="center"> 
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/summary.jpg" style="width:60%;">
 </p>
+
+# 完全背包
+
+有N件物品和一个最多能背重量为W的背包。第i件物品的重量是weight[i]，得到的价值是value[i]。每件物品都有无限个（也就是可以放入背包多次），求解将哪些物品装入背包里物品价值总和最大？
+
+先来回顾下01背包的一维数组代码：
+
+```cpp
+for(int i = 0; i < weight.size(); i++){ //遍历物品
+	for(int j = bagweight; j >= weight[i]; j--){ //遍历背包容量
+    	dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+    }
+}
+```
+
+01背包内嵌的循环是从大到小，为了保证每个物品仅被添加一次；完全背包的物品是可以添加多次的，所以要从小到大去遍历
+
+```cpp
+for(int i = 0; i < weight.size(); i++){ //遍历物品
+	for(int j = weight[i]; j <= bagweight; j++){ //遍历背包
+    	dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+    }
+}
+```
+
+对于纯完全背包问题，其for循环的先后循环是可以颠倒的！但如果题目稍有变化，就会体现在遍历顺序上。
+
+**如果是求组合数，就是先遍历物品，再遍历背包**
+
+```cpp
+for (int i = 0; i < nums.size(); i++) {
+	//嵌套循环也必须是从小到大，因为物品可以重复使用
+	//不能重复使用，一维dp就是从大到小，比如01背包
+	//j从nums[i]开始，是为了保证背包一开始就能装的下第一个物品
+	for (int j = nums[i]; j <= bagSize; j++) {
+		dp[j] += dp[j - nums[i]];
+	}
+}
+```
+
+**如果是求排列数，就是先遍历背包，再遍历物品**
+
+```cpp
+for (int j = 0; j <= bagSize; j++) {
+	for (int i = 0; i < nums.size(); i++) {
+		if (j >= nums[i] { //如果背包都装不下，自然不必累加次数
+			dp[j] += dp[j - nums[i]];
+		}
+	}
+}
+```
+
+## 518 零钱兑换
+
+给定不同面额的硬币和一个总金额。写出函数来计算可以凑成总金额的硬币组合数。假设每一种面额的硬币有无限个。 
+
+输入: amount = 5, coins = [1, 2, 5] 输出: 4 解释: 四种方式: 5, 2+2+1, 2+1+1+1, 1+1+1+1+1
+
+> 第一步：确定dp数组和下标的含义
+
+凑成总金额j的组合数为dp[j]
+
+> 第二步：确定递推公式
+
+题494讲过，对于求装满背包有多少种方法，递推公式一般为 dp[j] += dp[j - nums[i]]
+
+> 第三步：dp数组的初始化
+
+dp[0]一定要为1，这是递归公式的基础，即凑成总金额为0的组合数为1，下标非0的dp初始为0即可
+
+> 第四步：确定遍历顺序
+
+本题不关心排列顺序，只关心组合数，所以先遍历物品，嵌套遍历背包
+
+```cpp
+int change(int amount, vector<int>& coins) {
+	//dp[j]是凑成总金额j的组合数
+	std::vector<int> dp(amount + 1, 0); //其余的初始化为0即可
+	dp[0] = 1; //开头要初始化为1，比如把0装入背包有1种方法
+	for (int i = 0; i < coins.size(); i++) { //先遍历物品后遍历背包
+		for (int j = coins[i]; j <= amount; j++) { //完全背包内层从左往右遍历
+			dp[j] += dp[j - coins[i]];
+		}
+	}
+	return dp[amount];
+}
+```
