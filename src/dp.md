@@ -706,14 +706,14 @@ dp[0]一定要为1，这是递归公式的基础，即凑成总金额为0的组�
 
 ```cpp
 int change(int amount, vector<int>& coins) {
-	//dp[j]是凑成总金额j的组合数
-	std::vector<int> dp(amount + 1, 0); //其余的初始化为0即可
-	dp[0] = 1; //开头要初始化为1，比如把0装入背包有1种方法
-	for (int i = 0; i < coins.size(); i++) { //先遍历物品后遍历背包
-		for (int j = coins[i]; j <= amount; j++) { //完全背包内层从左往右遍历
-			dp[j] += dp[j - coins[i]];
-		}
-	}
-	return dp[amount];
+    //dp[j]是凑成总金额j的组合数
+    std::vector<int> dp(amount + 1, 0); //其余的初始化为0即可
+    dp[0] = 1; //开头要初始化为1，比如把0装入背包有1种方法
+    for (int i = 0; i < coins.size(); i++) { //先遍历物品后遍历背包
+        for (int j = coins[i]; j <= amount; j++) { //完全背包内层从左往右遍历
+            dp[j] += dp[j - coins[i]];
+        }
+    }
+    return dp[amount];
 }
 ```
