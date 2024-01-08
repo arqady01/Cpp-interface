@@ -300,7 +300,7 @@ for(int j = 0; j <= bagweight; j++) { //遍历背包容量
 从递推公式可以看出，dp[i][j]是靠dp[i-1][j]和dp[i - 1][j - weight[i]]推导而来的，dp[i-1][j]和dp[i-1][j-weight[i]]都在dp[i][j]的左上方，所以先遍历物品再遍历背包的过程如下图所示：
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/01bag.jpg" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/01bag.jpg" style="width:70%;">
 </p>
 
 再来看先遍历背包再物品的流程图，如上图所示。可以看到，虽然两个for循环遍历的次序不同，但是dp[i][j]所需要的数据就是左上角，根本不影响dp[i][j]公式的推导！
@@ -316,7 +316,7 @@ for(int j = 0; j <= bagweight; j++) { //遍历背包容量
 | 物品2 | 4    | 30   |
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/bag.png" style="width:90%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/dp/bag.png" style="width:90%;">
 </p>
 
 最终的答案就在dp数组的右下角
