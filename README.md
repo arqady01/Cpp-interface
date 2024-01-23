@@ -974,9 +974,9 @@ C++ Primer说，为了支持快速的随机访问，vector的元素以连续的�
 
 <h1 id="multithread">🎡 多线程</h1>
 
-[C++多线程](https://github.com/arqady01/Cpp-interface/blob/main/src/smart%20pointer/smart_pointer.md)
+[C++多线程](https://github.com/arqady01/Cpp-interface/blob/main/src/multithread/cpp.md)
 
-[posix多线程](https://github.com/arqady01/Cpp-interface/blob/main/src/smart%20pointer/smart_pointer.md)
+[posix多线程](https://github.com/arqady01/Cpp-interface/blob/main/src/multithread/posix.md)
 
 ## 死锁
 
