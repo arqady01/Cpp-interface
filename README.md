@@ -572,7 +572,8 @@ int max(int a, int b) {
 }
 int main() {
     int (*p)(int, int); //函数指针的定义
-    p = max; //函数指针初始化
+    p = &max; //函数指针初始化
+    //或者直接p = max，因为函数名本身就代表函数的地址
     int ans = p(10, 7); //函数指针的调用
     std::cout << ans << std::endl;
 }
