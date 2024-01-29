@@ -1,0 +1,56 @@
+# 尽可能使用const
+
+#### 修饰指针
+
+- const * p; 被指物是常量，指向可变
+- * const p; 指向固定，被指物可变
+- const * const p; 被指物和指针都是常量
+
+#### 迭代器
+
+```cpp
+std::vector<int> vec;
+const std::vector<int>::iterator iter = vec.begin(); //iter的作用像个T* const
+*iter = 10; //没问题，改变iter所指物
+iter++; //错误。iter是const
+```
+
+```cpp
+std::vector<int>::const_iterator cIter = vec.begin(); //cIter像个const T*
+*cIter = 10; //错误。*cIter是const
+cIter++; //没问题，可以改变cIter指向
+```
+
+#### 函数声明
+
+```cpp
+class matrix { ... };
+const matrix operator*(const matrix& lhs, const matrix& rhs);
+```
+
+假若没有返回一个const对象这个动作，那么 `if (a * b = c)` 也是可以的，但是客户只想做一个比较动作
+
+#### 成员函数
+
+```cpp
+struct Text {
+    std::string str;
+    Text(std::string s) : str(s) {}
+    char operator[](int pos) {
+        std::cout << "non const\n";
+        return str[pos];
+    }
+    char operator[](int pos) const {
+        std::cout << "with const\n";
+        return str[pos];
+    }
+};
+int main() {
+    //调用non-const Text::operator[]
+    Text t("world");
+    std::cout << t[2] << std::endl;
+    //调用const Text::operator[]
+    const Text t("world");
+    std::cout << t[2] << std::endl;
+}
+```
