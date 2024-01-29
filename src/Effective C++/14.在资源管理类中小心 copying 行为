@@ -1,0 +1,34 @@
+```cpp
+std::mutex mtx;
+void bar() {
+	std::lock_guard<std::mutex> lck(mtx);
+	//....
+}
+```
+
+多线程中经常用lock_guard 或者 unique_lock来代替锁的上锁和解锁步骤，背后原理就是在构造函数中调用lock，在析构函数中调用unlock
+
+```cpp
+template <typename _Mutex>
+class lock_guard {
+public:
+	typename _Mutex mutex_type;
+	explicit lock_guard(mutex_type& __m): _M_device(__m) {
+		_M_device.lock();
+	}
+	~lock_guard() {
+		_M_device.unlock();
+	}
+	lock_guard(const lock_guard&) = delete;
+	lock_guard& operator=(const lock_guard&) = delete;
+private:
+	mutex_type& _M_device;
+};
+```
+
+RAII（资源获取立即初始化）对象的拷贝行为：
+
+- 禁止拷贝：std::unique_ptr
+- 管理资源的引用计数：std::shared_ptr，复制或者新增对象的共享指针，引用计数+1，销毁一个就-1
+- 拷贝底层资源，比如 std::string
+- 移交资源管理的所有权：std::unique_ptr 的 std::move() 方法
