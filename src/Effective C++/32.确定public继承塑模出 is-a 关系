@@ -1,0 +1,58 @@
+适用于基类上的每一件事情一定适用于派生类身上，因为每一个派生类对象也都是一个基类对象
+
+```cpp
+class Person { ... };
+class Student : public Person { ... };
+void eat(const Person& p); //任何人都会吃
+void study(const Student& s); //只有学生才能在校学习
+
+Person p; //p是人
+Student s; //s是学生
+eat(p); //没问题，p是人
+eat(s); //没问题，s是学生，学生也是（is-a）人
+study(p); //错误！p不是学生
+study(s); //没问题，s是学生
+```
+
+再看一个例子，企鹅不会飞，所以企鹅不能调用`fly()`函数
+
+```cpp
+class Bird {
+public:
+    virtual void fly() { ... } //birds can fly
+};
+class Penguin : public Bird { ... }; //企鹅是鸟
+```
+
+很显然企鹅可以重写fly函数，让自己能飞，所以需要改造，方案之一就是让企鹅在调用fly的时候抛出异常
+
+```cpp
+void error(const std::string& msg);
+
+class Penguin : public Bird {
+public:
+    virtual void fly() {
+        error("企鹅不能飞！");
+    }
+    ...
+};
+
+Penguin p;
+p.fly(); //error！
+```
+
+但是违反了尽量不要抛出异常的规定，所以将能飞的鸟类从鸟类独立出来，企鹅继承鸟类，其他会飞的鸟继承会飞的鸟类：
+
+```cpp
+class Bird {
+... //fly()在这里不定义
+};
+class FlyBird: public Bird {
+public:
+    virtual void fly(); //fly()在会飞的鸟类中定义
+    ...
+};
+class Penguin: public Bird {
+    ... //企鹅继承自鸟大类，但鸟大类中不含fly()方法
+}
+```
