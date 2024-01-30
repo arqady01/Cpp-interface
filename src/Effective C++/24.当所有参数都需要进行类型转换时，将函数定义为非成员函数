@@ -1,0 +1,32 @@
+```cpp
+class Rational {
+public:
+    const Rational operator*(const Rational& rhs) const {
+        return { this->num * rhs.num, this->denomic * rhs.denomic; }
+    }
+private:
+    int num, denomic; //分子，分母
+};
+int main() {
+    Rational eight(1, 8);
+    Rational two(1, 2);
+    Rational result = eight * two; //fine
+    result = result * eight; //fine
+    result = two * 2; //fine
+    result = 2 * two; //error!
+}
+```
+
+为什么会出错而前一个不会，因为 `result = two * 2;` 相当于 `result = two.operator*(2)`，而另一个相当于`result = 2.operator*(two);`，
+
+而且没有定义`Rational operator*(const Rational& lhs, const Rational& rhs)`这样的函数，兜底函数都没有就自然报错
+
+因为 2 需要被转换成 Rational(2, 0)，所以将成员函数替换成 non-member 函数
+
+```cpp
+const Rational operator*(const Rational& lhs, const Rational& rhs) {
+    return {
+        lhs.num........;
+    }
+}
+```
