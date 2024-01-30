@@ -1,0 +1,32 @@
+```cpp
+class Rational {
+public:
+    const Rational& operator*(const Rational& lhs, const Rational& rhs) {
+        return Rational(lhs.n * rhs.n, lhs.d * rhs.d);
+    }
+    int n, d;
+};
+int main() {
+    Rational a(1, 2); //没问题
+    Rational b(3, 5); //没问题
+    Rational c = a * b; //error，此时c还未被构造出来，更别提引用了
+}
+```
+
+那么改造一下是否可行呢：
+
+```cpp
+const Rational& operator*(const Rational& lhs, const Rational& rhs) {
+    Rational* result = new Rational(lhs.n * rhs.n, lhs.d * rhs.d);
+    return (*result);
+}
+```
+
+可行是可行，但是在堆上开辟内存空间效率慢，且有内存泄漏的风险，考虑极端情况：
+
+```cpp
+Rational x, y, z, w;
+w = x * y * z; //same as operator*(operator*(x, y), z);
+```
+
+但是 operator*(x, y)是一个临时变量，没有做 delete 动作，内存泄漏
