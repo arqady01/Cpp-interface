@@ -1109,7 +1109,7 @@ C++ Primer说，为了支持快速的随机访问，vector的元素以连续的�
 1. 视 C++ 为一个语言联邦（C、Object-Oriented C++、Template C++、STL）
 2. 宁可以编译器替换预处理器
     - 尽量以 `const`、`enum`、`inline` 替换 `#define`
-3. 3. [尽可能使用 const](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/03.%E5%B0%BD%E5%8F%AF%E8%83%BD%E4%BD%BF%E7%94%A8const)
+3. [尽可能使用 const](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/03.%E5%B0%BD%E5%8F%AF%E8%83%BD%E4%BD%BF%E7%94%A8const)
 4. 确定对象被使用前已先被初始化
 5. 了解 C++ 默默编写并调用哪些函数
     - 编译器暗自为类创建ctor、copy ctor、copy assignment、dtor
