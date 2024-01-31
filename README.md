@@ -963,7 +963,9 @@ auto ans = sum(args);
 
 假如用push_back给vector插入临时对象（右值）时，首先会调用ctor构造这个临时对象，然后调用copy ctor将临时对象插入vector中，原先的临时变量释放，这太繁琐了。
 
-而emplace_back会在插入时在vector的末尾原地构造，不触发ctor和copy ctor
+而emplace_back会在插入时在vector的末尾原地构造，无需先创建临时对象然后再复制或移动到容器中
+
+如果正在添加的元素需要通过构造函数创建，并且希望避免额外的复制或移动开销，使用 emplace_back。如果只是简单地添加已存在的对象副本，push_back 和 emplace_back 的性能差异不大
 
 ## resize 和 reserver 的区别
 
