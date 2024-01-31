@@ -1408,7 +1408,7 @@ TCP 基于字节流传输（UDP 基于报文的），“流” 意味着 TCP 所
     - 滑动窗口实现。发送窗口大小由确认报文中的窗口字段控制，从而控制发送方的发送速率
     - ![](https://gitee.com/huihut/interview/raw/master/images/利用可变窗口进行流量控制举例.png)
     - <p align="center"> 
-    	<img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Question_images/rainwatertrap.png" style="width:50%;">
+    	<img src="https://gitee.com/huihut/interview/raw/master/images/利用可变窗口进行流量控制举例.png" style="width:50%;">
       </p>
 * 拥塞控制
     - 慢开始
