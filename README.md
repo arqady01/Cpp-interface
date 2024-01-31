@@ -1406,22 +1406,14 @@ TCP 基于字节流传输（UDP 基于报文的），“流” 意味着 TCP 所
     - 针对个别报文段的丢失
 * 流量控制
     - 滑动窗口实现。发送窗口大小由确认报文中的窗口字段控制，从而控制发送方的发送速率
-    - ![](https://gitee.com/huihut/interview/raw/master/images/利用可变窗口进行流量控制举例.png)
     - <p align="center"> 
-    	<img src="https://gitee.com/huihut/interview/raw/master/images/利用可变窗口进行流量控制举例.png" style="width:50%;">
+    	<img src="https://gitee.com/huihut/interview/raw/master/images/利用可变窗口进行流量控制举例.png" style="width:73%;">
       </p>
-* 拥塞控制
+* 拥塞控制，防止过多的数据注入到网络中，可使网络中的路由器或链路不过载
     - 慢开始
     - 拥塞避免
     - 快重传
     - 快恢复
-
-
-### TCP 拥塞控制
-
-防止过多的数据注入到网络中，可使网络中的路由器或链路不过载
-
-#### 方法
 
 * 慢开始：每次传输，拥塞窗口cwnd扩大一倍。当cwnd等于慢开始门限后，改用拥塞避免算法
 * 拥塞避免：拥塞窗口随传输轮次缓慢加一，若发生超时，cwnd置为1，慢开始门限ssthresh减半，并重新用慢开始算法
