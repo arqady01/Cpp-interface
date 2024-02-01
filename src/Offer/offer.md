@@ -1,3 +1,110 @@
+# 146 LRU 缓存
+
+[LRU (最近最少使用) 缓存](https://leetcode.cn/problems/lru-cache/description/)，实现两个函数
+
+如果关键字 key 存在于缓存中，get(key)则返回关键字的值，否则返回 -1 
+
+如果关键字 key 已经存在，则变更其数据值 value ；如果不存在，则向缓存中插入该组 key-value 。如果插入操作导致关键字数量超过 capacity ，则应该 逐出 最久未使用的关键字。
+
+函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
+
+下面代码有点问题，因为一开始看用例数据，以为key-value是一致的，所以问题出在这儿
+
+为什么有哈希表还要实现一个双向链表呢？因为要控制谁是最少使用的元素，将新插入的元素或者get()后最近使用的元素放到最右边（tail处），保持这个规律，那么最左边就是最少使用元素
+
+```cpp
+struct Node {
+    Node(): val(0), prev(nullptr), next(nullptr) {}
+    Node(int num): val(num), prev(nullptr), next(nullptr) {}
+    int val;
+    Node* prev;
+    Node* next;
+};
+
+struct LRUCache {
+    LRUCache(int _capacity): capacity(_capacity), size(0) {
+        // 使用伪头部和伪尾部节点
+        head = new Node();
+        tail = new Node();
+        head->next = tail;
+        tail->prev = head;
+    }
+
+    int get(int key) {
+        std::unordered_map<int, int>::iterator iter = cache.find(key);
+        if(iter != cache.end()) { //在哈希表中查找key
+            //在链表中为查找值增加热度，输出返回值和链表没有任何关系
+            int find_value = iter->second;
+            heater(head, tail, find_value);
+            return find_value;
+        }
+        return -1;
+    }
+    void put(int key, int value) {
+        std::unordered_map<int, int>::iterator iter = cache.find(key);
+        if (iter != cache.end()) {
+            //待插入元素在哈希表已存在，更新哈希表的值，并在链表中为该值增加热度
+            cache[key] = value;
+            heater(head, tail, iter->second);
+        } else { //待插入元素在哈希表中不存在，就需要先判断链表满没满
+            if (capacity > size) { //没满，直接将哈希表和链表都插入新元素
+                size++; //链表元素加一，或者说哈希表中元素数量加一
+                cache.insert(std::make_pair(key, value));
+                push_back(head, tail, value);
+            } else if (capacity == size) { //满了，就删除最不活跃元素，并添加新元素
+                int num = head->next->val; //找到链表中的最不活跃元素（最左边）
+                cache.erase(num); //将其从哈希表中删除
+                del(head->next); //将其从链表中删除
+                cache.insert(std::make_pair(key, value)); //将新元素插入到哈希表中
+                push_back(head, tail, value); //将新元素插入到链表中
+            }
+            
+        }
+    }
+
+    //为节点p增加热度
+    void heater(Node* left, Node* right, int value) {
+        Node* temp = new Node(value);
+        Node* cur = head;
+        Node* p = nullptr; //操作指针，或者说value对应的指针
+        while (cur->next != nullptr) {
+            if (cur->next->val == value) {
+                p = cur->next;
+                break;
+            }
+            cur = cur->next;
+        }
+        del(p);
+        right->prev->next = temp;
+        temp->prev = right->prev;
+        temp->next = right;
+        right->prev = temp;
+    }
+    //在链表right处，尾插一个节点
+    void push_back(Node* left, Node* right, int num) {
+        Node* temp = new Node(num);
+        right->prev->next = temp;
+        temp->prev = right->prev;
+        temp->next = right;
+        right->prev = temp;
+    }
+    //删除节点p
+    void del(Node* p) {
+        Node* cur = p->prev;
+        cur->next = p->next;
+        p->next->prev = cur;
+        p->next = nullptr;
+        p->prev = nullptr;
+        delete p;
+    }
+    std::unordered_map<int, int> cache;
+    Node* head;
+    Node* tail;
+    int size;
+    int capacity;
+};
+```
+
 # 13 找出数组中重复的数字
 
 在一个长度为n的数组nums里的所有数字都在 0 ~ n - 1 的范围内。数组中某些数字是重复的，但不知道有几个数字重复了，也不知道每个数字重复了几次。请找出数组中任意一个重复的数字。
