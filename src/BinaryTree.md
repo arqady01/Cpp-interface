@@ -187,6 +187,36 @@ TreeNode* increasingBST(TreeNode* root) {
 
 展平之后的二叉搜索树的根节点是值最小的节点，因此也是中序遍历第一个被遍历到的节点。变量first就是第一个被遍历到的节点，在展平之后就是二叉搜索树的根节点，因此将它作为函数的返回值
 
+# 230 二叉搜索树中第K小的元素
+
+给定一个二叉搜索树的根节点 root ，和一个整数 k ，请你设计一个算法查找其中第 k 个最小元素（从 1 开始计数）
+
+输入：root = [5,3,6,2,4,null,null,1] k = 3，输出：3
+
+[230wt](https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/230wt.jpg)
+
+二叉搜索树的中序遍历刚好是从小到大的序列，采用中序遍历的模板
+
+补充一点，如果将压栈的左右顺序调换一下，就会得到一个从大到小的序列
+
+```cpp
+int kthSmallest(TreeNode* root, int k) {
+    std::stack<TreeNode*> s;
+    while (root != nullptr || !s.empty()) {
+        while (root != nullptr) {
+            s.push(root);
+            root = root->left;
+        }
+        root = s.top();
+        s.pop();
+        k--;
+        if (k == 0) return root->val;
+        root = root->right;
+    }
+    return 0;
+}
+```
+
 # 二叉搜索树的下一个节点
 
 给定一棵二叉搜索树和它的一个节点p，请找出比p的值更大的下一个节点。假设二叉搜索树中节点的值都是唯一的
