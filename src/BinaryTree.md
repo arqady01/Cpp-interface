@@ -194,7 +194,7 @@ TreeNode* increasingBST(TreeNode* root) {
 输入：root = [5,3,6,2,4,null,null,1] k = 3，输出：3
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/230wt.jpg" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/BinaryTree/230wt.jpg" style="width:30%;">
 </p>
 
 二叉搜索树的中序遍历刚好是从小到大的序列，采用中序遍历的模板
