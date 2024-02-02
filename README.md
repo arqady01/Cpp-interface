@@ -630,11 +630,18 @@ int main() {
 ## new/delete 和 malloc/free
 
 - malloc需要手动计算分配空间大小，new不需要
-- malloc/free需要库文件支持，new/delete不需要
+- malloc/free是库函数，不支持重载；new/delete是操作符，支持运算符重载
 - new是类型安全的，malloc不是
+- new分配成功返回类型指针，不需要转换；malloc分配成功返回void*，需要强制类型转换
 - new分配内存失败会抛bac_alloc异常，malloc分配失败返回nullptr
 - malloc仅分配内存空间，free仅回收空间；new和delete除了分配和释放外，还能调用构造函数和析构函数
 - new底层调用 operator new 分配空间并执行构造函数，而operator new又封装了malloc。delele先运行析构函数，之后运行operator delete
+
+### free函数只接收一个内存地址，它是如何知道要分配多大内存？
+
+malloc返回的起始地址比空间地址多了16字节，这16字节保存了内存块描述信息，其中就包括了内存块大小
+
+执行free时，free将传入的地址向左偏移16字节，进而分析出内存块大小，就知道要释放多大的内存了
 
 ## 堆 和 栈
 
