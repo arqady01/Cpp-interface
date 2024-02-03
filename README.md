@@ -1041,6 +1041,30 @@ unordered_multimap|哈希表|O(1)、若哈希碰撞退化为(n)|同前|无序|�
 
 ## vector
 
+成员方法|解释
+---|---
+operator=|将新内容拷贝给容器，并修改容器大小，但capacity()不会缩小
+swap|交换容器的内容，注意swap不接受临时对象（右值），但是可以用临时对象去调用swap
+begin|返回容器中第一个元素的迭代器
+end|返回容器中最后一个元素的后一位的迭代器
+size|返回容器中元素的数量
+capacity|返回容器的容量
+empty|判断vector是否为空
+resize|改变容器元素的数量
+reserve|改变容器的最大容量
+shrink_to_fit()|尝试减少内存的浪费，通过减少容器容量以匹配元素个数
+operator[]|返回容器中第n个位置的元素，注意不是返回一个迭代器
+at()|作用和operator[]相同，但是at提供边界检查，operator[]不提供
+front()|返回容器中第一个元素
+back()|返回容器中最后一个元素
+push_back|构造一个临时对象并调用拷贝构造函数将其尾插到容器中
+emplace_back|在容器尾部原地构造
+pop_back|删除容器中的最后一个元素
+insert(pos, vals)|在pos处插入一个或多个对象，原先pos处这里的迭代器及之后所有的迭代器都会失效
+erase|从删除单个元素（`pos`）或一系列元素（`[first，last)`）
+clear|删除所有元素，元素个数会变为0，但容量不会变
+emplace(pos, vals)|在pos处插入一个或多个对象
+
 ### emplace_back 和 push_back 的区别
 
 假如用push_back给vector插入临时对象（右值）时，首先会调用ctor构造这个临时对象，然后调用copy ctor将临时对象插入vector中，原先的临时变量释放，这太繁琐了。
@@ -1048,6 +1072,12 @@ unordered_multimap|哈希表|O(1)、若哈希碰撞退化为(n)|同前|无序|�
 而emplace_back会在插入时在vector的末尾原地构造，无需先创建临时对象然后再复制或移动到容器中
 
 如果正在添加的元素需要通过构造函数创建，并且希望避免额外的复制或移动开销，使用 emplace_back。如果只是简单地添加已存在的对象副本，push_back 和 emplace_back 的性能差异不大
+
+### insert 和 emplace 的区别
+
+insert在vector中指定位置插入一个或多个元素，通过拷贝或者移动已经存在的对象来插入元素
+
+emplace在指定位置直接构造元素，不需要创建临时对象，避免了额外的拷贝或移动操作
 
 ### resize 和 reserver 的区别
 
