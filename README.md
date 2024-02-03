@@ -32,10 +32,10 @@ multimap|红黑树|O(logn)|O(logn)|有序|可重复|||
 
 容器 | 内部数据结构 | 查找的O(n) | 增删的O(n) | 有序情况 | 能否重复
 ---|---|---|---|---|---
-unordered_set|哈希表|O(1)、若哈希碰撞退化为)(n)|O(1)、最差O(n)|无序|不可重复|
-unordered_multiset|哈希表|O(1)、最差O(n)|O(1)、最差O(n)|无序|可重复|
-unordered_map|哈希表|O(1)、最差O(n)|O(1)、最差 O(n)|无序|不可重复|
-unordered_multimap|哈希表|O(1)、最差O(n)|O(1)、最差O(n)|无序|可重复|
+unordered_set|哈希表|O(1)、若哈希碰撞退化为)(n)|同前|无序|不可重复|
+unordered_multiset|哈希表|O(1)、若哈希碰撞退化为)(n)|同前|无序|可重复|
+unordered_map|哈希表|O(1)、若哈希碰撞退化为)(n)|同前|无序|不可重复|
+unordered_multimap|哈希表|O(1)、若哈希碰撞退化为)(n)|同前|无序|可重复|
 
 <h1 id="c/c++">➕ C/C++ ☃️</h1>
 
