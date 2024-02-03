@@ -1124,6 +1124,66 @@ C++ Primer说，为了支持快速的随机访问，vector的元素以连续的�
 
 因为vector中有三个指针， begin、end和end_of_storage，用一个临时变量`vector<int>()`调用swap去和v交换，指针交换了个，自然被清空
 
+## deque
+
+成员方法|解释
+---|---
+push_back|在容器的末尾添加一个元素
+push_front|在容器的开头添加一个元素
+pop_back|删除容器的最后一个元素
+pop_front|删除容器的第一个元素
+emplace_front|容器的开头插入一个新元素
+emplace_back|容器的末尾插入一个新元素
+
+## list
+
+list，双向链表，是序列容器，允许在序列中的任何地方进行常数时间插入和擦除操作，并在两个方向上进行迭代。
+
+## stack
+
+stack 是一种容器适配器，用于在LIFO（后进先出）的操作，其中元素仅从容器的一端插入和提取。
+
+## queue
+
+queue 是一种容器适配器，用于在FIFO（先入先出）的操作，其中元素插入到容器的一端并从另一端提取。
+
+## priority_queue
+
+## set
+
+set 是按照特定顺序存储唯一元素的容器。
+
+## multiset
+
+## map
+
+成员方法|解释
+---|---
+begin|返回引用容器中第一个元素的迭代器
+find|在容器中搜索具有等于 k（参数）的键的元素，如果找到则返回一个迭代器，否则返回 map::end 的迭代器
+count|在容器中搜索具有等于 k（参数）的键的元素，并返回匹配的数量
+lower_bound|返回一个非递减序列 `[first, last)`（参数）中的第一个大于等于值 val（参数）的位置的迭代器
+upper_bound|返回一个非递减序列 `[first, last)`（参数）中第一个大于 val（参数）的位置的迭代器
+equal_range|获取相同元素的范围，返回包含容器中所有具有与 k（参数）等价的键的元素的范围边界（`pair< map<char,int>::iterator, map<char,int>::iterator >`）
+
+## multimap
+
+## unordered\_set
+
+## unordered\_multiset
+
+## unordered\_map
+
+## unordered\_multimap
+
+## tuple
+
+元组是一个能够容纳元素集合的对象。每个元素可以是不同的类型。
+
+## pair
+
+这个类把一对值（values）结合在一起，这些值可能是不同的类型（T1 和 T2）。每个值可以被公有的成员变量first、second访问
+
 <h1 id="multithread">🎡 多线程</h1>
 
 [C++多线程](https://github.com/arqady01/Cpp-interface/blob/main/src/multithread/cpp.md)
