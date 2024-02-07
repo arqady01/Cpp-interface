@@ -2123,7 +2123,7 @@ vector<int> dailyTemperatures(vector<int>& temperatures) {
 输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]，输出：6
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/42ans.jpg" style="width:80%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/42ans_1.jpg" style="width:90%;">
 </p>
 
 ```cpp
