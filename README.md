@@ -2127,32 +2127,32 @@ vector<int> dailyTemperatures(vector<int>& temperatures) {
 </p>
 
 ```cpp
-int trap(vector<int>& height) {
-    stack<int> s;
-    int ans = 0;
-    for (int i = 0; i < height.size(); i++) {
-        while (!s.empty() && height[i] > height[s.top()]) {
-            //栈顶元素的右边第一个比栈顶元素大的就是height[i]
-            int mid = s.top(); //记录下栈顶元素的下标
-            //现在需要在栈顶元素左边，寻找比栈顶元素大的元素
-            s.pop(); //弹出自己后，新的栈顶元素就是要寻找的
-            //防卫式写法
-            if (!s.empty()) {
-                int mid_leftBig = s.top();
-                //mid的左右两边比自己大的中取一个最矮的（但也比自己高）
-                int h = min(height[mid_leftBig], height[i]);
-                h = h - height[mid]; //高度差
-                int w = i - mid_leftBig - 1;
-                ans += h * w;
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        for (int i = 0; i < height.size(); i++) {
+            while (!s.empty() && height[i] > height[s.top()]) {
+                //栈顶元素的右边第一个比栈顶元素大的就是height[i]
+                int mid = s.top(); //需要记录，不然就没了
+                s.pop(); //弹出栈顶元素后，新的栈顶元素就是mid左边的第一大元素
+                if (!s.empty()) { //防卫式声明
+                    int high = min(height[i], height[s.top()]); //mid左右两侧的综合第一个大的元素高度
+                    int h = high - height[mid]; //高度
+                    int w = i - s.top() - 1; //宽度
+                    ans += h * w;
+                }
             }
+            //如果当前元素大于等于栈顶元素，压栈，这样就得到一个单调递增栈
+            s.push(i);
         }
-        s.push(i); //将下标入栈
+        return ans;
     }
-    return ans;
-}
+    int ans{};
+    std::stack<int> s{}; //存储的是下标而不是数值，但是在理解的时候，可以代入一个pair
+};
 ```
 
-再举个例子，输入：height = [4,2,0,3,2,5]，输出：9
+再举个例子，输入：height = [4,2,0,3,2,5]，输出：9。图示：
 
 <p align="center"> 
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/42ans_2.jpg" style="width:100%;">
