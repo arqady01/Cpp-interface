@@ -2123,7 +2123,7 @@ vector<int> dailyTemperatures(vector<int>& temperatures) {
 输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]，输出：6
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/42ans_1.jpg" style="width:90%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/42ans_1.jpg" style="width:100%;">
 </p>
 
 ```cpp
@@ -2151,6 +2151,12 @@ int trap(vector<int>& height) {
     return ans;
 }
 ```
+
+再举个例子，输入：height = [4,2,0,3,2,5]，输出：9
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/Offer_Answer_images/42ans_2.jpg" style="width:100%;">
+</p>
 
 《接雨水》求的是基准数字左、右两边第一个比自己大的元素；《柱状图中最大的矩形》求的是基准数字左右两边第一个比自己小的元素。
 
