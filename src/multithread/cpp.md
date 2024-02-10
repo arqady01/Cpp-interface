@@ -230,6 +230,7 @@ unique_lock比lock_guard灵活，也一样无需手动上下锁，但占用更�
 - defer_lock特有的成员函数
     - lock()，对于未上锁的unique_lock，可以通过lock()进行上锁
     - try_lock()，尝试给互斥量上锁，成功返回true，失败返回false
+    - try_lock_for(std::chrono::seconds(n))，若上锁不成功，那就等待n个时间单位，时间一到还未获得锁资源，就退出不再等待
 - unlock()，对于上锁的互斥量，可以暂时解锁来运行一些不需要共享数据的代码
 - release()，返回他所管理的互斥量对象指针，并释放所有权。release()后必须要给上锁的互斥量解锁，否则报错
 
