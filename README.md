@@ -966,6 +966,73 @@ int main() {
 }
 ```
 
+### 堆排序
+
+堆是一棵完全二叉树，并且父节点的值大于孩子节点
+
+因为是完全二叉树，就能将二叉树的节点坐标和数组映射上，比如二叉树：5-8-10-3-4-6-7-1-2，他的坐标为0~8，假设一节点的序号为i，那么：
+
+```
+parent = (i - 1) / 2;
+child1 = 2 * i + 1;
+child2 = 2 * i + 2;
+```
+
+具体代码：
+
+```cpp
+#include <iostream>
+//交换操作
+void swap(int* x, int* y) {
+  int temp = *x;
+  *x = *y;
+  *y = temp;
+}
+//左子节点和右子节点轮流和当前节点i对比，取最大
+int max(int arr[], int n, int i) {
+  int max = i; //假设i处是最大的
+  int child1 = 2 * i + 1; //左子节点的坐标
+  int child2 = 2 * i + 2; //右子节点的坐标  
+  if (child1 < n && arr[child1] > arr[max]) max = child1;
+  if (child2 < n && arr[child2] > arr[max]) max = child2;
+  return max;
+}
+//递归实现，将i号节点及它的子树变成大根堆
+void heapify(int arr[], int n, int i) {
+  if (i >= n) return; //递归退出条件
+  int maximum = max(arr, n, i); //注意maximum是最大值的下标
+  if (maximum != i) { //只有最大值不是节点i自己，
+    swap(&arr[maximum], &arr[i]); //才需要将最大值移动到根节点
+    heapify(arr, n, maximum); //然后递归
+  }
+}
+//建造大根堆
+void build_heap(int arr[], int n) {
+  int last_node = (n - 1);
+  int last_node_parent = (last_node - 1) / 2;
+  for (int i = last_node_parent; i >= 0; i--) {
+    heapify(arr, n, i);
+  }
+}
+//最终排序操作
+void sort(int arr[], int n) {
+  //在大根堆中，根节点的值无疑是最大的，交换根节点和最后的叶子节点
+  for (int i = n - 1; i >= 0; i--) {
+    swap(&arr[0], &arr[i]);
+    //i会不断减少，意思就是最后的节点不用再纳入heapify()，但是它并未从堆中删除
+    heapify(arr, i, 0); //而且是对根节点开始做heapify()
+  }
+}
+int main() {
+  int nums[9]  = {5,8,10,3,4,6,7,1,2};
+  // heapify(nums, 9, 0); //测试heapify操作
+  build_heap(nums, 9); //建立大根堆
+  sort(nums, 9);
+  for (auto i : nums) std::cout << i << " ";
+  std::cout << std::endl;
+}
+```
+
 <h1 id="template">📡 模板元编程</h1>
 
 ## std::decay
