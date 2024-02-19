@@ -978,6 +978,12 @@ child1 = 2 * i + 1;
 child2 = 2 * i + 2;
 ```
 
+介绍一下heapify()操作，它接收一个元素地址，递归的将此元素的子孩子中最大的节点挪到当前位置，如图：
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/heapify.jpg" style="width:90%;">
+</p>
+
 具体代码：
 
 ```cpp
@@ -1032,6 +1038,8 @@ int main() {
   std::cout << std::endl;
 }
 ```
+
+![leetcode的堆排序](https://leetcode.cn/problems/sort-an-array/description/)
 
 <h1 id="template">📡 模板元编程</h1>
 
