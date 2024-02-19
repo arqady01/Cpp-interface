@@ -98,6 +98,27 @@ int main() {
 }
 ```
 
+借助运算符重载实现
+
+```cpp
+#include <iostream>
+#include <memory>
+struct Foo {
+    ~Foo() {
+        std::cout << "调用析构函数\n";
+    }
+};
+struct FooDeleter {
+    void operator()(Foo* ptr) const {
+        std::cout << "调用自定义删除器\n";
+        delete ptr;
+    }
+};
+int main() {
+    std::unique_ptr<Foo, FooDeleter> ptr(new Foo());
+}
+```
+
 # shared_ptr
 
 共享型智能指针
@@ -140,6 +161,20 @@ get()方法
 不过新标准中有了默认删除器可以管理动态数组
 
 `std::shared_ptr<int> sptr(new int[10], std::default_delete<int[]>());`
+
+## shared_ptr的线程安全
+
+std::shared_ptr 的线程安全性主要体现在引用计数上。每当一个新的 std::shared_ptr 指向同一个对象时，引用计数器就会增加，当停止使用时，引用计数器就会减少。当引用计数器为0时，std::shared_ptr 会自动删除所指向的对象。
+
+引用计数操作是线程安全的，也就是说，可以在多个线程中同时创建和销毁指向同一个对象的 std::shared_ptr，而无需担心引用计数器的同步问题。这是因为 std::shared_ptr 内部使用了原子操作（atomic operations）来更新引用计数器。
+
+虽然引用计数操作是线程安全的，但是并不意味着可以在多个线程中同时对同一个对象进行读写操作而不需要同步。即如果在多个线程中共享一个 std::shared_ptr，并且这些线程都要修改 std::shared_ptr 所指向的对象，那么你仍然需要使用互斥锁（mutex）或其他同步机制来保证线程安全。
+
+## 循环引用的后果
+
+循环引用发生在两个及以上的 std::shared_ptr 对象相互引用，形成一个闭环。在这种情况下，每个对象都有至少一个 std::shared_ptr 指向它，因此它们的引用计数永远不会降到 0，导致内存泄漏。
+
+最常用的方法是使用 std::weak_ptr，它是一种不控制其所指向对象的生存期的智能指针，它不会增加引用计数。当需要使用 std::weak_ptr 所指向的对象时，可以调用 std::weak_ptr::lock 方法来获取一个std::shared_ptr。如果这个 std::shared_ptr 不为空，就可以安全地使用它。
 
 # weak_ptr
 
