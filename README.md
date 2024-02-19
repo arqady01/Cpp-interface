@@ -1039,7 +1039,7 @@ int main() {
 }
 ```
 
-![leetcode的堆排序](https://leetcode.cn/problems/sort-an-array/description/)
+[leetcode的堆排序](https://leetcode.cn/problems/sort-an-array/description/)
 
 <h1 id="template">📡 模板元编程</h1>
 
