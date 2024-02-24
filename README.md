@@ -713,6 +713,7 @@ ptr = new int; //原来的内存泄漏
 如何解决或预防？
 
 - 使用[智能指针](https://github.com/arqady01/Cpp-interface/blob/main/src/smart%20pointer/smart_pointer.md)
+- 使用shared_ptr时，防止循环引用，即A对象持有B对象的智能指针，同时B对象也持有A的智能指针，这样会导致引用计数无法减为零造成内存泄漏
 - 养成良好的编程规范，让new和delete，或者malloc和free成对出现
 - 定义一个全局的变量，分配内存时变量加一，析构时变量减一，程序结束时若变量不为零说明内存泄漏
 - 可以使用宏和预定义宏来定位内存泄漏。通过定义一个名为DEBUG_NEW的宏，并结合预定义的__FILE__和__LINE__宏，可以跟踪内存泄漏发生的文件和行号，从而帮助定位
