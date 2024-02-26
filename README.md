@@ -2943,6 +2943,48 @@ C++11规定，当逻辑进入一个未被初始化的声明变量，所有的并
 静态变量在全局/静态区，只要在分区内，只要数据等于0，就是未被初始化的，比如`int a = 0;`，`int b;`；但是`int c = 1;`就是初始化过的变量<br>
 所以`static Singoton sn;`也是未初始化的静态局部变量，于是所有的并发操作都会被阻塞
 
+## 简单简单工厂
+
+优点：
+
+- 封装性
+- 扩展性：增加新产品类容易，只需修改工厂类，客户端代码无需修改
+
+```cpp
+```cpp
+#include <iostream>
+#include <memory>
+struct AbstractProtuct {
+    virtual void show() = 0;
+};
+struct ProtuctA : public AbstractProtuct {
+    virtual void show() override {
+        std::cout << "产品A创建\n";
+    }
+};
+struct ProtuctB : public AbstractProtuct {
+    virtual void show() override {
+        std::cout << "产品B创建\n";
+    }
+};
+struct Factory {
+    static std::unique_ptr<AbstractProtuct> createProtuct(const std::string& type) {
+        if (type == "A") {
+            return std::make_unique<ProtuctA>();
+        } else if(type == "B") {
+            return std::make_unique<ProtuctB>();
+        }
+        return nullptr;
+    }
+};
+
+int main() {
+    std::unique_ptr<AbstractProtuct> ptr = Factory::createProtuct("A");
+    ptr->show();
+}
+```
+```
+
 <h2>简单工厂模式</h2>
 
 * 优点
