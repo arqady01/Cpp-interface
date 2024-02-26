@@ -2951,7 +2951,6 @@ C++11规定，当逻辑进入一个未被初始化的声明变量，所有的并
 - 扩展性：增加新产品类容易，只需修改工厂类，客户端代码无需修改
 
 ```cpp
-```cpp
 #include <iostream>
 #include <memory>
 struct AbstractProtuct {
@@ -2982,7 +2981,6 @@ int main() {
     std::unique_ptr<AbstractProtuct> ptr = Factory::createProtuct("A");
     ptr->show();
 }
-```
 ```
 
 <h2>简单工厂模式</h2>
