@@ -3000,7 +3000,41 @@ int main() {
 - 优点：遵循开闭原则，实现了可扩展和更复杂的层次结构。明确了职责，具有多态性
 - 缺点：如果业务增加，会使得系统中类的个数成倍增加，提高了代码的复杂度
 
-[工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%A4%BA%E4%BE%8B)
+```cpp
+struct Product {
+    virtual void show() = 0;
+};
+struct Car : public Product {
+    virtual void show() override {
+        std::cout << "生产汽车\n";
+    }
+};
+struct mask : public Product {
+    virtual void show() override {
+        std::cout << "生产口罩\n";
+    }
+};
+
+struct Factory {
+    virtual Product* create() = 0;
+};
+struct Car_Factory : public Factory {
+    virtual Product* create() override {
+        return new Car;
+    }
+};
+struct Mask_Factory : public Factory {
+    virtual Product* create() override {
+        return new mask;
+    }
+};
+
+int main() {
+    Factory* factory = new Car_Factory;
+    Product* product = factory->create();
+    product->show();
+}
+```
 
 <h2>抽象工厂模式</h2>
 
