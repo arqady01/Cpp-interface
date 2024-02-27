@@ -3036,10 +3036,10 @@ int main() {
 }
 ```
 
-<h2>抽象工厂模式</h2>
+## 抽象工厂模式
 
 - 优点：增加分组比较容易，能大大减少工厂类的数量
-- 缺点：因为分组，所以分组中的产品扩展就比较困难，比如再新增一个Product3，就需要改动AbstractFactory、FactoryA和FactoryB几乎所有工厂类
+- 缺点：类似于工厂模式，但是它每个工厂都能做别的事，比如汽车工厂，可以做到不仅能生产汽车也能生产口罩。所以抽象工厂添加新产品较复杂，需要改动AbstractFactory和自身工厂，抽象工厂的纯虚函数一变，其他工厂也要跟着改变
 
 [抽象工厂模式示例](https://github.com/arqady01/cpp-interview/blob/main/design%20parton/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%A4%BA%E4%BE%8B)
 
