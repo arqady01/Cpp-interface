@@ -3043,7 +3043,35 @@ int main() {
 
 ## 策略模式
 
-定义一系列算法，将他们封装起来，使他们可以互相替换
+策略模式是一种设计模式，它使得一组算法可以在运行时互相替换。该模式使用组合方式将算法的使用和实现分离开来，这比继承更加灵活。支持开闭原则。
+
+```cpp
+struct Weapon {
+    virtual void attack() = 0;
+};
+struct m416 : public Weapon {
+    void attack() override {
+        std::cout << "使用m416射击\n";
+    }
+};
+struct iron : public Weapon {
+    void attack() override {
+        std::cout << "拿起铁锹攻击\n";
+    }
+};
+
+struct Person {
+    Person() = default;
+    Person(Weapon* p):pw (p) {
+        pw->attack();
+    }
+    Weapon* pw;
+};
+int main() {
+    Weapon* weapon = new m416;
+    Person s(weapon); //使用m416射击
+}
+```
 
 ## 外观模式
 
