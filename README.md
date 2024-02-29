@@ -2943,7 +2943,9 @@ C++11规定，当逻辑进入一个未被初始化的声明变量，所有的并
 静态变量在全局/静态区，只要在分区内，只要数据等于0，就是未被初始化的，比如`int a = 0;`，`int b;`；但是`int c = 1;`就是初始化过的变量<br>
 所以`static Singoton sn;`也是未初始化的静态局部变量，于是所有的并发操作都会被阻塞
 
-<h2>简单工厂模式</h2>
+## 简单工厂模式
+
+![simple_factory](https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/simple_factory.png)
 
 - 优点
     - 封装性
@@ -2984,10 +2986,12 @@ int main() {
 }
 ```
 
-<h2>工厂模式</h2>
+## 工厂模式
 
 - 优点：遵循开闭原则，实现了可扩展和更复杂的层次结构。明确了职责，具有多态性
 - 缺点：如果业务增加，会使得系统中类的个数成倍增加，提高了代码的复杂度
+
+![factory](https://github.com/arqady01/Cpp-interface/blob/main/resource/cpp_images/factory.png)
 
 ```cpp
 struct Product {
