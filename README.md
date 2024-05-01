@@ -430,15 +430,54 @@ cout << a; //输出：5。why？看上去左值a通过move()移动到了右值a_
 
 move()是一个非常有迷惑性的函数，往往以为它能把一个变量里的内容移动到另一个变量，但事实上move()移动不了什么，唯一的功能是把左值强制转化为右值，让右值引用可以指向左值。其实现等同于一个类型转换，所以，单纯的move不会有性能提升
 
-### 引用折叠【未编辑】
+### 万能引用
+
+对于形如T&&的变量，只有发生自动类型推导（例如：函数模板的类型自动推导），T&&才是万能引用。最常见的万能引用方式如以下两种：
+
+```cpp
+template<typename T>
+void f(T&& param); // 存在类型推导，param是一个万能引用
+
+auto&& var = var1; // auto自动类型推导，var是一个万能引用
+```
+
+注意以下情况不是万能引用：
+
+```cpp
+template<typename T>
+class Test {
+	Test(Test&& rhs);  // Test是一个特定的类型，不需要类型推导，所以&&表示右值引用  
+};
+
+//形如const T&&的方式也不是万能引用
+template<typename T>
+void f(const T&& t); // t是右值引用
+```
+
+### 引用折叠
 
 X& &、X& &&、X&& & 可折叠成 X&
 
 X&& && 可折叠成 X&&
 
-### 完美转发 std::forward【未编辑】
+### 完美转发 std::forward
 
-保证右值引用在传递的过程中类型不发生变化，不会变为左值引用
+保证右值引用在传递的过程中类型不会变为左值引用，比如：
+
+```cpp
+template <typename T>
+void wrapper(T&& t) { // 万能引用
+    func(std::forward<T>(t)); // 完美转发
+}
+
+class MyClass {};
+void func(MyClass& a) { std::cout << "in func(MyClass&)\n"; }
+void func(const MyClass& a) { std::cout << "in func(const MyClass&)\n"; }
+void func(MyClass&& a) { std::cout << "in func(MyClass &&)\n"; }
+int main(void) {
+    wrapper(MyClass()); //in func(MyClass &&)而不是in func(const MyClass&)
+}
+```
 
 - 当模板类型为左值引用，类型会被推导为左值
 - 当模板类型不是左值引用类型，一律推导为右值
