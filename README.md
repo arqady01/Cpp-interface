@@ -1638,7 +1638,12 @@ equal_range|获取相同元素的范围，返回包含容器中所有具有与 k
 2. 宁可以编译器替换预处理器
     - 尽量以 `const`、`enum`、`inline` 替换 `#define`
 3. [尽可能使用 const](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/03.%E5%B0%BD%E5%8F%AF%E8%83%BD%E4%BD%BF%E7%94%A8const)
-4. [确定对象被使用前已先被初始化](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/04.%E7%A1%AE%E5%AE%9A%E5%AF%B9%E8%B1%A1%E8%A2%AB%E4%BD%BF%E7%94%A8%E5%89%8D%E5%B7%B2%E5%85%88%E8%A2%AB%E5%88%9D%E5%A7%8B%E5%8C%96)
+4. [确定对象被使用前已先被初始化
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/04.png" style="width:70%;">
+</p>
+
 5. 了解 C++ 默默编写并调用哪些函数
     - 编译器暗自为类创建ctor、copy ctor、copy assignment、dtor
 6. 若不想使用编译器自动生成的函数，就应该明确拒绝
@@ -1704,8 +1709,13 @@ processWidget(pw, priority());
 19. 设计 class 犹如设计 type，需要考虑对象创建、销毁、初始化、赋值、值传递、合法值、继承关系、转换、一般化等等。
 20. 宁以 const引用传递 替换 按值传递
     - 前者通常更高效、避免切割问题，但不适用于内置类型、STL迭代器、函数对象
-21. [必须返回对象时，别妄想返回其 reference](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/21.%E5%BF%85%E9%A1%BB%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%97%B6%EF%BC%8C%E5%88%AB%E5%A6%84%E6%83%B3%E8%BF%94%E5%9B%9E%E5%85%B6%20reference)
+21. 必须返回对象时，别妄想返回其 reference
     - 不要错误的返回对象的引用/指针
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/21.png" style="width:70%;">
+</p>
+
 22. 将成员变量声明为 private
     - 为了封装、一致性、对其读写精确控制等
 23. 宁以 non-member、non-friend 替换成员函数
