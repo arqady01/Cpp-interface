@@ -1676,72 +1676,95 @@ equal_range|获取相同元素的范围，返回包含容器中所有具有与 k
 17. 成对使用 new 和 delete 时要采取相同形式
     - delete：释放内存并调用析构函数
     - delete[]：释放内存，并逐一调用array new的对象们的析构函数
-18. [以独立语句将 newed 对象置入智能指针](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/17.%E4%BB%A5%E7%8B%AC%E7%AB%8B%E8%AF%AD%E5%8F%A5%E5%B0%86%20newed%20%E5%AF%B9%E8%B1%A1%E7%BD%AE%E5%85%A5%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88)
-19. [让接口容易被正确使用，不易被误用](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/18.%E8%AE%A9%E6%8E%A5%E5%8F%A3%E5%AE%B9%E6%98%93%E8%A2%AB%E6%AD%A3%E7%A1%AE%E4%BD%BF%E7%94%A8%EF%BC%8C%E4%B8%8D%E6%98%93%E8%A2%AB%E8%AF%AF%E7%94%A8)
-20. 设计 class 犹如设计 type，需要考虑对象创建、销毁、初始化、赋值、值传递、合法值、继承关系、转换、一般化等等。
-21. 宁以 const引用传递 替换 按值传递
+18. 以独立语句将 newed 对象置入智能指针
+
+```cpp
+应选择No2，因为No1有潜在内存泄漏风险。先 new Widget，接着执行priority()，如果恰好抛出异常程序结束，此时就发生了资源泄漏
+
+int priority();
+//No.1
+processWidget(std::shared_ptr<Widget>(new Widget), priority());
+//No.2
+std::shared_ptr<Widget> pw = make_shared<Widget>(new Widget);
+processWidget(pw, priority());
+```
+
+20. 让接口容易被正确使用，不易被误用
+
+```
+# 建立新类型
+
+设计一个 Date(int month, int day, int year) 接口，传参写成了 `Date(28, 10, 1999);`，明显就是写倒了月份和天数，这很简单，增加 Day 、month 和 year 类
+
+# 谨防将 == 写成 =
+
+# 使用智能指针
+```
+
+22. 设计 class 犹如设计 type，需要考虑对象创建、销毁、初始化、赋值、值传递、合法值、继承关系、转换、一般化等等。
+23. 宁以 const引用传递 替换 按值传递
     - 前者通常更高效、避免切割问题，但不适用于内置类型、STL迭代器、函数对象
-22. [必须返回对象时，别妄想返回其 reference](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/21.%E5%BF%85%E9%A1%BB%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%97%B6%EF%BC%8C%E5%88%AB%E5%A6%84%E6%83%B3%E8%BF%94%E5%9B%9E%E5%85%B6%20reference)
+24. [必须返回对象时，别妄想返回其 reference](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/21.%E5%BF%85%E9%A1%BB%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%97%B6%EF%BC%8C%E5%88%AB%E5%A6%84%E6%83%B3%E8%BF%94%E5%9B%9E%E5%85%B6%20reference)
     - 不要错误的返回对象的引用/指针
-23. 将成员变量声明为 private
+25. 将成员变量声明为 private
     - 为了封装、一致性、对其读写精确控制等
-24. [宁以 non-member、non-friend 替换成员函数](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/23.%E5%AE%81%E4%BB%A5%20non-member%E3%80%81non-friend%20%E6%9B%BF%E6%8D%A2%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0)
-25. [若所有参数皆须要类型转换，请为此采用 non-member 函数](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.%E5%BD%93%E6%89%80%E6%9C%89%E5%8F%82%E6%95%B0%E9%83%BD%E9%9C%80%E8%A6%81%E8%BF%9B%E8%A1%8C%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%EF%BC%8C%E5%B0%86%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89%E4%B8%BA%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0)
+26. [宁以 non-member、non-friend 替换成员函数](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/23.%E5%AE%81%E4%BB%A5%20non-member%E3%80%81non-friend%20%E6%9B%BF%E6%8D%A2%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0)
+27. [若所有参数皆须要类型转换，请为此采用 non-member 函数](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.%E5%BD%93%E6%89%80%E6%9C%89%E5%8F%82%E6%95%B0%E9%83%BD%E9%9C%80%E8%A6%81%E8%BF%9B%E8%A1%8C%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%EF%BC%8C%E5%B0%86%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89%E4%B8%BA%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0)
     - 所有参数包括被this指针所指的那个隐喻参数
-26. 考虑写一个不抛异常的 swap 函数
-27. [尽可能延后变量定义式的出现时间](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/26.%E5%B0%BD%E5%8F%AF%E8%83%BD%E5%BB%B6%E5%90%8E%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F%E6%97%B6%E6%9C%BA)
-28. 尽量少做转型动作
+28. 考虑写一个不抛异常的 swap 函数
+29. [尽可能延后变量定义式的出现时间](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/26.%E5%B0%BD%E5%8F%AF%E8%83%BD%E5%BB%B6%E5%90%8E%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F%E6%97%B6%E6%9C%BA)
+30. 尽量少做转型动作
     - static_cast
     - dynamic_cast
     - const_cast
     - reinterpret_cast
-29. 避免使用 handles（包括 引用、指针、迭代器）指向对象内部
+31. 避免使用 handles（包括 引用、指针、迭代器）指向对象内部
     - 以增加封装性、使 const 成员函数的行为更像 const、降低 “虚吊号码牌”（如悬空指针等）的可能性
-30. 为 “异常安全” 而努力是值得的
+32. 为 “异常安全” 而努力是值得的
     - 异常安全函数即使发生异常也不会泄露资源或允许任何数据结构败坏
-31. 透彻了解 inlining 的里里外外
+33. 透彻了解 inlining 的里里外外
     - inline 在大多数程序中是编译期的行为
     - 函数是否真正 inline，取决于编译器，它们拒绝太过复杂（如循环或递归）的函数
     - 虚函数的调用会让 inlining 落空，因为虚函数是通过虚函数表实现的，虚表指针在创建对象时设置
     - inline 造成的代码膨胀可能带来效率损失
-32. 将文件间的编译依存关系降至最低
+34. 将文件间的编译依存关系降至最低
     - 如果使用 object references 或 object pointers 可以完成任务，就不要使用 objects
-33. [确定public继承塑模出 is-a 关系](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.%E7%A1%AE%E5%AE%9Apublic%E7%BB%A7%E6%89%BF%E5%A1%91%E6%A8%A1%E5%87%BA%20is-a%20%E5%85%B3%E7%B3%BB)
-34. 避免遮掩继承而来的名字
+35. [确定public继承塑模出 is-a 关系](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.%E7%A1%AE%E5%AE%9Apublic%E7%BB%A7%E6%89%BF%E5%A1%91%E6%A8%A1%E5%87%BA%20is-a%20%E5%85%B3%E7%B3%BB)
+36. 避免遮掩继承而来的名字
     - 可使用 using 声明或转交函数（forwarding）来让被遮掩的名字再见天日
-35. 区分接口继承和实现继承
+37. 区分接口继承和实现继承
     在公共继承下，派生类总是继承基类的接口
     纯虚函数只具体指定接口继承
     非虚函数具体指定接口继承以及强制性实现继承
-36. 考虑 virtual 函数以外的其他选择
+38. 考虑 virtual 函数以外的其他选择
         - 考虑将虚函数替换为函数指针成员变量，以 `tr1::function` 成员变量替换虚函数
-37. 绝不重新定义继承而来的 non-virtual 函数
-38. 绝不重新定义继承而来的缺省参数值
+39. 绝不重新定义继承而来的 non-virtual 函数
+40. 绝不重新定义继承而来的缺省参数值
     - 因为缺省参数值是静态绑定，而虚函数是动态绑定
-39. 通过复合塑模 has-a 或 “根据某物实现出”
+41. 通过复合塑模 has-a 或 “根据某物实现出”
     - 在应用域，复合意味 has-a（有一个）；在实现域，复合意味着 is-implemented-in-terms-of（根据某物实现出）
-40. 明智而审慎地使用 private 继承
-41. 明智而审慎地使用多重继承
+42. 明智而审慎地使用 private 继承
+43. 明智而审慎地使用多重继承
     - 多继承比单一继承复杂，可能导致新的歧义性
     - 但确有正当用途，如 “public 继承某个 interface class” 和 “private 继承某个协助实现的 class”；
     - virtual 继承可解决多继承下菱形继承的二义性问题，但会增加大小、速度、初始化及赋值的复杂度等等成本
-42. 了解隐式接口和编译期多态
-43. 了解 typename 的双重意义
-44. 学习处理模板化基类内的名称
-45. 将与参数无关的代码抽离模板
+44. 了解隐式接口和编译期多态
+45. 了解 typename 的双重意义
+46. 学习处理模板化基类内的名称
+47. 将与参数无关的代码抽离模板
     - 因类型模板参数造成代码膨胀往往可以通过函数参数或类成员变量替换模板参数来消除
     - 因类型参数而造成的代码膨胀往往可以通过让带有完全相同二进制表述的实现类型共享实现码
-46. 运用成员函数模板接受所有兼容类型（请使用成员函数模板（member function templates）生成 “可接受所有兼容类型” 的函数；声明 member templates 用于 “泛化 copy 构造” 或 “泛化 assignment 操作” 时还需要声明正常的 copy 构造函数和 copy assignment 操作符）
-47. 需要类型转换时请为模板定义非成员函数（当我们编写一个 class template，而它所提供之 “与此 template 相关的” 函数支持 “所有参数之隐式类型转换” 时，请将那些函数定义为 “class template 内部的 friend 函数”）
-48. 请使用 traits classes 表现类型信息（traits classes 通过 templates 和 “templates 特化” 使得 “类型相关信息” 在编译期可用，通过重载技术（overloading）实现在编译期对类型执行 if...else 测试）
-49. 认识 template 元编程（模板元编程（TMP，template metaprogramming）可将工作由运行期移往编译期，因此得以实现早期错误侦测和更高的执行效率；TMP 可被用来生成 “给予政策选择组合”（based on combinations of policy choices）的客户定制代码，也可用来避免生成对某些特殊类型并不适合的代码）
-50. 了解 new-handler 的行为（set\_new\_handler 允许客户指定一个在内存分配无法获得满足时被调用的函数；nothrow new 是一个颇具局限的工具，因为它只适用于内存分配（operator new），后继的构造函数调用还是可能抛出异常）
-51. 了解 new 和 delete 的合理替换时机（为了检测运用错误、收集动态分配内存之使用统计信息、增加分配和归还速度、降低缺省内存管理器带来的空间额外开销、弥补缺省分配器中的非最佳齐位、将相关对象成簇集中、获得非传统的行为）
-52. 编写 new 和 delete 时需固守常规（operator new 应该内涵一个无穷循环，并在其中尝试分配内存，如果它无法满足内存需求，就应该调用 new-handler，它也应该有能力处理 0 bytes 申请，class 专属版本则还应该处理 “比正确大小更大的（错误）申请”；operator delete 应该在收到 null 指针时不做任何事，class 专属版本则还应该处理 “比正确大小更大的（错误）申请”）
-53. 写了 placement new 也要写 placement delete（当你写一个 placement operator new，请确定也写出了对应的 placement operator delete，否则可能会发生隐微而时断时续的内存泄漏；当你声明 placement new 和 placement delete，请确定不要无意识（非故意）地遮掩了它们地正常版本）
-54. 不要轻忽编译器的警告
-55. 让自己熟悉包括 TR1 在内的标准程序库（TR1，C++ Technical Report 1，C++11 标准的草稿文件）
-56. 让自己熟悉 Boost（准标准库）
+48. 运用成员函数模板接受所有兼容类型（请使用成员函数模板（member function templates）生成 “可接受所有兼容类型” 的函数；声明 member templates 用于 “泛化 copy 构造” 或 “泛化 assignment 操作” 时还需要声明正常的 copy 构造函数和 copy assignment 操作符）
+49. 需要类型转换时请为模板定义非成员函数（当我们编写一个 class template，而它所提供之 “与此 template 相关的” 函数支持 “所有参数之隐式类型转换” 时，请将那些函数定义为 “class template 内部的 friend 函数”）
+50. 请使用 traits classes 表现类型信息（traits classes 通过 templates 和 “templates 特化” 使得 “类型相关信息” 在编译期可用，通过重载技术（overloading）实现在编译期对类型执行 if...else 测试）
+51. 认识 template 元编程（模板元编程（TMP，template metaprogramming）可将工作由运行期移往编译期，因此得以实现早期错误侦测和更高的执行效率；TMP 可被用来生成 “给予政策选择组合”（based on combinations of policy choices）的客户定制代码，也可用来避免生成对某些特殊类型并不适合的代码）
+52. 了解 new-handler 的行为（set\_new\_handler 允许客户指定一个在内存分配无法获得满足时被调用的函数；nothrow new 是一个颇具局限的工具，因为它只适用于内存分配（operator new），后继的构造函数调用还是可能抛出异常）
+53. 了解 new 和 delete 的合理替换时机（为了检测运用错误、收集动态分配内存之使用统计信息、增加分配和归还速度、降低缺省内存管理器带来的空间额外开销、弥补缺省分配器中的非最佳齐位、将相关对象成簇集中、获得非传统的行为）
+54. 编写 new 和 delete 时需固守常规（operator new 应该内涵一个无穷循环，并在其中尝试分配内存，如果它无法满足内存需求，就应该调用 new-handler，它也应该有能力处理 0 bytes 申请，class 专属版本则还应该处理 “比正确大小更大的（错误）申请”；operator delete 应该在收到 null 指针时不做任何事，class 专属版本则还应该处理 “比正确大小更大的（错误）申请”）
+55. 写了 placement new 也要写 placement delete（当你写一个 placement operator new，请确定也写出了对应的 placement operator delete，否则可能会发生隐微而时断时续的内存泄漏；当你声明 placement new 和 placement delete，请确定不要无意识（非故意）地遮掩了它们地正常版本）
+56. 不要轻忽编译器的警告
+57. 让自己熟悉包括 TR1 在内的标准程序库（TR1，C++ Technical Report 1，C++11 标准的草稿文件）
+58. 让自己熟悉 Boost（准标准库）
 
 <h1 id="internet">☁️ 计算机网络</h1>
 
