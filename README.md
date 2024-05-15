@@ -1708,7 +1708,7 @@ processWidget(pw, priority());
     - 不要错误的返回对象的引用/指针
 22. 将成员变量声明为 private
     - 为了封装、一致性、对其读写精确控制等
-23. [宁以 non-member、non-friend 替换成员函数](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/23.%E5%AE%81%E4%BB%A5%20non-member%E3%80%81non-friend%20%E6%9B%BF%E6%8D%A2%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0)
+23. 宁以 non-member、non-friend 替换成员函数
 
 ```cpp
 class WebBrowser {
