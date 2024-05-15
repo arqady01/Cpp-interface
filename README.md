@@ -1641,7 +1641,7 @@ equal_range|获取相同元素的范围，返回包含容器中所有具有与 k
 4. [确定对象被使用前已先被初始化
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/04.png" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/04.png" style="width:55%;">
 </p>
 
 5. 了解 C++ 默默编写并调用哪些函数
@@ -1713,7 +1713,7 @@ processWidget(pw, priority());
     - 不要错误的返回对象的引用/指针
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/21.png" style="width:70%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/21.png" style="width:60%;">
 </p>
 
 22. 将成员变量声明为 private
