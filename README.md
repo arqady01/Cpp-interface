@@ -1638,7 +1638,7 @@ equal_range|获取相同元素的范围，返回包含容器中所有具有与 k
 2. 宁可以编译器替换预处理器
     - 尽量以 `const`、`enum`、`inline` 替换 `#define`
 3. [尽可能使用 const](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/03.%E5%B0%BD%E5%8F%AF%E8%83%BD%E4%BD%BF%E7%94%A8const)
-4. [确定对象被使用前已先被初始化
+4. 确定对象被使用前已先被初始化
 
 <p align="center"> 
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/04.png" style="width:55%;">
@@ -1740,7 +1740,7 @@ void clearEverything(WebBrowser& wb) {
     - 所有参数包括被this指针所指的那个隐喻参数
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.png" style="width:65%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.png" style="width:70%;">
 </p>
 
 25. 考虑写一个不抛异常的 swap 函数
@@ -1769,7 +1769,7 @@ void clearEverything(WebBrowser& wb) {
 32. 确定public继承塑模出 is-a 关系
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.png" style="width:75%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.png" style="width:80%;">
 </p>
 
 33. 避免遮掩继承而来的名字
