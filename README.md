@@ -1736,10 +1736,20 @@ void clearEverything(WebBrowser& wb) {
 推荐第二种方法，non-member 代替 member 函数，增加封装性、包裹弹性、机能扩充性
 ```
 
-24. [若所有参数皆须要类型转换，请为此采用 non-member 函数](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.%E5%BD%93%E6%89%80%E6%9C%89%E5%8F%82%E6%95%B0%E9%83%BD%E9%9C%80%E8%A6%81%E8%BF%9B%E8%A1%8C%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%EF%BC%8C%E5%B0%86%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89%E4%B8%BA%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0)
+24. 若所有参数皆须要类型转换，请为此采用 non-member 函数
     - 所有参数包括被this指针所指的那个隐喻参数
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.png" style="width:58%;">
+</p>
+
 25. 考虑写一个不抛异常的 swap 函数
-26. [尽可能延后变量定义式的出现时间](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/26.%E5%B0%BD%E5%8F%AF%E8%83%BD%E5%BB%B6%E5%90%8E%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F%E6%97%B6%E6%9C%BA)
+26. [尽可能延后变量定义式的出现时间
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/26.png" style="width:58%;">
+</p>
+
 27. 尽量少做转型动作
     - static_cast
     - dynamic_cast
@@ -1756,7 +1766,12 @@ void clearEverything(WebBrowser& wb) {
     - inline 造成的代码膨胀可能带来效率损失
 31. 将文件间的编译依存关系降至最低
     - 如果使用 object references 或 object pointers 可以完成任务，就不要使用 objects
-32. [确定public继承塑模出 is-a 关系](https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.%E7%A1%AE%E5%AE%9Apublic%E7%BB%A7%E6%89%BF%E5%A1%91%E6%A8%A1%E5%87%BA%20is-a%20%E5%85%B3%E7%B3%BB)
+32. 确定public继承塑模出 is-a 关系
+
+<p align="center"> 
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.png" style="width:60%;">
+</p>
+
 33. 避免遮掩继承而来的名字
     - 可使用 using 声明或转交函数（forwarding）来让被遮掩的名字再见天日
 34. 区分接口继承和实现继承
