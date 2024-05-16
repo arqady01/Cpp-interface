@@ -1740,11 +1740,11 @@ void clearEverything(WebBrowser& wb) {
     - 所有参数包括被this指针所指的那个隐喻参数
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.png" style="width:58%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/24.png" style="width:65%;">
 </p>
 
 25. 考虑写一个不抛异常的 swap 函数
-26. [尽可能延后变量定义式的出现时间
+26. 尽可能延后变量定义式的出现时间
 
 <p align="center"> 
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/26.png" style="width:58%;">
@@ -1769,7 +1769,7 @@ void clearEverything(WebBrowser& wb) {
 32. 确定public继承塑模出 is-a 关系
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.png" style="width:60%;">
+    <img src="https://github.com/arqady01/Cpp-interface/blob/main/src/Effective%20C%2B%2B/32.png" style="width:75%;">
 </p>
 
 33. 避免遮掩继承而来的名字
