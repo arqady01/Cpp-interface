@@ -1,4 +1,182 @@
-# 77 组合
+# 递归法
+
+### 104.二叉树的最大深度
+
+给定一个二叉树 root ，返回其最大深度（根节点到最远叶子节点的最长路径上的节点数）
+
+```cpp
+//求root节点的最大深度
+int maxDepth(TreeNode* root) {
+    if (root == nullptr) //递归终止条件：当所求
+        return 0; //节点是空节点时，最大深度为0
+
+    //root节点的左节点的最大深度为leftMax
+    int leftMax = maxDepth(root->left);
+    //root节点的右节点的最大深度为rightMax
+    int rightMax = maxDepth(root->right);
+    return max(leftMax, rightMax) + 1;
+}
+```
+
+### 111. 二叉树的最小深度
+
+给定一个二叉树，找出其最小深度(根节点到最近叶子节点的最短路径上的节点数量)
+
+输入：`root = [2,null,3,null,4,null,5,null,6]`，输出：5
+
+```cpp
+//求root节点的最小深度
+int minDepth(TreeNode* root) {
+    //终止条件：当root为空时，最小深度为0
+    if (root == nullptr) return 0;
+
+    //右子树为空，就去左子树中递归
+    if (root->right == nullptr) {
+        return minDepth(root->left) + 1;
+    }
+    //左子树为空，就去右子树中递归
+    if (root->left == nullptr) {
+        return minDepth(root->right) + 1;
+    }
+
+    int leftMin = minDepth(root->left);
+    int rightMin = minDepth(root->right);
+    return min(leftMin, rightMin) + 1;
+}
+```
+
+### 226.反转二叉树
+
+Google面试题
+
+输入：`root = [4,2,7,1,3,6,9]`，输出：`[4,7,2,9,6,3,1]`
+
+```cpp
+TreeNode* invertTree(TreeNode* root) {
+    if (root == nullptr) return nullptr; //如果是空节点就直接输出nullptr节点
+
+    //invertTree(root->left)就是反转root->left树，最后挂到root的左边
+    root->left = invertTree(root->left);
+    root->right = invertTree(root->right); //同理
+    std::swap(root->left, root->right); //交换root的左/右节点
+    
+    return root;
+}
+```
+
+### 100.相同的树
+
+给你两棵二叉树的根节点 p 和 q ，从结构和值上判断两棵树是否相同
+
+可能不止有一个循环终止条件！
+
+```cpp
+bool isSameTree(TreeNode* p, TreeNode* q) {
+    if (p == nullptr && q == nullptr)
+        return true;
+    else if (p == nullptr || q == nullptr)
+        return false;
+
+    if (p->val != q->val)
+        return false;
+
+    bool leftTree = isSameTree(p->left, q->left);
+    bool rightTree = isSameTree(p->right, q->right);
+    return leftTree && rightTree;
+}
+```
+
+### 110.平衡二叉树
+
+给定一个二叉树，判断它是否是平衡二叉树
+
+```cpp
+//辅助函数height计算*root的高度
+int height(TreeNode* root) {
+    if (root == nullptr) return 0;
+
+    int leftH = height(root->left);
+    int rightH = height(root->right);
+    return std::max(leftH, rightH) + 1;
+}
+//主函数
+bool isBalanced(TreeNode* root) {
+    if (root == nullptr) return true;
+    
+    if (std::abs(height(root->left) - height(root->right)) > 1) {
+        return false;
+    }
+
+    //应对这种情况：[1,2,2,3,null,null,3,4,null,null,4]
+    //即平衡二叉树不止站在根节点看，要求树中的每一个节点都是平衡的
+    return isBalanced(root->left) && isBalanced(root->right);
+}
+```
+
+### 二叉树的所有路径
+
+给你一个二叉树的根节点 root ，按任意顺序 ，返回所有从根节点到叶子节点的路径
+
+输入：`[1,2,3,7,5]`，输出：`["1->2->7","1->2->5","1->3"]`
+
+```cpp
+vector<string> binaryTreePaths(TreeNode* root) {
+    //递归终止条件Ⅰ
+    std::vector<std::string> ans;
+    if (root == nullptr) return ans;
+    
+    //递归终止条件Ⅱ
+    if (root->left == nullptr && root->right == nullptr) {
+        ans.push_back(to_string(root->val));
+        return ans;
+    }
+    
+    //root的左子节点组成的字符串
+    std::vector<string> leftString = binaryTreePaths(root->left);
+    for (int i = 0; i < leftString.size(); i++) {
+        ans.push_back(to_string(root->val) + "->" + leftString[i]);
+    }
+    //root的右子节点组成的字符串
+    std::vector<string> rightString = binaryTreePaths(root->right);
+    for (int i = 0; i < rightString.size(); i++) {
+        ans.push_back(to_string(root->val) + "->" + rightString[i]);
+    }
+
+    return ans;
+}
+```
+
+## 回溯法
+
+- 组合问题：N个数里面按一定规则找出k个数的集合
+- 切割问题：一个字符串按一定规则有几种切割方式
+- 子集问题：一个N个数的集合里有多少符合条件的子集
+- 排列问题：N个数按一定规则全排列，有几种排列方式
+- 棋盘问题：N皇后，解数独
+
+组合不强调顺序，而排列强调顺序，即：组合无序，排列有序。
+
+回溯法都可以抽象为树形结构；集合的大小即树的宽度，递归回溯的深度就是树的深度，递归回溯必须有终止条件，树是一颗高度有限的N叉树
+
+**回溯法模板**
+
+```cpp
+void backtracking(参数) {
+    if 满足终止条件 {
+        将结果纳入结果集;
+        return;
+    }
+    for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) {
+        处理节点;
+        backtracking(路径，选择列表); //递归
+        回溯，撤销处理结果
+    }
+}
+```
+
+# 回溯法
+
+### 77 组合
 
 给定两个整数 n 和 k，返回 1 ... n 中所有可能的k个数的组合？
 
@@ -48,7 +226,7 @@ public: //主函数
 };
 ```
 
-# 216 组合总和 III
+### 216 组合总和 III
 
 找出所有相加之和为 n 的 k 个数的组合。组合中只允许含有 1 - 9 的正整数，并且每种组合中不存在重复的数字。
 
@@ -88,7 +266,7 @@ private:
 };
 ```
 
-# 17 电话号码的组合
+### 17 电话号码的组合
 
 <p align="center"> 
     <img src="/resource/backtravel/LCR17_que.png" style="width:70%;">
@@ -154,7 +332,7 @@ private:
 };
 ```
 
-# 39 组合总和
+### 39 组合总和
 
 给定一个无重复元素的数组candidates和一个目标数target，找出candidates中所有可以使数字和为target的组合，注意candidates中的数字可以无限制重复选取。
 
@@ -201,7 +379,7 @@ public:
 };
 ```
 
-# 40 组合总和II
+### 40 组合总和II
 
 给定一个数组candidates和正数target，找出candidates中所有可以让数字和为target的组合。注意candidates每个数字只能使用一次。
 
@@ -258,7 +436,7 @@ public:
 };
 ```
 
-# 131 分割回文串
+### 131 分割回文串
 
 给你一个字符串s，将s分割成一些子串，使每个子串都是回文串（正反读都一样的字符串）。返回所有的分割方案。
 
@@ -307,7 +485,7 @@ public:
 };
 ```
 
-# 78 求子集
+### 78 求子集
 
 整数数组nums中，元素互不相同。返回该数组所有可能的子集。
 
@@ -341,7 +519,7 @@ public:
 };
 ```
 
-# 90 子集Ⅱ
+### 90 子集Ⅱ
 
 整数数组nums中，元素可以相同。返回该数组所有可能的子集。
 
@@ -389,7 +567,7 @@ public:
 };
 ```
 
-# 491 递增子序列
+### 491 递增子序列
 
 一个整数数组nums，返回所有该数组中不同的递增子序列，递增子序列中至少有两个元素。
 
@@ -432,7 +610,7 @@ public:
     <img src="/resource/backtravel/491ans.jpg" style="width:80%;">
 </p>
 
-# 46 全排列
+### 46 全排列
 
 给定一个不含重复数字的数组nums，返回所有可能的全排列。
 
@@ -473,7 +651,7 @@ public:
 };
 ```
 
-# 47 全排列Ⅱ
+### 47 全排列Ⅱ
 
 给定一个可包含重复数字的序列nums，按任意顺序返回所有不重复的全排列
 
@@ -516,7 +694,7 @@ public:
 };
 ```
 
-# 51 N皇后
+### 51 N皇后
 
 将n个皇后放置在 n×n 的棋盘上，并且皇后之间不能互相攻击（上下左右斜向攻击）
 
