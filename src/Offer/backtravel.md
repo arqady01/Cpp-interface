@@ -5,10 +5,8 @@
 示例: 输入: n = 4, k = 2 输出: [ [2,4], [3,4], [2,3], [1,2], [1,3], [1,4], ]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/77.jpg" style="width:60%;">
+    <img src="/resource/backtravel/77.jpg" style="width:66%;">
 </p>
-
-<img src="/resource/backtravel/77.jpg" width = 60%>
 
 引入index的目的是防止出现重复的组合，因为用过的数字就不能再用了，下一层递归要怎么知道从哪里开始就需要靠index。
 
@@ -58,7 +56,7 @@ public: //主函数
 示例 2: 输入: k = 3, n = 9 输出: [[1,2,6], [1,3,5], [2,3,4]]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/216.jpg" style="width:80%;">
+    <img src="/resource/backtravel/216.jpg" style="width:80%;">
 </p>
 
 ```cpp
@@ -92,11 +90,11 @@ private:
 # 17 电话号码的组合
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/LCR17_que.png" style="width:70%;">
+    <img src="/resource/backtravel/LCR17_que.png" style="width:70%;">
 </p>
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/LCR17.jpg" style="width:60%;">
+    <img src="/resource/backtravel/LCR17.jpg" style="width:60%;">
 </p>
 
 > 终止条件
@@ -164,7 +162,7 @@ private:
 答案： [ [2,2,2,2], [2,3,3], [3,5] ]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/39ans.png" style="width:70%;">
+    <img src="/resource/backtravel/39ans.png" style="width:70%;">
 </p>
 
 > 终止条件
@@ -212,7 +210,7 @@ public:
 输出：[ [1, 7], [1, 2, 5], [2, 6], [1, 1, 6] ]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/40ans.jpg" style="width:70%;">
+    <img src="/resource/backtravel/40ans.jpg" style="width:70%;">
 </p>
 
 > 问：去重是树枝去重还是树层去重呢？
@@ -269,7 +267,7 @@ public:
 输出：[["a","a","b"],["aa","b"]]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/131ans.png" style="width:80%;">
+    <img src="/resource/backtravel/131ans.png" style="width:80%;">
 </p>
 
 ```cpp
@@ -318,7 +316,7 @@ public:
 输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/78ans.png" style="width:80%;">
+    <img src="/resource/backtravel/78ans.png" style="width:80%;">
 </p>
 
 ```cpp
@@ -352,7 +350,7 @@ public:
 输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/90ans.png" style="width:80%;">
+    <img src="/resource/backtravel/90ans.png" style="width:80%;">
 </p>
 
 本题中出现重复元素，而且求取的子集要去重，所以是树层剪枝而非树枝剪枝。
@@ -431,7 +429,7 @@ public:
 ```
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/491ans.jpg" style="width:80%;">
+    <img src="/resource/backtravel/491ans.jpg" style="width:80%;">
 </p>
 
 # 46 全排列
@@ -527,7 +525,7 @@ public:
 输出：[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
 
 <p align="center"> 
-    <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/51ans.PNG" style="width:80%;">
+    <img src="/resource/backtravel/51ans.PNG" style="width:80%;">
 </p>
 
 ```cpp
