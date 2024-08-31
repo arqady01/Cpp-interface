@@ -189,8 +189,8 @@ public:
         for (int i = index; i < candidates.size(); i++) {
             sum += candidates[i];
             path.push_back(candidates[i]);
-			//i不用++，因为i传给index，而index控制深度
-			//如果i+1，下次for循环会跳过自己没法重复选取
+            //i不用++，因为i传给index，而index控制深度
+            //如果i+1，下次for循环会跳过自己没法重复选取
             fx(candidates, target, i, sum);
             sum -= candidates[i];
             path.pop_back();
