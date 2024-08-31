@@ -11,6 +11,7 @@
 引入index的目的是防止出现重复的组合，因为用过的数字就不能再用了，下一层递归要怎么知道从哪里开始就需要靠index。
 
 vector<vector<int>> ans; //存放符合条件的所有的结果的集合
+
 vector<int> path; //符合条件的单一数组，存放根节点到叶子节点的路径
 
 > 回溯函数的终止条件该如何选择呢？
@@ -159,15 +160,11 @@ private:
 
 输入：candidates = [2,3,5], target = 8
 
-答案： [ [2,2,2,2], [2,3,3], [3,5] ]
+输出： [ [2,2,2,2], [2,3,3], [3,5] ]
 
 <p align="center"> 
     <img src="/resource/backtravel/39ans.png" style="width:70%;">
 </p>
-
-> 终止条件
-
-当和sum大于target时，条件不成立直接返回；和sum等于target，收集结果后返回。
 
 > 单层递归的逻辑
 
@@ -181,15 +178,18 @@ public:
         return ans;
     }
     void fx(std::vector<int> candidates, int target, int index, int sum) {
+        //递归终止条件Ⅰ：sum大于target时，条件不成立直接返回
         if (sum > target) return;
+        //递归终止条件Ⅱ：sum等于target时，收集结果后返回
         if (sum == target) {
             ans.push_back(path);
             return;
         }
+        
         for (int i = index; i < candidates.size(); i++) {
             sum += candidates[i];
             path.push_back(candidates[i]);
-			//i不用++，因为i是传给index参数的
+			//i不用++，因为i传给index，而index控制深度
 			//如果i+1，下次for循环会跳过自己没法重复选取
             fx(candidates, target, i, sum);
             sum -= candidates[i];
