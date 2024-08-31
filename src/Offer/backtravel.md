@@ -8,7 +8,7 @@
     <img src="https://github.com/arqady01/Cpp-interface/blob/main/resource/backtravel/77.jpg" style="width:60%;">
 </p>
 
-<img src=".\resource\backtravel\77.jpg" width = 60%>
+<img src="/resource/backtravel/77.jpg" width = 60%>
 
 引入index的目的是防止出现重复的组合，因为用过的数字就不能再用了，下一层递归要怎么知道从哪里开始就需要靠index。
 
