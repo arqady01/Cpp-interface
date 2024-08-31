@@ -2250,9 +2250,18 @@ session是另一种记录服务器和客户端会话状态的机制。session基
 
 [题库](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/offer.md)
 
-## 回溯法backtraveling
+## 递归与回溯
 
-回溯法一般用于解决以下这五类问题
+使用递归法的注意事项
+
+1. 递归终止条件
+每个递归函数必须有一个明确的终止条件，否则会无限递归，最终栈溢出
+2. 栈空间限制
+设计递归算法时要考虑递归深度问题，因为递归调用会占用栈空间
+3. 重复计算问题：
+如果递归过程中存在大量重复计算，可以考虑使用剪枝或动态规划来优化性能。
+
+回溯法解决的五类问题
 
 - 组合问题：N个数里面按一定规则找出k个数的集合
 - 切割问题：一个字符串按一定规则有几种切割方式
@@ -2280,7 +2289,7 @@ void backtracking(参数) {
 }
 ```
 
-[回溯法题库](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/backtravel.md)
+[递归与回溯题库](https://github.com/arqady01/Cpp-interface/blob/main/src/Offer/backtravel.md)
 
 ## 链表
 
