@@ -8,7 +8,7 @@
     <img src="/resource/backtravel/77.jpg" style="width:66%;">
 </p>
 
-引入index的目的是防止出现重复的组合，因为用过的数字就不能再用了，下一层递归要怎么知道从哪里开始就需要靠index。
+引入startIndex的目的是防止出现重复的组合，因为用过的数字就不能再用了，下一层递归要怎么知道从哪里开始就需要靠startIndex。
 
 vector<vector<int>> ans; //存放符合条件的所有的结果的集合
 
@@ -27,14 +27,14 @@ class Solution {
 private:
     vector<vector<int>> result;
     vector<int> path;
-    void backtracking(int n, int k, int index) {
+    void backtracking(int n, int k, int startIndex) {
         //终止条件
         if (path.size() == k) {
             result.push_back(path);
             return;
         }
         //单层递归逻辑
-        for (int i = index; i <= n; i++) {
+        for (int i = startIndex; i <= n; i++) {
             path.push_back(i); // 处理节点 
             backtracking(n, k, i + 1); // 递归
             path.pop_back(); // 回溯，撤销处理的节点
@@ -67,14 +67,14 @@ public:
         fx(k, n, 1, 0);
         return ans;
     }
-    void fx(int k, int n, int index, int sum) {
+    void fx(int k, int n, int startIndex, int sum) {
         //终止条件
         if (sum == n && path.size() == k) {
             ans.push_back(path);
             return;
         }
         //单层递归的逻辑
-        for (int i = index; i <= 9; i++) {
+        for (int i = startIndex; i <= 9; i++) {
             path.push_back(i);
             sum += i; //sum是已收集元素和，即path的和
             fx(k, n, i + 1, sum);
@@ -102,13 +102,13 @@ private:
 
 用例"23"，两个数字，那么根节点往下递归两层就可以了，叶子节点就是要收集的结果集
 
-那么终止条件就是如果index等于输入的数字个数（digits.size）了（本来index就是用来遍历digits的）
+那么终止条件就是如果startIndex等于输入的数字个数（digits.size）了（本来startIndex就是用来遍历digits的）
 
 然后收集结果，结束本层递归
 
 > 单层遍历的逻辑
 
-取index指向的数字，并找到对应的字符集。然后for循环来处理这个字符集，注意这个for循环是按照字符集的情况做循环的。
+取startIndex指向的数字，并找到对应的字符集。然后for循环来处理这个字符集，注意这个for循环是按照字符集的情况做循环的。
 
 ```cpp
 class Solution {
@@ -121,18 +121,18 @@ public:
         fx(digits, 0);
         return ans;
     }
-    //index就是看当前取哪个数字的，比如digits=“23”、index=2时，数字取3
-    //同时index还有一个作用，当index等于path大小时，说明符合终止条件了
-    void fx(string digits, int index) { //index一次次自增，直到走完字典
-        if (index == digits.size()) {
+    //startIndex就是看当前取哪个数字的，比如digits=“23”、startIndex=2时，数字取3
+    //同时startIndex还有一个作用，当startIndex等于path大小时，说明符合终止条件了
+    void fx(string digits, int startIndex) { //startIndex一次次自增，直到走完字典
+        if (startIndex == digits.size()) {
             ans.push_back(path);
             return;
         }
-        int num = digits[index] - '0'; //比如从“23”中找到第二个字符3并转为int型
+        int num = digits[startIndex] - '0'; //比如从“23”中找到第二个字符3并转为int型
         std::string ch = letterMap[num]; //取出对应字符集，比如3对应“def”
         for (int i = 0; i < ch.size(); i++) { //单层递归逻辑
             path.push_back(ch[i]); //处理
-            fx(digits, index + 1); //递归
+            fx(digits, startIndex + 1); //递归
             path.pop_back(); //回溯，即回退
         }
     }
@@ -168,7 +168,7 @@ private:
 
 > 单层递归的逻辑
 
-单层for循环依然是从index开始，搜索candidates集合；不过本题是可以重复选取的，反应在代码注释处。
+单层for循环依然是从startIndex开始，搜索candidates集合；不过本题是可以重复选取的，反应在代码注释处。
 
 ```cpp
 class Solution {
@@ -177,7 +177,7 @@ public:
         fx(candidates, target, 0, 0);
         return ans;
     }
-    void fx(std::vector<int> candidates, int target, int index, int sum) {
+    void fx(std::vector<int> candidates, int target, int startIndex, int sum) {
         //递归终止条件Ⅰ：sum大于target时，条件不成立直接返回
         if (sum > target) return;
         //递归终止条件Ⅱ：sum等于target时，收集结果后返回
@@ -186,10 +186,10 @@ public:
             return;
         }
         
-        for (int i = index; i < candidates.size(); i++) {
+        for (int i = startIndex; i < candidates.size(); i++) {
             sum += candidates[i];
             path.push_back(candidates[i]);
-            //i不用++，因为i传给index，而index控制深度
+            //i不用++，因为i传给startIndex
             //如果i+1，下次for循环会跳过自己没法重复选取
             fx(candidates, target, i, sum);
             sum -= candidates[i];
@@ -236,13 +236,13 @@ public:
         fx(candidates, target, used, 0, 0);
         return ans;
     }
-    void fx(vector<int> candidates, int target, vector<bool> used, int index, int sum) {
+    void fx(vector<int> candidates, int target, vector<bool> used, int startIndex, int sum) {
         if (sum == target) {
             ans.push_back(path);
             return;
         }
         //sum + candidates[i] <= target为剪枝操作
-        for (int i = index; i < candidates.size() && sum + candidates[i] <= target; i++) {
+        for (int i = startIndex; i < candidates.size() && sum + candidates[i] <= target; i++) {
             //i - 1可能越界，要保证i>0；同时去重发生在树层上
             if (i > 0 && candidates[i] == candidates[i - 1] && used[i - 1] == false) continue;
             sum += candidates[i];
@@ -277,14 +277,14 @@ public:
         fx(s, 0);
         return ans;
     }
-    void fx(string s, int index) {
-        if (index == s.size()) {
+    void fx(string s, int startIndex) {
+        if (startIndex == s.size()) {
             ans.push_back(path);
             return;
         }
-        for (int i = index; i < s.size(); i++) {
-            if (isPalindrome(s, index, i)) {
-                string str = s.substr(index, i - index + 1);
+        for (int i = startIndex; i < s.size(); i++) {
+            if (isPalindrome(s, startIndex, i)) {
+                string str = s.substr(startIndex, i - startIndex + 1);
                 path.push_back(str);
             } else {
                 continue;
@@ -327,9 +327,9 @@ public:
         fx(nums, 0);
         return ans;
     }
-    void fx(std::vector<int> nums, int index) {
-        if (index >= nums.size()) return;
-        for (int i = index; i < nums.size(); i++) {
+    void fx(std::vector<int> nums, int startIndex) {
+        if (startIndex >= nums.size()) return;
+        for (int i = startIndex; i < nums.size(); i++) {
             path.push_back(nums[i]); //处理
             ans.push_back(path); //每个节点都要纳入结果集
             fx(nums, i + 1);
@@ -367,9 +367,9 @@ public:
         fx(nums, 0, used);
         return ans;
     }
-    void fx(std::vector<int> nums, int index, std::vector<bool> used) {
-        if (index >= nums.size()) return;
-        for (int i = index; i < nums.size(); i++) {
+    void fx(std::vector<int> nums, int startIndex, std::vector<bool> used) {
+        if (startIndex >= nums.size()) return;
+        for (int i = startIndex; i < nums.size(); i++) {
             //used[i - 1] == true，说明同一树枝candidates[i - 1]使用过
             //used[i - 1] == false，说明同一树层candidates[i - 1]使用过
             //要对同一树层使用过的元素进行跳过
@@ -404,13 +404,13 @@ public:
         fx(nums, 0);
         return ans;
     }
-    void fx(std::vector<int> nums, int index) {
+    void fx(std::vector<int> nums, int startIndex) {
         std::unordered_set<int> us;
         if (path.size() >= 2) {
             ans.push_back(path);
             //不要加return
         }
-        for (int i = index; i < nums.size(); i++) {
+        for (int i = startIndex; i < nums.size(); i++) {
             //在同一层中，不能重复使用元素，但是又不能像之前排序后在做，所以借助unordered_set
             //用过的元素加入容器中，如果使用过就会在容器中找到。如果重复使用，直接跳过
             //如果不满足递增条件也直接跳过，path不为空是为了防止调用back()函数段错误
@@ -483,7 +483,7 @@ public:
 
 洒洒水啦
 
-不需要用到index变量，但是要先排序
+不需要用到startIndex变量，但是要先排序
 
 ```cpp
 class Solution {
