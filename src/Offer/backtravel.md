@@ -146,7 +146,7 @@ vector<string> binaryTreePaths(TreeNode* root) {
 }
 ```
 
-## 回溯法
+# 回溯法
 
 - 组合问题：N个数里面按一定规则找出k个数的集合
 - 切割问题：一个字符串按一定规则有几种切割方式
