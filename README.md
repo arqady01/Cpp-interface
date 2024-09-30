@@ -46,29 +46,29 @@
 - 成员变量，修饰成员变量使所有的对象只保存一个该变量，而且不需要实例化类对象就可以访问该成员，比如 类名::成员变量
 ```cpp
 struct MyClass {
-	static int count;
-	MyClass() { count++; }
+    static int count;
+    MyClass() { count++; }
 };
 //无需实例化类，就能使用类的静态成员，此时我们给count赋值
 int MyClass::count = 2;
 int main() {
-	MyClass cls;
-	std::cout << MyClass::count << std::endl; //3
-	//std::cout << cls.count << std::endl; 一样的效果
+    MyClass cls;
+    std::cout << MyClass::count << std::endl; //3
+    //std::cout << cls.count << std::endl; 一样的效果
 }
 ```
 - 成员函数，修饰成员函数使得不需要实例化类对象就可以访问该函数，但只能访问静态成员，不能访问非静态成员
 ```cpp
 struct MyClass {
-	static void get() {
-		std::cout << "Count: " << count << std::endl;
-	}
-	static int count; //静态成员函数只允许访问静态成员变量
+    static void get() {
+        std::cout << "Count: " << count << std::endl;
+    }
+    static int count; //静态成员函数只允许访问静态成员变量
 };
 
 int MyClass::count = 5; //无需实例化类对象就能访问类成员变量
 int main() {
-	MyClass::get(); //无需实例化类对象就能调用类成员静态函数
+    MyClass::get(); //无需实例化类对象就能调用类成员静态函数
 }
 ```
 
