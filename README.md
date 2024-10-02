@@ -2936,15 +2936,16 @@ redis缓存和数据库中**没有相关数据**（比如id < 0 的请求），r
 ## 单例模式
 
 <h3>饿汉式</h3>
-饿汉式不存在线程安全问题
+饿汉式不存在线程安全问题，只有懒汉式在单线程下才会有线程安全的风险
 
 ```cpp
 #include <iostream>
 class Singoton {
 public:
+    //类中的静态函数只能访问类中静态成员变量
 	static Singoton* getInstance() {
 		return ptr;
-	} //类中的静态函数只能访问类中静态成员变量
+	}
 	void show() {
 		std::cout << "hungry\n";
 	}
@@ -2952,11 +2953,12 @@ public:
 	Singoton& operator=(const Singoton& s) = delete;
 private:
 	Singoton() {};
-	static Singoton* ptr; //声明
+	static Singoton* ptr; //静态成员变量声明
 };
-Singoton* Singoton::ptr = new Singoton; //定义
+Singoton* Singoton::ptr = new Singoton; //静态成员变量需在类外定义
 
-int main() { //测试
+//测试
+int main() {
 	Singoton* op = Singoton::getInstance();
 	op->show();
 }
@@ -2969,12 +2971,13 @@ int main() { //测试
 #include <iostream>
 class Singoton {
 public:
-	static Singoton* getInstance() {
+    //类中的静态函数只能访问类中静态成员变量
+    static Singoton* getInstance() {
 		if (ptr == nullptr) {
 			ptr = new Singoton();
 		}
 		return ptr;
-	} //类中的静态函数只能访问类中静态成员变量
+	}
 	void show() {
 		std::cout << "lazy\n";
 	}
@@ -2984,13 +2987,14 @@ private:
 	Singoton() {};
 	static Singoton* ptr; //声明
 };
-Singoton* Singoton::ptr = nullptr; //定义
+Singoton* Singoton::ptr = nullptr; //静态成员变量需在类外定义
 
 int main() { //测试
 	Singoton* op = Singoton::getInstance();
 	op->show();
 }
 ```
+
 试想，现在有两个线程调用了Singoton::getInstance()方法，线程A首先进行判空操作，于是new了一个Singoton对象，此时发生了上下文切换，调度权给到了线程B，线程B首先也进行判空操作，发现为空，于是也new了一个Singoton对象，就发生了问题。<br>
 * 双重检查锁定解决线程安全问题
 
@@ -2998,6 +3002,7 @@ int main() { //测试
 #include <mutex>
 class Singoton {
 public:
+    //类中的静态函数只能访问类中静态成员变量
 	static Singoton* getInstance() {
 		mtx.lock();
 		if (ptr == nullptr) {
@@ -3005,10 +3010,8 @@ public:
 		}
 		mtx.unlock();
 		return ptr;
-	} //类中的静态函数只能访问类中静态成员变量
-	void show() {
-		std::cout << "lazy\n";
 	}
+	void show() { std::cout << "lazy\n"; }
 	Singoton(const Singoton& s) = delete;
 	Singoton& operator=(const Singoton& s) = delete;
 private:
@@ -3016,11 +3019,14 @@ private:
 	static Singoton* ptr; //声明
 	static std::mutex mtx;
 };
-Singoton* Singoton::ptr = nullptr; //定义
+Singoton* Singoton::ptr = nullptr; //静态变量需在类外定义
 std::mutex Singoton::mtx;
 ```
+
 假想现在有三个线程A B C，线程A首先加锁，再判断、new对象，若此时发生了上下文切换，调度权给了线程B和线程C，但是他没有锁资源，进入阻塞态，最终调度权回归线程A，将锁头解锁，于是线程B和线程C自然就解除阻塞，进行判空操作，此时就会因为判空失败而直接返回，线程安全<br>
 但是效率太低了，进行双重检查，在加锁之前再进行一次判空操作：
+
+但是这种写法性能非常低下，因为每次调用getInstance()都会上锁/解锁，而这个步骤只有在第一次new Singleton()才是有必要的，只要p被创建出来了，不管多少线程同时访问，使用if (p == nullptr)进行判断都是足够的（只是读操作，不需要加锁），没有线程安全问题，加了锁之后反而存在性能问题。
 
 ```cpp
 static Singoton* getInstance() {
