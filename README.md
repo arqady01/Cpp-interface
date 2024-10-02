@@ -3030,9 +3030,9 @@ std::mutex Singoton::mtx;
 ```cpp
 static Singoton* getInstance() {
     //只有ptr为空才进行上/解锁操作，如果不为空直接返回出去
-    if (ptr == nullptr) {
+    if (ptr == nullptr) { //第一次检查
         mtx.lock();
-        if (ptr == nullptr) {
+        if (ptr == nullptr) { //第二次检查
             ptr = new Singoton();
         }
         mtx.unlock();
