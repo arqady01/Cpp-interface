@@ -2943,24 +2943,24 @@ redis缓存和数据库中**没有相关数据**（比如id < 0 的请求），r
 class Singoton {
 public:
     //类中的静态函数只能访问类中静态成员变量
-	static Singoton* getInstance() {
-		return ptr;
-	}
-	void show() {
-		std::cout << "hungry\n";
-	}
-	Singoton(const Singoton& s) = delete;
-	Singoton& operator=(const Singoton& s) = delete;
+    static Singoton* getInstance() {
+        return ptr;
+    }
+    void show() {
+        std::cout << "hungry\n";
+    }
+    Singoton(const Singoton& s) = delete;
+    Singoton& operator=(const Singoton& s) = delete;
 private:
-	Singoton() {};
-	static Singoton* ptr; //静态成员变量声明
+    Singoton() {};
+    static Singoton* ptr; //静态成员变量声明
 };
 Singoton* Singoton::ptr = new Singoton; //静态成员变量需在类外定义
 
 //测试
 int main() {
-	Singoton* op = Singoton::getInstance();
-	op->show();
+    Singoton* op = Singoton::getInstance();
+    op->show();
 }
 ```
 
@@ -2973,25 +2973,25 @@ class Singoton {
 public:
     //类中的静态函数只能访问类中静态成员变量
     static Singoton* getInstance() {
-		if (ptr == nullptr) {
-			ptr = new Singoton();
-		}
-		return ptr;
-	}
-	void show() {
-		std::cout << "lazy\n";
-	}
-	Singoton(const Singoton& s) = delete;
-	Singoton& operator=(const Singoton& s) = delete;
+        if (ptr == nullptr) {
+            ptr = new Singoton();
+        }
+        return ptr;
+    }
+    void show() {
+        std::cout << "lazy\n";
+    }
+    Singoton(const Singoton& s) = delete;
+    Singoton& operator=(const Singoton& s) = delete;
 private:
-	Singoton() {};
-	static Singoton* ptr; //声明
+    Singoton() {};
+    static Singoton* ptr; //声明
 };
 Singoton* Singoton::ptr = nullptr; //静态成员变量需在类外定义
 
 int main() { //测试
-	Singoton* op = Singoton::getInstance();
-	op->show();
+    Singoton* op = Singoton::getInstance();
+    op->show();
 }
 ```
 
@@ -3003,41 +3003,41 @@ int main() { //测试
 class Singoton {
 public:
     //类中的静态函数只能访问类中静态成员变量
-	static Singoton* getInstance() {
-		mtx.lock();
-		if (ptr == nullptr) {
-			ptr = new Singoton();
-		}
-		mtx.unlock();
-		return ptr;
-	}
-	void show() { std::cout << "lazy\n"; }
-	Singoton(const Singoton& s) = delete;
-	Singoton& operator=(const Singoton& s) = delete;
+    static Singoton* getInstance() {
+        mtx.lock();
+        if (ptr == nullptr) {
+            ptr = new Singoton();
+        }
+        mtx.unlock();
+        return ptr;
+    }
+    void show() { std::cout << "lazy\n"; }
+    Singoton(const Singoton& s) = delete;
+    Singoton& operator=(const Singoton& s) = delete;
 private:
-	Singoton() {};
-	static Singoton* ptr; //声明
-	static std::mutex mtx;
+    Singoton() {};
+    static Singoton* ptr; //声明
+    static std::mutex mtx;
 };
 Singoton* Singoton::ptr = nullptr; //静态变量需在类外定义
 std::mutex Singoton::mtx;
 ```
 
-假想现在有三个线程A B C，线程A首先加锁，再判断、new对象，若此时发生了上下文切换，调度权给了线程B和线程C，但是他没有锁资源，进入阻塞态，最终调度权回归线程A，将锁头解锁，于是线程B和线程C自然就解除阻塞，进行判空操作，此时就会因为判空失败而直接返回，线程安全<br>
-但是效率太低了，进行双重检查，在加锁之前再进行一次判空操作：
+假想现在有三个线程A B C，线程A首先加锁，再判断、new对象，若此时发生了上下文切换，调度权给了线程B和线程C，但是他没有锁资源，进入阻塞态，最终调度权回归线程A，将锁头解锁，于是线程B和线程C自然就解除阻塞，进行判空操作，此时就会因为判空失败而直接返回，线程安全
 
-但是这种写法性能非常低下，因为每次调用getInstance()都会上锁/解锁，而这个步骤只有在第一次new Singleton()才是有必要的，只要p被创建出来了，不管多少线程同时访问，使用if (p == nullptr)进行判断都是足够的（只是读操作，不需要加锁），没有线程安全问题，加了锁之后反而存在性能问题。
+但是这种写法性能非常低下，因为每次调用getInstance()都会上锁/解锁，而这个步骤只有在第一次new Singleton()才是有必要的，只要ptr被创建出来了，不管多少线程同时访问，使用if (ptr == nullptr)进行判断都是足够的（只是读操作，不需要加锁），没有线程安全问题，加了锁之后反而存在性能问题。
 
 ```cpp
 static Singoton* getInstance() {
-	if (ptr == nullptr) {
-		mtx.lock();
-		if (ptr == nullptr) {
-			ptr = new Singoton();
-		}
-		mtx.unlock();
-	}
-	return ptr;
+    //只有ptr为空才进行上/解锁操作，如果不为空直接返回出去
+    if (ptr == nullptr) {
+        mtx.lock();
+        if (ptr == nullptr) {
+            ptr = new Singoton();
+        }
+        mtx.unlock();
+    }
+    return ptr;
 }
 ```
 
