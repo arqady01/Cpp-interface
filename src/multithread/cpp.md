@@ -1,8 +1,8 @@
-## 线程id
+# 线程id
 
 每个线程都对应着线程id，可以通过`std::this_thread::get_id()`获取
 
-## 线程创建
+# 创建的方式
 
 - 通过非成员函数创建线程
 
@@ -16,7 +16,7 @@ int main() {
 }
 ```
 
-- 通过成员函数创建线程
+- 普通成员函数创建线程
 
 理解两个&的含义，第一个表示取成员函数的地址，第二个表示类的实例化对象地址
 
@@ -38,6 +38,22 @@ int main() {
 }
 ```
 
+- 通过仿函数创建线程
+
+```cpp
+struct test {
+    void operator()(){
+        std::cout << "子线程\n";
+    }
+};
+int main() {
+    test t;
+    std::thread pthread(t); //可以仔细对比上一种方式
+    pthread.join();
+    std::cout << "main函数\n";
+}
+```
+
 - 类中创建线程
 
 借助this指针
@@ -55,27 +71,11 @@ int main() {
 }
 ```
 
-- 通过仿函数创建线程
-
-```cpp
-struct test {
-    void operator()(){
-        std::cout << "子线程\n";
-    }
-};
-int main() {
-    test t;
-    std::thread pthread(t);
-    pthread.join();
-    std::cout << "main函数\n";
-}
-```
-
 - 通过lambda创建线程
 
 ```cpp
 int main() {
-    auto print = [](){std::cout << "子线程\n";};
+    auto print = [](){ std::cout << "子线程\n"; };
     std::thread pthread(print);
     pthread.join();
     std::cout << "main函数\n";
@@ -114,9 +114,9 @@ int main() {
 }
 ```
 
-## 计算二维数组的最大值
+# 例题：计算二维数组的最大值
 
-思路是拦腰将二维数组切成两半，上下分别求各自的最大值
+拦腰将二维数组切成两半，上下分别求各自的最大值
 
 ```cpp
 int matrix[4][4] = {{1,5,3,6},{22,80,4,34},{4,45,67,3},{99,3,23,3}};
@@ -144,7 +144,7 @@ int main() {
 }
 ```
 
-## std::lock()
+# std::lock()
 
 多个线程尝试用lock()上锁，只有一个线程能上锁成功，如果没有锁头上锁成功，那么流程将卡在lock()这里
 
@@ -153,9 +153,9 @@ int main() {
 - 如果所有的互斥量都没有被锁定，那么lock()会给它们都上锁
 - 只要有一个互斥量已经被其他线程锁定，那么lock()会阻塞当前线程，直到所有的互斥量都可用，并给它们都上锁
 
-#### 生产者消费者模型
+## 生产-消费者模型
 
-线程1负责收集玩家命令，并把命令数据写到队列中；线程2负责从队列中取出并执行命令
+线程1负责收集玩家指令并把命令数据写到队列中；线程2负责从队列中取出并执行命令（有点像进程间通信方式之一的消息队列）
 
 实现思路：使用成员函数作为线程函数，做多线程
 
@@ -163,14 +163,16 @@ int main() {
 #define NUM 10000
 class test {
 public:
-    void PushMsg() { //线程1：把命令塞到消息队列中
+    //线程1：把命令塞到消息队列中
+    void PushMsg() {
         for (int i = 0; i < NUM; ++i) {
             mtx.lock(); //上锁
-            msgQueue.push_back(i); //假设i就是命令，塞到消息队列中
+            msgQueue.push_back(i); //假设i就是指令，塞到消息队列中
             mtx.unlock(); //解锁
         }
     }
-    void GetMsg() { //线程2：提取消息队列中的命令
+    //线程2：提取消息队列中的命令
+    void GetMsg() {
         for (int i = 0; i < NUM; ++i) {
             mtx.lock(); //上锁
             if (!msgQueue.empty()) {
@@ -184,7 +186,7 @@ public:
         }
     }
 private:
-    std::list<int> msgQueue; //命令容器
+    std::list<int> msgQueue; //指令容器
     std::mutex mtx; //互斥锁
 };
 int main() {
@@ -196,7 +198,7 @@ int main() {
 }
 ```
 
-## lock_guard<>
+# RAII之lock_guard<>
 
 lock_guard构造函数中执行lock，作用域结束后，调用析构函数，执行unlock，如此一来就取代了lock和unlock
 
@@ -215,47 +217,87 @@ int main() {
 }
 ```
 
-- lock_guard的copy ctor和operator= ctor是私有的，所以lock_guard是不可复制和转移的
-- lock_guard无法手动上下锁，只能在ctor和dtor中自动执行，因此它的锁的粒度是固定的
-- lock_guard的效率比较高，因为它不需要维护锁的状态
+- `lock_guard`的copy ctor和operator= ctor是私有的，所以lock_guard是不可复制和转移的
+- `lock_guard`无法手动上下锁，只能在ctor和dtor中自动执行，因此它的锁的粒度是固定的
+- `lock_guard`的效率比较高，因为它不需要维护锁的状态
+- `lock_guard`比lock / unlock更安全：因为`lock_guard`结束时，锁会自动释放，不论是否有异常
+```cpp
+std::mutex mtx;
+void riskyFunction() {
+    mtx.lock();  // 手动加锁
+    // 如果在此处发生异常，下面的unlock将不会执行，导致死锁
+    throw std::runtime_error("Something went wrong!");
+    mtx.unlock();  // 手动解锁
+}
+```
 
-## unique_lock<>
+# RAII之unique_lock<>
 
 unique_lock比lock_guard灵活，也一样无需手动上下锁，但占用更大的内存
 
-- unique_lock可以在构造时指定不同的锁策略
-    - try_to_lock，尝试锁定，上锁失败可以立即返回，所以不能提前lock。如果其他线程持续占有互斥锁，那么该线程不会继续等待
-    - defer_lock，延迟锁定，初始化了一个未上锁的mutex，也不能提前lock。不加锁是因为以后可以调用成员方法
-    - adopt_lock，接管锁定，互斥量必须提前上锁否则异常。表现为线程已拥有互斥量的所有权，不需要在构造函数中lock此互斥量
-- defer_lock特有的成员函数
+1. unique_lock可以在构造时指定不同的锁策略
+    1. `std::try_to_lock`，尝试锁定，所以不能提前lock。上锁失败，也不会阻塞，程序可以决定是否继续执行其他逻辑
+```cpp
+void task() {
+    std::unique_lock<std::mutex> lock(mtx, std::try_to_lock); // 尝试锁定，不会阻塞
+    if (lock.owns_lock()) {
+        std::cout << "Thread " << std::this_thread::get_id() << " acquired the lock." << std::endl;
+    } else {
+        std::cout << "Thread " << std::this_thread::get_id() << " could not acquire the lock." << std::endl;
+    }
+}
+```
+    2. `std::defer_lock`，延迟锁定，初始化了一个未上锁的mutex，也不能提前lock。不加锁是因为以后可以调用成员方法
+```cpp
+void task() {
+    std::unique_lock<std::mutex> lock(mtx, std::defer_lock); // 不立即锁定
+    // 在稍后需要时手动加锁
+    lock.lock();
+    std::cout << std::this_thread::get_id() << " acquired the lock.";
+    // 临界区代码
+    lock.unlock(); // 手动解锁
+}
+```
+    3. `std::adopt_lock`，接管锁定，互斥量必须提前上锁否则异常。表现为线程已拥有互斥量的所有权，不需要再次锁定
+```cpp
+void task() {
+    mtx.lock();  // 提前手动锁定互斥量
+
+    // 使用 adopt_lock 告诉 unique_lock，互斥量已经被锁定，不需要再锁定
+    std::unique_lock<std::mutex> lock(mtx, std::adopt_lock);
+
+    // 临界区代码
+    std::cout << std::this_thread::get_id() << " is working in critical section.\n";
+}
+```
+
+2. defer_lock特有的成员函数
     - lock()，对于未上锁的unique_lock，可以通过lock()进行上锁
     - try_lock()，尝试给互斥量上锁，成功返回true，失败返回false
     - try_lock_for(std::chrono::seconds(n))，若上锁不成功，那就等待n个时间单位，时间一到还未获得锁资源，就退出不再等待
-- unlock()，对于上锁的互斥量，可以暂时解锁来运行一些不需要共享数据的代码
-- release()，返回他所管理的互斥量对象指针，并释放所有权。release()后必须要给上锁的互斥量解锁，否则报错
-
+3. unlock()函数，对于上锁的互斥量，可以暂时解锁来运行一些不需要共享数据的代码
+4. release()函数，返回互斥量对象指针，并释放 unique_lock 对互斥量的管理。release()后必须要给上锁的互斥量解锁，否则报错
 ```cpp
 std::mutex mtx;
 std::unique_lock<std::mutex> lck(mtx);
 std::mutex* ptr = lck.release(); //所有权由ptr接管
 ptr->unlock(); //手动解锁，不然互斥量一直被锁定
 ```
-
-- 通过move()可以实现转移所有权，但不能复制。
+5. owns_lock()，返回布尔值，指示当前是否持有锁
+6. move()函数，转移所有权，但不能复制。
 
 ```cpp
 std::unique_lock<std::mutex> lk1(mtx);
 std::unique_lock<std::mutex> lk2 = std::move(lk1);  //转移所有权
-
 ```
 
-举个例子，这个cplusplus.com的示例代码
+举个例子，这个cplusplus.com的示例代码：
 
 ```cpp
 std::mutex mtx; //全局互斥量
 void print_block(int n, char c) {
   //unique_lock在构造时尝试锁定互斥量，如果锁定失败，会立即返回
-  std::unique_lock<std::mutex> lck(mtx, std::try_to_lock); //第二参数可省略
+  std::unique_lock<std::mutex> lck(mtx, std::try_to_lock); //尝试上锁
   //检查是否成功获取锁
   if (lck.owns_lock()) {
     //打印n个字符c
@@ -263,7 +305,7 @@ void print_block(int n, char c) {
       std::cout << c;
     }
     std::cout << '\n';
-  } else {//如果没有获取锁，打印另一条信息
+  } else { //如果没有获取锁，打印另一条信息
     std::cout << "lock failed: " << c << '\n';
   }
 }
@@ -277,11 +319,12 @@ int main() {
 }
 ```
 
-可能正常输出，也可能失败，却决于哪个线程先锁定互斥量
+可能正常输出，也可能失败，取决于哪个线程先锁定互斥量
 
-## 单例模式
+# feat.单例模式
 
 ```cpp
+//懒汉式
 class singoton {
 public:
     //ctor为私有导致无法创建对象，static可以保证不创建对象就能调用函数
@@ -296,13 +339,14 @@ private:
     };
 private:
     singoton() {}; //ctor设为私有
-    //未创建对象就调用getPtr()是ok的，但是*sn也要提前创建，所以设为静态
+    //解释1：静态成员函数只能访问静态成员变量，所以*sn设置为静态
+    //解释2：未创建对象就调用getPtr()是ok的，但是*sn也要提前创建，所以设为静态
     static singoton* sn;
 };
-singoton* singoton::sn = nullptr; //懒汉式
+singoton* singoton::sn = nullptr; //类外定义
 
 int main() {
-    //创建类的唯一对象，相当于 singoton* ptr = new singoton();
+    //创建类的唯一对象，类似于 singoton* ptr = new singoton();
     singoton* ptr = singoton::getPtr();
     //因为sn不为空，调用getPtr，*sn也会原封不动的传出来
     singoton* ptr2 = singoton::getPtr();
@@ -312,10 +356,12 @@ int main() {
 
 假设在主函数中，有两个线程调用单例模式，假设线程A判断完指针为空，正准备创建指针，调度权给到了线程B，刚好指针也为空，所以B创建成功
 
-调度权回到了A，他不会再判断了，直接创建。此时创建了两个，问题出现
+调度权回到了A，A不会再判断了，直接创建。此时创建了两个，出现bug
 
 ```cpp
-std::mutex mtx; //不放到类内，是因为静态成员函数只能访问静态成员，除非也定义成静态
+//不放到类内，是因为静态成员函数只能访问静态成员，除非也定义成静态
+std::mutex mtx;
+
 class singoton {
 public:
     //ctor为私有导致无法创建对象，static可以保证不创建对象就能调用函数
@@ -326,6 +372,7 @@ public:
     }
     void print() { std::cout << "singoton mode\n"; }
 private:
+    //垃圾回收：类中类
     struct CS {
     public:
         ~CS() {
@@ -333,14 +380,16 @@ private:
             singoton::sn = nullptr;
         }
     };
-    static CS cs;
+    static CS cs; //实例化成静态，那么类外就必须要定义了
 private:
     singoton() {}; //ctor设为私有
-    //未创建对象就调用getPtr()是ok的，但是*sn也要提前创建，所以设为静态
+    //解释1：静态成员函数只能访问静态成员变量，所以*sn设置为静态
+    //解释2：未创建对象就调用getPtr()是ok的，但是*sn也要提前创建，所以设为静态
     static singoton* sn;
 };
 singoton* singoton::sn = nullptr; //懒汉式
 singoton::CS singoton::cs; //必须初始化，不然程序结束无法析构CS
+
 void test() {
     std::cout << "start\n";
     singoton* ptr = singoton::getPtr();
@@ -353,7 +402,7 @@ int main() {
 }
 ```
 
-#### 效率改进
+## 效率改进：双重检查锁
 
 ```cpp
 static singoton* getPtr() {
@@ -371,32 +420,32 @@ static singoton* getPtr() {
 
 所以，只需要针对sn判断，若指针sn非空，一定被创建过，直接返回即可；若指针为空，因为不确定，所以需要互斥锁保护
 
-## call_once
+# std::call_once
 
-确保函数只执行一次，也就具备互斥量的能力。常用的场景如初始化操作或一些系统参数的获取等
+确保某函数只执行一次，也就具备互斥量的能力。常用的场景如初始化操作或一些系统参数的获取等
 
 需要搭配`std::once_flag`一起使用，原理就是检查标志位是否被改写，有就说明函数被执行过；没有被改写就说明函数未执行
 
 ```cpp
 std::once_flag flag; //定义一个once_flag对象
-void Initialize() {
-    std::cout << "Initialize..." << std::endl;
+void init() {
+    std::cout << "初始化...." << std::endl;
 }
 
-void Init() {
-    std::call_once(flag, Initialize);
+void func() {
+    std::call_once(flag, init);
 }
 
 int main() {
     //创建两个线程，都调用Init函数
-    std::thread(Init).join(); 
-    std::thread(Init).join();
+    std::thread(func).join(); 
+    std::thread(func).join();
 }
 ```
 
-Initialize()只被调用了一次，而其他线程则等待该函数执行完成后返回
+init()只被调用了一次，而其他线程则等待该函数执行完成后返回
 
-## 条件变量
+# 条件变量
 
 条件变量允许一个线程等待另一个线程满足某个条件
 
@@ -443,7 +492,7 @@ int main() {
 }
 ```
 
-#### 虚假唤醒
+## 虚假唤醒
 
 如果wait不指定第二参数，那么第二参数默认为false，如果使用不当就会造成虚假唤醒
 
@@ -475,7 +524,7 @@ void consumer() {
 
 或者用lambda去指定wait的第二参数也可以，这也是推荐做法
 
-#### leetcode1116 打印零与奇偶数
+## leetcode1116 打印零与奇偶数
 
 定义一个printNumber(x)函数，他会输出数字x，给定一个ZeroEvenOdd实例，其中
 
@@ -530,7 +579,7 @@ public:
 };
 ```
 
-## std::promise & std::future
+# std::promise & std::future
 
 利用勾股定理求第三边边长，单线程做法：
 
@@ -596,7 +645,7 @@ int main() {
 }
 ```
 
-## std::async
+# std::async
 
 用来启动一个异步任务（自动创建一个线程并执行对应的线程入口函数），随后返回一个std::future对象
 
