@@ -1850,18 +1850,20 @@ void clearEverything(WebBrowser& wb) {
 <h1 id="internet">☁️ 计算机网络</h1>
 
 ## 输入网址后发生了什么？
+1. 输入url后，用户主机先查询本机DNS缓存，有记录就知道待访问url的IP是什么了
+2. 如果没有记录，DNS客户端就发送DNS查询报文，它被UDP协议封装成UDP数据报，进一步封装在IP数据报中，通过以太网发送给DNS服务器
+3. 服务器解析之后回送一个DNS响应报文，封装在IP数据包中
+4. 用户主机的DNS进程解析之后就知道url对应的IP是什么，随后存储到DNS表中
+5. 用户主机主动发起TCP三次握手，请求和web服务器建立连接
+6. 用户主机的HTTP进程发送HTTP请求报文，它被TCP协议封装成TCP报文段，进一步封装进IP数据报发送出去
+7. web服务器接收到后解析报文，并回送HTTP响应报文传给用户主机
+8. 用户主机接收后根据端口号，交给HTTP进程解析并渲染
 
-1.域名由DNS解析到IP地址<br>
-2.三次握手建立tcp连接<br>
-3.浏览器发送http请求<br>
-4.服务器处理该http请求，返回一个html文件<br>
-5.浏览器解析并渲染
-
-## 计算机网络体系结构
+## 分层架构
 
 ![计算机网络体系结构](https://github.com/arqady01/cpp-interview/blob/main/internet/%E7%BD%91%E7%BB%9C%E5%88%86%E5%B1%82%E6%A8%A1%E5%9E%8B.png)
 
-## 各层作用及协议
+各层作用及常见协议：
 
 七层 | 作用 | 协议
 ---|---|---
@@ -1881,7 +1883,7 @@ void clearEverything(WebBrowser& wb) {
 数据链路层 | 相邻网络节点间的数据传输 | 解决分组在相邻网络上传输的问题 | PPP MAC
 物理层 | 在线路上传输比特bit | 解决用何种信号传输比特的问题 | RJ45 IEEE802.3
 
-## 物理层
+**物理层**
 
 * 传输数据的单位：比特
 * 数据传输系统：源系统（源点、发送器） --> 传输系统 --> 目的系统（接收器、终点）
@@ -1897,7 +1899,7 @@ void clearEverything(WebBrowser& wb) {
 * 波分复用（WDM，Wavelength Division Multiplexing）：光的频分复用
 * 码分复用（CDM，Code Division Multiplexing）：不同用户使用不同的码，可以在同样时间使用同样频带通信
 
-## 数据链路层
+**数据链路层**
 
 主要信道：
 * 点对点信道
