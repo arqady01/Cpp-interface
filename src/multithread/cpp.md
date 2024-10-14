@@ -42,15 +42,15 @@ int main() {
 
 ```cpp
 struct test {
-    void operator()(){
-        std::cout << "子线程\n";
-    }
+	void operator()(int a){
+		std::cout << a;
+	}
 };
 int main() {
-    test t;
-    std::thread pthread(t); //可以仔细对比上一种方式
-    pthread.join();
-    std::cout << "main函数\n";
+	test t;
+	std::thread pthread(t, 5); //可以仔细对比上一种方式
+	pthread.join();
+	std::cout << "main函数\n";
 }
 ```
 
