@@ -102,20 +102,40 @@ int main() {
 链式引用允许我们在一个表达式中连续调用同一个对象的方法。每个方法在执行完操作后返回对象自身（比如*this），从而使得下一个方法调用成为可能。
 ```cpp
 struct complex {
-    complex& operator+=(const complex&);
+    complex& operator+=(const complex& r) {
+        return dop(this, r); //为了和dop参数匹配，需要显式使用this指针
+    }
     int a;
 };
-//设计的函数：需要传递两个参数，调用者和被调用者
+//设计的函数：传递两个参数，调用者和被调用者
 //返回类型必须是引用，不然返回一个临时对象，生命周期不足以进入第二个参数
 complex& dop(complex* t, const complex& c) {
     t->a += c.a; //改造t
     return *t; //改造完后将其返回
 }
-//类外定义
-complex& complex::operator+=(const complex& r) {
-    return dop(this, r); //为了和dop参数匹配，需要显式使用this指针
-}
+
+main():
 //链式使用：c3 += c2 += c1;
+```
+
+```cpp
+class buffer {
+private:
+    std::string str;
+public:
+    buffer() : str("") {} //ctor
+    //添加字符串
+    buffer& append(const std::string& s) {
+        str += s;
+        return *this; //返回对象自身的引用
+    }
+};
+
+int main() {
+    buffer sb;
+    //链式引用
+    std::string result = sb.append("abcd").append("efg");
+}
 ```
 
 2. lambda中捕获this指针
