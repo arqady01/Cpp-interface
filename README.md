@@ -49,7 +49,7 @@
 - 普通函数，指明作用范围，仅在定义该函数的文件内才能使用。团队开发项目时，为防止和他人的函数重名，可将函数定义成static
 - 成员变量，static成员变量必须在类外进行定义和初始化，因为static成员不属于类的任何对象，而是属于整个类。可以不需要实例化类对象就可以访问该成员，比如`类名::成员变量`
     - 静态成员变量的定义不能重复。多人开发时，如果静态成员变量的定义直接写在头文件中，该头文件被多次引用在其他源文件中并重新定义，就会出现错误
-    - 只有常量静态成员可以在类中同时声明并定义：`class X { static const int num{42}; };`，或者`inline static int num = 42;`
+    - 只有常量静态成员可以在类中同时声明并定义：`class X { static const int num{42}; };`，或者`inline static int num = 42;`。前者不可修改后者可以修改
 ```cpp
 struct MyClass {
     static int count;
@@ -242,13 +242,12 @@ String& String::operator=(const String& str) {
 - inline函数的改变需要重新编译，不像 non-inline 可以直接链接
 - 是否内联的决定权在于编译器，用户不可控
 
-
 ```cpp
 struct X {
     inline static int num = 10;
 };
 ```
-- 相比于类内静态成员变量必须在类外定义，inline修饰的静态成员就可以同时声明和定义（可以结合static章节来看）
+- 相比于类内静态成员变量必须在类外定义，inline修饰的静态成员就可以同时声明和定义（`static const`类内成员也可以，但是定义后不可更改）
 - inline修饰的静态成员，即使将类X作为头文件包含在多个源文件中，并且多次定义，也不会有问题，而类内静态成员变量被多次重新定义会出错
 
 ## extern
