@@ -253,13 +253,46 @@ struct X {
 ## extern
 
 - 对变量或函数进行声明：表示extern修饰的变量或者函数定义在别的文件中，告知编译器遇到此变量或函数时，应去别的文件中寻找它的定义
-- 对链接规范进行指定：当与字符串连用时，extern指明当前声明使用了其他语言的链接规范。比如extern "C"，就表示使用C语言的链接规范。
+- 对链接规范进行指定：与"C"一起使用，指示编译器使用C语言的链接方式，方便调用C库
 
 ## mutable 
+在类中的const成员函数中，不能修改非mutable的成员变量，但可以修改mutable成员变量。谨慎使用，滥用可能会破坏类的逻辑状态
 
-在类中声明一个可变的数据成员。如果一个数据成员被声明为mutable，即使在const成员函数中，数据成员依旧可以被修改，谨慎使用，滥用可能会破坏类的逻辑状态
-
-mutable 允许在不改变对象状态的情况下修改数据成员。这在一些特殊情况下非常有用，比如实现缓存、线程安全性等。例如，一个类需要在第一次请求时计算一个值并缓存结果，就可以使用mutable来修改缓存的数据成员。
+使用场景：
+1. 缓存数据：当需要在const成员函数中缓存某些计算结果时，可以使用mutable
+2. 统计信息：在类中维护一些统计信息（如调用次数），即使在const上下文中也需要更新
+```cpp
+class Example {
+public:
+    Example() : count(0) {} //ctor
+    void increment() const {  //const成员函数
+        count++;  //允许修改mutable成员
+    }
+    void display() const {
+        std::cout << count << std::endl;
+    }
+private:
+    mutable int count;  //mutable成员变量
+};
+int main() {
+    const Example ex; //创建const对象
+    ex.increment(); //允许调用const成员函数
+    ex.display(); //输出: Count: 1
+}
+```
+3. 线程同步
+```cpp
+class ThreadSafeCounter {
+private:
+    mutable std::mutex mtx;  //可在const函数中使用
+    mutable int count = 0;
+public:
+    void increment() const {
+        std::lock_guard<std::mutex> lock(mtx); //自动上下锁
+        count++;  //即使在const函数中也可修改
+    }
+};
+```
 
 ## volatile
 
