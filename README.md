@@ -296,28 +296,98 @@ public:
 
 ## volatile
 
-声明变量是容易发生变化的（比如在中断处理或者硬件操作中），不要对该变量进行优化，每次取值都必须从内存中去取，而不是去之前保存在寄存器中的值，以避免对变量访问进行优化，从而确保变量的实时性。
+- 防止编译器优化
+    - 每次取值都必须从内存中重新读取，而不是使用寄存器中的值，以避免对变量访问进行优化
+    - 确保对该变量的读写操作都直接针对内存
+- 多线程可见性
+    - 保证多个线程都能看到该变量的最新值
+    - 注意：volatile不能保证操作的原子性，不能替代互斥锁
+    - 对于多线程程序，优先考虑std::atomic和互斥锁
 
-常见场景:
+常见使用场景
 
-- 共享变量，多线程中使用共享变量不应对变量优化
-- 中断程序会修改其他程序中使用的变量
+1. 主要用于硬件交互和信号处理
+2. 中断服务程序中的标志
+```cpp
+volatile bool interruptFlag = false;
+
+void interruptHandler() {
+    interruptFlag = true;
+}
+
+void mainLoop() {
+    while (!interruptFlag) {
+        // 等待中断
+    }
+}
+```
+3. 多线程共享的状态标志
+```cpp
+volatile bool shouldExit = false;
+
+void workerThread() {
+    while (!shouldExit) {
+        // 执行任务
+    }
+}
+```
+
+错误案例
+```cpp
+// 错误：不能保证线程安全
+volatile int counter = 0;
+void increment() {
+    counter++;  // 非原子操作
+}
+
+// 正确：使用atomic
+std::atomic<int> counter{0};
+void increment() {
+    counter++;  // 原子操作
+}
+```
 
 ## explicit
 
-- 修饰构造函数时，可以防止隐式转换和复制初始化
-- 修饰转换函数时，可以防止隐式转换
+- 防止隐式转换
+    - 用于构造函数，防止隐式类型转换
+    - 要求必须使用直接初始化或显式类型转换
+
+```cpp
+class MyString {
+public:
+    //不使用explicit时，允许隐式转换
+    MyString(const char* str) {
+        //构造函数实现....
+    }
+};
+
+class SafeString {
+public:
+    //使用explicit，禁止隐式转换
+    explicit SafeString(const char* str) {
+        //构造函数实现....
+    }
+};
+
+void example() {
+    MyString str1 = "hello";     // 允许，发生隐式转换
+    SafeString str2 = "world";   // 错误！不允许隐式转换
+    SafeString str3("world");    // 正确，显式构造
+    SafeString str4 = SafeString("world");  // 正确，显式构造
+}
+```
 
 ## struct & class
 
 以下说的struct都是C语言的结构体，不是C++的！
 
-- 访问权限不同，struct默认public属性，class默认private属性
-- struct没有构造函数，更不能用列表初始化；struct只能用函数指针不能定义函数
+- 访问权限不同，struct默认public，class默认private
+- struct默认继承权限是public，class继承默认private
+- struct没有构造函数，更不能用列表初始化，struct只能用函数指针不能定义函数
 - struct无法重载malloc（不过本身malloc也不支持重载），class可以operator new接管内存分配
 - struct必须定义别名才能使用`typedef struct {} stu;`
-- 继承相关
-- 类能够实现类模板，但是class不支持虚函数模板
+- 类能够实现类模板，但是class不支持虚函数模板【看书回答】
 
 ## 面向对象特性
 
