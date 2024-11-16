@@ -349,33 +349,71 @@ void increment() {
 
 ## explicit
 
-- 防止隐式转换
-    - 用于构造函数，防止隐式类型转换
-    - 要求必须使用直接初始化或显式类型转换
+用于构造函数或类型转换函数，强制要求使用直接初始化，为了防止隐式类型转换。在设计类时，要仔细考虑是否需要允许隐式转换，并相应地使用或省略explicit关键词
 
-```cpp
-class MyString {
-public:
-    //不使用explicit时，允许隐式转换
-    MyString(const char* str) {
-        //构造函数实现....
-    }
+**使用场景**
+
+1. 构造函数
+
+```c++
+struct MyString {
+    MyString(int size) { /* ... */ }
+};
+MyString str = 10; //允许隐式转换将10转换为MyString对象
+
+struct SafeString {
+    explicit SafeString(int size) { /* ... */ }
 };
 
-class SafeString {
-public:
-    //使用explicit，禁止隐式转换
-    explicit SafeString(const char* str) {
-        //构造函数实现....
-    }
+SafeString str = 10; //编译错误：不允许隐式转换
+SafeString str2(10); //正确：显式构造
+SafeString str3 = SafeString(42); //正确：显式构造
+```
+
+2. 类型转换函数
+
+```c++
+struct Number {
+    int value;
+    Number(int v): value(v) {}
+    //不使用explicit的转换运算符
+    operator bool() { return value != 0; }
 };
 
-void example() {
-    MyString str1 = "hello";     // 允许，发生隐式转换
-    SafeString str2 = "world";   // 错误！不允许隐式转换
-    SafeString str3("world");    // 正确，显式构造
-    SafeString str4 = SafeString("world");  // 正确，显式构造
-}
+struct SafeNumber {
+    int value;
+    SafeNumber(int v): value(v) {}
+    //使用explicit的转换运算符
+    explicit operator bool() { return value != 0; }
+};
+```
+
+**优势**
+
+1. 防止意外的类型转换
+2. 避免潜在bug
+```c++
+void processString(const MyString& str) { /* ... */ }
+
+// 不使用explicit时可能出现的问题
+processString(100); //意外地创建了临时MyString对象
+
+// 使用explicit后
+processString(100); //编译错误，强制开发者明确意图
+processString(MyString(100)); //正确：显式转换
+```
+3. 防止二义性
+```c++
+class Distance {
+public:
+    explicit Distance(double d) : meters(d) {}
+private:
+    double meters;
+};
+void calculate(const Distance& d) { /* ... */ }
+
+calculate(5.0); //如果没有explicit，这里可能产生二义性
+calculate(Distance(5.0)); //使用explicit后，必须明确指定
 ```
 
 ## struct & class
