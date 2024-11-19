@@ -482,7 +482,7 @@ class Calculator {
 3. 返回值类型相同
 4. 父类函数必须是虚函数
 
-当子类重写了父类的虚函数foo()时，以下三种方法都对：
+当子类重写了父类的虚函数foo()时，以下三种方法都对；但是推荐用第三种方法，因为如果手抖写成f0o()，编译就会报错因为找不到父类中f0o这个虚函数
 
 ```cpp
 void foo();
@@ -490,15 +490,7 @@ virtual void foo();
 virtual void foo() override;
 ```
 
-但是推荐用第三种方法，因为如果手抖写成f0o()，编译就会报错因为找不到父类中f0o这个虚函数
-
-### 重载和重写区别
-
-- 重载是不同函数之间的水平关系，重写是父类和子类之间的垂直关系
-- 重载要求参数列表不同，返回值无要求；重写要求参数列表必须相同
-- 重载根据调用时实参表和形参表的对应关系来选择函数体；重写调用方法根据对象类型决定
-
-## 隐藏hide
+### 隐藏hide
 
 某些情况下，子类中的函数隐藏了父类中的同名函数
 
@@ -525,11 +517,40 @@ int main() {
 
 两个函数参数不同，无论父类函数是不是虚函数，都会被隐藏
 
-## final
+### final
 
-不希望某个类被继承，可以在类后加上final关键字
-
-不希望某个类的虚函数在子类中被重写，可以在函数后加上final关键字
+- 防止类被继承
+```cpp
+struct Base final {
+    void display() {
+        std::cout << "Base class" << std::endl;
+    }
+};
+//编译错误：不能继承final类
+class Derived : public Base { };
+```
+- 防止虚函数被重写
+```cpp
+class Base {
+public:
+    virtual void display() final {
+        std::cout << "Base display" << std::endl;
+    }
+    virtual void show() {
+        std::cout << "Base show" << std::endl;
+    }
+};
+class Derived: public Base {
+    //编译错误：不能重写final函数
+    virtual void display() {  
+        std::cout << "Derived display" << std::endl;
+    }
+    //正确：show()不是final，可以被重写
+    virtual void show() override {  
+        std::cout << "Derived show" << std::endl;
+    }
+};
+```
 
 ### 虚函数表&虚函数表指针
 
@@ -683,18 +704,49 @@ public:
 
 ## RTTI运行时类型信息
 
-typeid
+RTTI允许程序在运行时获取和使用对象的类型信息。RTTI主要通过以下三种方式实现：
 
-- typeid 运算符允许在运行时确定对象的类型
-- type_id 返回一个 type_info 对象的引用
-- 如果想通过基类的指针获得派生类的数据类型，基类必须带有虚函数
-- 只能获取对象的实际类型
+1. `typeid`运算符
+
+`typeid`运算符返回一个`type_info`对象的引用，只能获取对象的实际类型信息。如果想通过基类的指针获得派生类的数据类型，基类必须带有虚函数
+
+```cpp
+#include <typeinfo>
+class Base {
+public:
+    virtual ~Base() {}  //这里需要虚析构函数才能正确使用RTTI
+};
+
+class Derived : public Base { };
+
+void test() {
+    Base* ptr = new Derived();
+    
+    // 获取实际类型
+    std::cout << "Type: " << typeid(*ptr).name() << std::endl;
+    
+    // 获取实际类型 + 比较
+    if(typeid(*ptr) == typeid(Derived)) {
+        std::cout << "ptr points to Derived" << std::endl;
+    }
+    
+    delete ptr;
+}
+```
+
+2. dynamic_cast运算符
+
+
+3. type_info类
+
+
+
 
 type_info
 
 提供了一种在运行时获取类型信息的方法
 
-## 左值 & 右值
+## 左值&右值
 
 不考虑引用以减少干扰：左值可以取地址、位于等号左边；而右值没法取地址，位于等号右边
 
