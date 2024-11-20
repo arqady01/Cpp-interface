@@ -702,9 +702,11 @@ public:
 };
 ```
 
-## RTTI运行时类型信息
+## RTTI运行时类型识别
 
-RTTI允许程序在运行时获取和使用对象的类型信息。RTTI主要通过以下三种方式实现：
+RTTI允许程序在运行时获取和使用对象的类型信息。使用前提：类必须有虚函数才能使用RTTI，通常需要虚析构函数
+
+RTTI主要通过以下三种方式实现：
 
 1. `typeid`运算符
 
@@ -734,17 +736,74 @@ void test() {
 }
 ```
 
-2. dynamic_cast运算符
+2. `dynamic_cast`运算符
+
+`dynamic_cast`用于在继承层次间进行安全的向下转型，我们必须始终检查dynamic_cast的返回值（因为可能为空）
+
+```cpp
+class Base {
+public:
+    virtual ~Base() {}
+};
+
+class Derived1 : public Base {
+public:
+    void derived1Method() {
+        std::cout << "Derived1 method" << std::endl;
+    }
+};
+
+class Derived2 : public Base {
+public:
+    void derived2Method() {
+        std::cout << "Derived2 method" << std::endl;
+    }
+};
+
+void test() {
+    Base* base_ptr = new Derived1();
+    
+    //安全的类型转换
+    Derived1* d1 = dynamic_cast<Derived1*>(base_ptr);
+    if(d1) {
+        d1->derived1Method();
+    }
+    
+    //转换失败，于是返回nullptr
+    Derived2* d2 = dynamic_cast<Derived2*>(base_ptr);
+    if(d2) {
+        d2->derived2Method();
+    } else {
+        std::cout << "Cast to Derived2 failed" << std::endl;
+    }
+    
+    delete base_ptr;
+}
+```
+
+3. `type_info`类
+
+`type_info`类包含类型的详细信息
+
+```cpp
+#include <typeinfo>
+
+void example_type_info() {
+    int i;
+    const std::type_info& ti = typeid(i);
+    
+    std::cout << "Name: " << ti.name() << std::endl;
+    std::cout << "Hash code: " << ti.hash_code() << std::endl;
+}
+```
+
+## RAII资源获取即初始化
+
+利用了C++对象生命周期的特性，在构造函数中获取资源，在析构函数中释放资源
+
+**RAII的典型例子**
 
 
-3. type_info类
-
-
-
-
-type_info
-
-提供了一种在运行时获取类型信息的方法
 
 ## 左值&右值
 
