@@ -4122,7 +4122,7 @@ git的重要性想必不言而喻了，但是面试一般很少考察
 
 ## github配置ssh
 
-生成ssh key：ssh-keygen -t rsa -b 4096
+生成ssh key：`ssh-keygen -t rsa -b 4096`
 私钥文件：id_rsa
 公钥文件：id_rsa.pub
 
