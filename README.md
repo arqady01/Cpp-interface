@@ -4109,4 +4109,209 @@ int main() {
 }
 ```
 
-<h1 id="Git">🔀</h1>
+<h1 id="Git">🔀 Git</h1>
+
+# git
+git的重要性想必不言而喻了
+
+## 准备工作
+
+- 配置用户名：`git config --global user.name 用户名`
+- 配置邮箱：`git config --global user.email 邮箱`
+- 持久化保存配置：`git config --global credential.helper store`
+- 查看密码：`git config --global --list`
+
+## github配置ssh
+
+生成ssh key：ssh-keygen -t rsa -b 4096
+私钥文件：id_rsa
+公钥文件：id_rsa.pub
+
+## 创建仓库
+
+1. `git init`初始化仓库
+
+在合适的目录下，通过`git init`初始化一个空的仓库
+
+2. `git clone`克隆仓库
+
+## 工作区域
+
+- 工作区（`.git`的所在目录）
+    - 实际操作的目录，包含项目的所有文件
+- 暂存区（.git/index）
+    - 临时存储区
+- 本地仓库（.git/objects）
+    - 存储项目的所有版本信息，包含项目的完整历史记录
+    
+**工作流程**
+
+工作区 --(`git add`)--> 暂存区 --(`git commit`)--> 本地仓库
+
+## 常见命令
+
+- `git status`：查看工作区和暂存区的状态
+- `git add`：将工作区的修改文件添加到暂存区
+- `git commit -m "提交信息"`：将暂存区的内容提交出去
+- `git log`：查看仓库提交历史记录
+- `git reset`：可以在这三个区域之间移动文件
+- `git checkout`：从仓库或暂存区检出文件到工作区
+
+### `git reset`
+
+`git reset` 命令有三种主要模式，分别是：
+
+1. `--soft`
+    - 保留暂存区和工作区的修改
+    - 适用场景：想要修改最近的提交信息或合并多个提交
+2. `--mixed`：也是默认模式
+    - 重置暂存区，但保留工作区的修改
+    - 适用场景：想要重新组织暂存区的文件
+3. `--hard`
+    - 重置暂存区和工作区
+    - 适用场景：想要完全放弃本地修改，回到之前的状态
+    
+**git reset案例**
+
+假设在 master 分支上有以下提交历史：`A -> B -> C -> D -> E (HEAD -> master)`，其中：
+- 提交A：初始化项目，添加了基础文件
+- 提交B：添加了用户登录功能
+- 提交C：添加了用户注册功能
+- 提交D：添加了密码重置功能
+- 提交E：最新的提交，添加了邮件通知功能
+
+注意各场景都是独立的，每次场景都是这五次提交组成的，上下文没有关联
+
+1. 场景1：最新的邮件通知功能有bug
+
+假设提交E的邮件通知功能有严重bug，想要完全放弃这次修改：
+
+`git reset --hard HEAD~1`
+
+这会将代码完全回退到提交D的状态，邮件通知功能的所有代码都会被删除，现在的提交历史：
+
+`A -> B -> C -> D (HEAD -> master)`
+
+2. 场景2：想要修改最后一次提交的信息
+
+假设发现只是提交D的提交信息写错了，想要修改：
+
+`git reset --soft HEAD~1`
+
+这会撤销最后一次提交，但保留所有修改在暂存区。然后你可以：
+
+`git commit -m "添加了密码重置功能，包含邮件验证"`
+
+3. 场景3：想要将最后两次提交合并成一个
+
+突然觉得密码重置和邮件通知功能应该在一个提交中：
+
+`git reset --soft HEAD~2`
+
+这会保留D和E的所有修改在暂存区，然后：
+
+`git commit -m "添加密码重置功能（包含邮件通知）"`
+
+现在的提交历史：`A -> B -> C -> D' (HEAD -> master)`，其中D包含了原来D和E的所有修改
+
+4. 场景4：暂存区混乱需要重组
+
+修改了多个文件，但发现 `git add . `添加了一些不想要的文件：
+
+`git reset HEAD  # 或 git reset --mixed HEAD`
+
+这会清空暂存区，但保留工作区的修改，然后你可以重新选择要提交的文件
+
+5. 场景5：恢复误操作
+
+如果在使用 reset 过程中出现误操作，可以使用 `git reflog` 找回：
+
+```
+git reflog  # 查看操作历史
+# 假设看到之前的提交在 b27e0cf
+git reset --hard b27e0cf  # 恢复到操作之前的状态
+```
+
+### 删除
+
+可以在工作区执行删除文件后在提交，比如工作区删除了file.txt：`rm -rf file.txt`，之后再提交：`git add file.txt`
+
+### `.gitignore`
+
+`.gitignore` 告诉Git哪些文件和目录不需要进行版本控制。这对于排除编译生成的文件、依赖包、日志文件等非常有用
+
+```
+# 编译输出
+/dist
+/build
+/out
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 但是保留特定文件
+!.env.example
+!.gitkeep
+```
+
+### 分支
+
+1. 查看分支
+    - 查看本地分支：`git branch`
+    - 查看远程分支：`git branch -r`
+    - 查看所有分支（本地+远程）：`git branch -a`
+    - 查看分支详细信息：`git branch -v`
+2. 创建分支
+    - 创建新分支：`git branch feature-name`
+    - 创建并切换到新分支：`git checkout -b feature-name`
+3. 切换分支
+    - 切换到已有分支：`git checkout branch-name`
+    - 使用新的 switch 命令切换分支：`git switch branch-name`
+
+### `git checkout`
+
+1. 切换分支
+    - 切换到已存在的分支：`git checkout branch-name`
+2. 代码回滚
+    - 放弃对单个文件的修改：`git checkout -- file.txt`
+    -  放弃所有未提交的修改：`git checkout -- .`
+
+## 冲突解决
+
+1. 场景1：`git push`出现冲突
+
+当执行 git merge 或 git pull 时出现冲突时，可以使用`git status`  查看冲突文件，手动编辑冲突文件，
+
+```
+# 冲突标记如下：
+<<<<<<< HEAD
+你的修改
+=======
+别人的修改
+>>>>>>> branch-name
+```
+
+再解决冲突后，`git add .`  添加，`git commit -m "解决冲突"`  提交
+
+2. 场景2：合并分支出现冲突
+
+我们想将 feature 分支合并到 master，于是执行如下命令：
+
+```
+git checkout master #切换到master分支，也可以使用git switch
+git merge feature #合并
+```
+
+如果发生冲突：
+
+1. 使用 `git status` 查看冲突文件
+2. 编辑冲突文件，选择要保留的代码
+3. `git add` 标记解决
+4. `git commit` 完成合并
