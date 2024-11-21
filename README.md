@@ -804,7 +804,50 @@ void example_type_info() {
 
 **RAII的典型例子**
 
+1. 互斥锁管理
 
+```cpp
+#include <mutex>
+class Bank {
+private:
+    std::mutex mtx;
+    double balance;
+public:
+    void transfer(double amount) {
+        //RAII方式管理锁
+        std::lock_guard<std::mutex> lock(mtx);  //构造时加锁
+        balance += amount;
+        //函数结束时，lock_guard析构，自动解锁
+    }
+};
+
+2. 智能指针
+
+```cpp
+class Resource {
+public:
+    void doSomething() { }
+};
+
+void processResource() {
+    // RAII方式管理内存
+    std::unique_ptr<Resource> ptr(new Resource());  // 构造时获取内存
+    ptr->doSomething();
+    // 函数结束时，unique_ptr析构，自动释放内存
+}
+```
+
+**RAII的常见应用**
+
+1. 互斥锁管理
+    - `std::lock_guard`
+    - `std::unique_lock`
+    - `std::scoped_lock`
+2. 内存管理
+    - std::unique_ptr
+    - std::shared_ptr
+    - std::weak_ptr
+3. 网络连接管理
 
 ## 左值&右值
 
