@@ -1074,7 +1074,7 @@ w.setData(std::move(vec)); //vec在这之后不应该被使用
 
 4. 完美转发
 
-结合模板和右值引用可以实现完美转发，保持参数的值类别
+保持参数的值类别，具体见下面的《完美转发》章节
 
 ```cpp
 template<typename T>
@@ -1112,7 +1112,7 @@ const int& cref2 = std::move(a); //绑定到亡值
 const int& cref3 = 10; //绑定到纯右值
 ```
 
-### 万能引用（转发引用、通用引用）
+### 万能引用（通用引用）
 
 ```cpp
 template<typename T>
@@ -1124,7 +1124,7 @@ void f(T&& param) {  //这不是右值引用，而是万能引用
 解释：满足以下**两个条件**时，&& 才表示万能引用，否则就是右值引用（右值引用必须精确指定类型）
 
 1. 类型推导存在
-2. 形式必须是 T&&
+2. 形式必须是 `T&&`
 
 ```cpp
 //明确的类型，没有类型推导
@@ -1153,6 +1153,53 @@ auto&& var = expr;    // 万能引用：auto导致类型推导
 2. 右值（推导为右值引用）
 
 通常与`std::forward`配合使用来实现完美转发
+
+### 完美转发
+
+可以将参数按照原来的类型（包括左值/右值、const/非const等属性）转发给其他函数。完美转发主要通过`std::forward<>`（需要显式指定模板参数）和万能引用（`T&&`形式和类型推导是必须的）来实现
+
+示例
+
+```cpp
+#include <iostream>
+#include <utility>
+#include <string>
+
+// 没有使用完美转发的情况
+void process(const std::string& s) {
+    std::cout << "左值引用: " << s << std::endl;
+}
+
+void process(std::string&& s) {
+    std::cout << "右值引用: " << s << std::endl;
+}
+
+// 不完美的转发
+template<typename T>
+void badWrapper(T arg) {
+    process(arg);  // arg 总是左值
+}
+
+// 使用完美转发
+template<typename T>
+void perfectWrapper(T&& arg) {
+    process(std::forward<T>(arg));  // 保持原始类型特征
+}
+
+int main() {
+    std::string str = "Hello";
+    
+    // 使用不完美转发
+    badWrapper(str);               // 输出：左值引用: Hello
+    badWrapper(std::string("World")); // 输出：左值引用: World
+    
+    // 使用完美转发
+    perfectWrapper(str);               // 输出：左值引用: Hello
+    perfectWrapper(std::string("World")); // 输出：右值引用: World
+    
+    return 0;
+}
+```
 
 ### 引用折叠【从这开始】
 
