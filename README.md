@@ -1158,46 +1158,63 @@ auto&& var = expr;    // 万能引用：auto导致类型推导
 
 可以将参数按照原来的类型（包括左值/右值、const/非const等属性）转发给其他函数。完美转发主要通过`std::forward<>`（需要显式指定模板参数）和万能引用（`T&&`形式和类型推导是必须的）来实现
 
-示例
+示例代码
 
 ```cpp
-#include <iostream>
-#include <utility>
-#include <string>
-
-// 没有使用完美转发的情况
+//左值引用
 void process(const std::string& s) {
-    std::cout << "左值引用: " << s << std::endl;
+    std::cout << "左值引用：" << s << std::endl;
 }
 
+//右值引用
 void process(std::string&& s) {
-    std::cout << "右值引用: " << s << std::endl;
+    std::cout << "右值引用：" << s << std::endl;
 }
 
-// 不完美的转发
+//不完美的转发：arg 总是左值
 template<typename T>
 void badWrapper(T arg) {
-    process(arg);  // arg 总是左值
+    process(arg);
 }
 
-// 使用完美转发
+//完美转发
 template<typename T>
 void perfectWrapper(T&& arg) {
-    process(std::forward<T>(arg));  // 保持原始类型特征
+    process(std::forward<T>(arg)); //保持原始类型特征
 }
 
 int main() {
     std::string str = "Hello";
-    
-    // 使用不完美转发
-    badWrapper(str);               // 输出：左值引用: Hello
-    badWrapper(std::string("World")); // 输出：左值引用: World
-    
-    // 使用完美转发
-    perfectWrapper(str);               // 输出：左值引用: Hello
+
+	//使用不完美转发
+    badWrapper(str); //输出：左值引用: Hello
+    badWrapper(std::string("World")); //输出：左值引用: World
+
+    //使用完美转发
+    perfectWrapper(str); //输出：左值引用: Hello
+    perfectWrapper(std::move(str)); //输出：右值引用: Hello
     perfectWrapper(std::string("World")); // 输出：右值引用: World
-    
-    return 0;
+}
+```
+
+应用场景
+
+1. 工厂函数
+
+```cpp
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+```
+
+2. 包装函数
+
+```cpp
+template<typename Func, typename... Args>
+auto wrapper(Func&& f, Args&&... args) {
+    //一些额外的工作
+    return std::forward<Func>(f)(std::forward<Args>(args)...);
 }
 ```
 
