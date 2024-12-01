@@ -1218,11 +1218,44 @@ auto wrapper(Func&& f, Args&&... args) {
 }
 ```
 
-### 引用折叠【从这开始】
+### 引用折叠
 
-X& &、X& &&、X&& & 可折叠成 X&
+引用折叠提供了当出现**引用的引用**时，如何将其折叠为**单个引用**的机制
 
-X&& && 可折叠成 X&&
+1. 引用折叠规则
+
+- 左值引用的左值引用（T& &） → T&
+- 左值引用的右值引用（T& &&） → T&
+- 右值引用的左值引用（T&& &） → T&
+- 右值引用的右值引用（T&& &&）→ T&&
+
+2. 示例代码
+
+```cpp
+#include <type_traits>
+
+//1. 基础示例
+template<typename T>
+void reference_collapse(T&& param) {
+    std::cout << (std::is_lvalue_reference_v<T> ? "lvalue" : "rvalue") << std::endl;
+}
+void demonstrate_reference_collapse() {
+    int x = 42;
+    
+    //情况1：传入左值
+    reference_collapse(x); //T推导为int&，参数类型折叠为int&
+    
+    //情况2：传入右值
+    reference_collapse(42); //T推导为int，参数类型为int&&
+    //解惑：对于右值参数，T 被推导为原始类型 int，而不是 int&&
+}
+
+//2. 更复杂的示例
+template<typename T>
+class Widget {
+    using RvalueRef = T&&; //这里会发生引用折叠
+};
+```
 
 ### 完美转发 std::forward
 
