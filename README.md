@@ -1165,7 +1165,6 @@ auto&& var = expr;    // 万能引用：auto导致类型推导
 void process(const std::string& s) {
     std::cout << "左值引用：" << s << std::endl;
 }
-
 //右值引用
 void process(std::string&& s) {
     std::cout << "右值引用：" << s << std::endl;
@@ -1193,7 +1192,7 @@ int main() {
     //使用完美转发
     perfectWrapper(str); //输出：左值引用: Hello
     perfectWrapper(std::move(str)); //输出：右值引用: Hello
-    perfectWrapper(std::string("World")); // 输出：右值引用: World
+    perfectWrapper(std::string("World")); //输出：右值引用: World
 }
 ```
 
@@ -1255,86 +1254,6 @@ template<typename T>
 class Widget {
     using RvalueRef = T&&; //这里会发生引用折叠
 };
-```
-
-### 完美转发 std::forward
-
-完美转发能够保持变量的原始值属性（左值或右值）不变，并转发出去
-
-一个应用就是保证右值引用在传递的过程中类型不会变为左值引用，比如：
-
-```cpp
-template <typename T>
-void wrapper(T&& t) { // 万能引用
-    func(std::forward<T>(t)); // 完美转发
-}
-
-class MyClass {};
-void func(MyClass& a) { std::cout << "in func(MyClass&)\n"; }
-void func(const MyClass& a) { std::cout << "in func(const MyClass&)\n"; }
-void func(MyClass&& a) { std::cout << "in func(MyClass &&)\n"; }
-int main(void) {
-    wrapper(MyClass()); //in func(MyClass &&)而不是in func(const MyClass&)
-}
-```
-
-- 当模板类型为左值引用，类型会被推导为左值
-- 当模板类型不是左值引用类型，一律推导为右值
-
-```cpp
-#include <iostream>
-template <typename T>
-void print(T& t) { //A函数，左值引用
-    std::cout << "left_reference：" << t << std::endl;
-}
-//重写print函数
-template <typename T>
-void print(T&& t) { //B函数，右值引用
-    std::cout << "right_reference：" << t << std::endl;
-}
-
-template <typename T>
-void task(T&& v) { //未定义的引用类型，需要根据传参来实时判断
-    print(v); //（1）
-    print(std::move(v)); //（2）
-    print(std::forward<T>(v)); //（3）
-    std::cout << std::endl;
-}
-
-int main() {
-    //task(8); //Ⅰ
-    int num = 1024;
-    //task(num); //Ⅱ
-    //task(std::forward<int>(num)); //Ⅲ
-    //task(std::forward<int&>(num)); //Ⅳ
-    task(std::forward<int&&>(num)); //Ⅴ
-}
-/*
- Ⅰ：8是个纯右值，进入task函数，未定义的引用类型推导出来为右值引用
- （1）：右值引用发生传递变为左值引用，进入A函数
- （2）：右值引用发生传递变成左值引用后，move成右值，右值引用进入B函数
- （3）：forward<T>的类型是T，是右值，forward将右值传递给B函数
- 
- Ⅱ：num可取地址，是左值进入task函数，未定义的引用类型推导出来为左值引用
- （1）：毫无疑问左值，由A函数执行
- （2）：左值move为右值，由B函数执行
- （3）：T为左值类型，forward成左值引用推出去，进入A函数
- 
- Ⅲ：std::forward<int>(num)，模板类型是int，forward中不是左值引用，就会被推导成右值
- （1）：右值引用发生传递，变成左值，进入A函数
- （2）：右值引用传递变成左值，再move成右值，进入B函数
- （3）：T是右值类型，完美转发成右值引用，进入B函数
- 
- Ⅳ：std::forward<int&>(num)，模板类型是int&，forward中是左值引用就会被推导成左值
- （1）：左值，进入A函数
- （2）：左值move成右值，进入B函数
- （3）：T为左值类型，forward转发成左值引用，进入A函数
- 
- Ⅴ：std::forward<int&&>(num)，模板类型是int&&，forward中不是左值引用则被推导成右值
- （1）：右值引用，发生传递变成左值，进入A函数
- （2）：右值引用发生传递变成左值，再move成右值，进入B函数
- （3）：T为右值类型，forward转发为右值引用，进入B函数
- */
 ```
 
 ## 二级指针
