@@ -35,6 +35,31 @@
     - 常量引用，比如`const int& ref = 42;`，可以绑定到右值，帮助延长临时对象的生命周期
 - 修饰成员函数，说明该成员函数内不能修改成员变量
 
+## constexpr&常量表达式
+
+常量表达式（const expression）是指**值不会改变**并且**在编译期就能知道结果**的表达式。显然，字面值属于常量表达式，用常量表达式初始化的const对象也是常量表达式
+
+一个对象（或表达式）是不是常量表达式由它的数据类型和初始值共同决定，例如：
+
+```cpp
+const int num = 20; //num是常量表达式
+const int limit = num + 1; //limit是常量表达式
+int staff = 42; //staff不是常量表达式，因为不是const型
+const int sz = get_size(); //const型，但是具体值要到运行期才能获得，sz不是常量表达式
+```
+
+在一个复杂系统中，很难（几乎不能）分辨一个初始值到底是不是常量表达式。C++11允许将变量声明为`constexpr`类型以便由编译器来验证变量是否是一个常量表达式。
+
+声明为`constexpr`的变量一定是一个常量，而且必须用常量表达式初始化：
+
+```cpp
+constexpr int mf = 20; //20是常量表达式
+constexpr int limit = mf + 1; //mf + 1 是常量表达式
+constexpr int sz = size(); //只有当size()是一个constexpr函数时才是正确的声明
+```
+
+一般来说，如果认定变量是一个常量表达式，那就把它声明成constexpr类型
+
 ## #define和const
 
 | 宏定义#define | const |
