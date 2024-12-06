@@ -170,7 +170,7 @@ decltype(*p) c; //错误，Ⅲ
 - 如果decltype使用的是一个不加括号的变量，则得到的结果就是该变量的类型
 - 如果给变量加上了一层或多层括号，得到的结果就是引用
 
-**切记**：decltype((variable))（注意是双层括号）的结果永远是引用，而decltype(variable)结果只有当variable本身就是一个引用时才是引用。
+**切记**：`decltype((variable))`（注意是双层括号）的结果永远是引用，而`decltype(variable)`结果只有当variable本身就是一个引用时才是引用。
 
 ```cpp
 decltype((i)) d; //错误：d是int&，必须初始化
