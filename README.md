@@ -26,6 +26,15 @@
 - 常量储存区：存放常量字符串和其他类型的常量，不允许修改。虚函数表vtable就存放常量存储区的只读数据段
 - 代码区：存放编译后的二进制代码
 
+## #define&const
+
+| 宏定义#define | const |
+| ---- | ---- |
+| 无类型安全检查 | 有类型安全检查 |
+| 不分配内存  | 要分配内存 |
+| 存储在代码段 | 存储在数据段 |
+| 可通过#undef取消 | 不可取消   |
+
 ## const
 - 修饰变量，该变量不可被改变，但在定义之初就必须初始化（否则再也没机会赋值）
 - 修饰指针，分为指向常量的指针和指针常量
@@ -34,6 +43,39 @@
 - 修饰引用，常用于函数参数，避免拷贝开销
     - 常量引用，比如`const int& ref = 42;`，可以绑定到右值，帮助延长临时对象的生命周期
 - 修饰成员函数，说明该成员函数内不能修改成员变量
+
+## 顶层const
+
+顶层const表示对象（算术类型、类、指针等）本身是const的
+
+## 底层const
+
+底层const表示引用或指针指向的对象是一个常量
+
+例题：
+
+```cpp
+const int x = 5; //不能改变x的值，x本身是const的，所以是顶层const
+const int* p1 = &x; //退化成const *p1来看，允许改变p1的指向，但p1所指的对象不允许改变，所以p1是底层const
+int y = 10;
+int *const p2 = &y; //不允许改变p2的指向，即指针p2本身是const的，所以p2是顶层const
+const int *const p3 = &x; //靠左的const表示底层const，右边的const表示顶层const
+```
+
+当执行对象的拷贝时，顶层const不受影响，但是底层const不容忽视，拷入和拷出的对象必须具备相同的底层const资格，或者两个对象的数据类型能转换，一般来说，非常量可以转换为常量，反之不行：
+
+```cpp
+int i = 10;
+const int ci = 5;
+const int *const p = &ci; //p既包含顶层也包含底层const
+const int *p2 = &ci; //指针p2允许改变指向但所指对象（*p2）是常量（不允许改变），底层const
+
+int *ptr = p; //错误：p包含底层const含义，而ptr没有
+p2 = p; //正确：p2和p都是底层const（尽管p同时也是顶层const）
+p2 = &i; //正确：int*能转换成const int*
+int &r = ci; //错误：普通的int&不能绑定到int常量上（不然可以通过引用r改变ci常量的值）
+const int &r2 = i; //正确：const int&可以绑定到普通int上（反正不能变）
+```
 
 ## constexpr&常量表达式
 
@@ -60,14 +102,80 @@ constexpr int sz = size(); //只有当size()是一个constexpr函数时才是正
 
 一般来说，如果认定变量是一个常量表达式，那就把它声明成constexpr类型
 
-## #define和const
+## auto
 
-| 宏定义#define | const |
-| ---- | ---- |
-| 无类型安全检查 | 有类型安全检查 |
-| 不分配内存  | 要分配内存 |
-| 存储在代码段 | 存储在数据段 |
-| 可通过#undef取消 | 不可取消   |
+auto一般会忽略顶层的const，同时底层const则会保留下来：
+
+```cpp
+int i;
+const int ci = i, &cr = ci;
+auto b = ci; //b是int（ci的顶层const被忽略）
+auto c = cr; //c是int（cr是ci的别名，ci本身是一个顶层const）
+auto d = &i; //d是int*（i是int，取地址自然是整形指针）
+auto e = &ci; //e是const int*（对ci取地址则变相表示指针e指向的对象是一个常量，auto会保留底层const属性）
+```
+
+如果希望推断出的auto类型是一个顶层const，需要明确指出：
+
+```cpp
+const auto f = ci; //ci是int，f是const int
+```
+
+还可以将引用和指针的类型设为auto，此时顶层const会被保留（原来的初始化规则仍然适用）：
+
+```cpp
+const int ci = i; //假设i是int型
+//注意下面这个，如果是auto g = ci;那么g就是int，顶层const被忽略
+auto &g = ci; //ci是const int，g是const int&
+auto *p = &ci; //ci是const int，p是const int*
+auto &h = 42; //错误，纯右值不能绑定到左值引用上
+const auto &j = 42; //正确
+```
+
+## decltype
+
+`decltype`能分析表达式并得到它的类型，却不实际计算表达式的值：
+
+```cpp
+decltype(f()) sum = x; //sum的类型就是函数f的返回类型
+```
+
+编译器却不实际调用函数f，而是使用当调用发生时f的返回值类型作为sum的类型。
+
+如果`decltype`使用的表达式是一个变量，则`decltype`返回该变量的类型（**包括`顶层const`和引用在内**）：
+
+```cpp
+const int ci = 0, &cj = ci;
+decltype(ci) x = 0; //x的类型是const int
+decltype(cj) y = x ;//cj的类型是const int&，y的类型是const int&
+decltype(cj) z; //错误：z是一个引用，必须初始化
+```
+
+如果decltype使用的表达式不是一个变量，则decltype返回表达式结果对应的类型。
+
+```cpp
+//decltype的结果可以是引用类型
+int i = 42, *p = &i, &r = i;
+decltype(r) b; //错误，Ⅰ
+decltype(r + 0) b; //正确，Ⅱ
+decltype(*p) c; //错误，Ⅲ
+```
+
+- Ⅰ：r是i的引用，如果`decltype(r)`的结果是引用类型，引用必须初始化
+- Ⅱ：r作为表达式的一部分，(r+0)的结果将是一个具体值而非一个引用
+- Ⅲ：解引用后返回的是a的类型，即int，但它是一个左值（lvalue）。因此decltype(*b)的结果是int&
+
+对于decltype所用的表达式来说，如果变量名加上一对括号，得到的类型与不加括号时会有不同：
+
+- 如果decltype使用的是一个不加括号的变量，则得到的结果就是该变量的类型
+- 如果给变量加上了一层或多层括号，得到的结果就是引用
+
+**切记**：decltype((variable))（注意是双层括号）的结果永远是引用，而decltype(variable)结果只有当variable本身就是一个引用时才是引用。
+
+```cpp
+decltype((i)) d; //错误：d是int&，必须初始化
+decltype(i) e; //正确：e是一个（未初始化的）int
+```
 
 ## static
 
