@@ -1389,147 +1389,118 @@ class Widget {
 };
 ```
 
-## 二级指针
-
-矩阵举例
-
-```cpp
-#include <iostream>
-class Matrix {
-public:
-    Matrix(int _row, int _col): row(_row), col(_col) {
-        data = new float*[row]; //申请row行，类型匹配：data是二级指针，new需要再配一个指针
-        for (int i = 0; i < row; i++) { //遍历行
-            data[i] = new float[col]; //类型匹配：data[i]是一级指针，直接new出来就是一个一级指针
-            for (int j = 0; j < col; j++) {
-                data[i][j] = 0; //初始化为0
-            }
-        }
-    }
-    Matrix(const Matrix& mx) {
-        row = mx.row;
-        col = mx.col;
-        data = new float*[row]; //类型：二级指针
-        for (int i = 0; i < row; i++) {
-            data[i] = new float[col]; //类型：一级指针
-            for (int j = 0; j < col; j++) {
-                data[i][j] = mx.data[i][j]; //拷贝
-            }
-        }
-    }
-    ~Matrix() {
-        if (nullptr != data) {
-            for (int i = 0; i < row; i++) {
-                if (data[i]) {
-                    delete[] data[i];
-                    data[i] = nullptr; //释放二级指针
-                }
-            }
-            delete[] data;
-            data = nullptr; //释放一级指针
-        }
-    }
-private:
-    int row; //行
-    int col; //列
-    float** data = nullptr; //二维数组
-};
-```
-
 ## 四大类型转换
 
-- static_cast，用于基类和派生类之间，指针或引用的转换
-  	- 上行转换（将派生类指针/引用转换为基类指针/引用）是安全的，相当于将哈士奇退化成犬科是安全的
-  	- 下行转换（将基类指针/引用转换为派生类指针/引用）不安全的，相当于将犬类都“进化”成哈士奇很不安全
+- static_cast
+  	- 上行转换（将派生类指针/引用 转换为 基类指针/引用）是安全的，相当于将哈士奇退化成犬科是安全的
+  	- 下行转换（将基类指针/引用 转换为 派生类指针/引用）不安全的，相当于将犬类都“进化”成哈士奇很不安全
+  	    - static_cast在编译时只检查类型之间是否存在继承关系，但不会在运行时检查实际对象的类型
   	- 把 void* 转换成目标类型的指针是不安全的，相当于缩小圈子搞进化是不安全的
   	- 把任何类型的表达式转为void类型是可以的
-- const_cast，去除类型的 const 或 volatile 属性
+ 
+- dynamic_cast，继承体系中的安全向下转型相当于对static_cast的补充
+	- 可以安全的将基类指针/引用 转为 子类指针/引用，转换不安全就返回nullptr
+ 	- 只能用于有虚函数的类，通过虚函数表存储的RTTI(运行时类型信息)进行检查
 
+- const_cast，移除或添加 const 或 volatile 属性
+    - 移除 const：当有一个 const 对象，但需要调用一个非const成员函数时，可以使用const_cast移除const
+    - 添加 const 限定符：也可以使用 const_cast 将一个非const对象转换为const对象，但这通常不常见，因为可以直接将非 const 对象赋值给 const 对象
 ```cpp
 const char* p;
-char* l = const_cast<char*>(p); //正确
+char* l = const_cast<char*>(p); //移除const
+int a = 10;
+const int* ptr = const_cast<const int*>(&a); // 添加const
 ```
 
-- dynamic_cast，继承体系中的安全向下转型相当于对static_cast的补充
-	- 可以安全的将基类指针/引用转为子类指针/引用，转型失败就返回NULL
- 	- 只有在基类带有虚函数的情况下才允许转为派生类
-- reinterpret_cast，比较依赖于机器，本身也很少使用 
+- reinterpret_cast
+    - 可以进行任意指针类型之间的转换
+    - 可以在不相关的类型之间进行转换
+    - 结果取决于编译器实现，可能导致不可预期的行为，最危险的转换操作符
+```cpp
+int* p = new int(42);
+char* ch = reinterpret_cast<char*>(p); // 将int*重新解释为char*
+
+// 将指针转换为整数类型
+int addr = reinterpret_cast<int>(p);
+```
 
 ## 指针函数 & 函数指针
 
-#### 指针函数
+### 指针函数
 
-本质是一个函数，返回值是指针，格式如： `reference* func(args...);`
-
-func是函数，reference*作为一个整体，是func的返回值。args...是形参列表。
-
-#### 函数指针
-
-本质是一个指针，指向一个函数，所以它是指向函数的指针。我们知道，函数的定义位于代码段，所以每个函数在代码段中都有一个入口地址，函数指针就是指向代码段中函数入口地址的指针
-
-格式如： `reference (*p)(args...);`
-
-reference为返回值，*p是一个整体，代表指向该函数的指针，单独的p为函数指针变量。args...是形参列表。
-
-函数指针的初始化：函数指针变量 = 函数名
-
-举个例子：
+指针函数是返回指针的函数，其本质是一个函数，只是返回值是一个指针。格式如： `返回指针类型* 函数名(参数列表);`
 
 ```cpp
-int max(int a, int b) {
-    return a > b ? a : b;
+//1. 返回整型指针的函数
+int* getNumber() {
+    static int num = 42; //使用static确保返回的地址有效
+    return &num;
 }
-int main() {
-    int (*p)(int, int); //函数指针的定义
-    p = &max; //函数指针初始化
-    //或者直接p = max，因为函数名本身就代表函数的地址
-    int ans = p(10, 7); //函数指针的调用
-    std::cout << ans << std::endl;
+
+//2. 返回自定义类型指针的函数
+class MyClass {};
+MyClass* createObject() {
+    return new MyClass(); //返回堆上分配的对象
 }
 ```
 
-#### 回调函数
+### 函数指针
+函数指针是指向函数的指针。其本质是一个指针，指向某个函数的地址。我们知道，函数的定义位于代码段，所以每个函数在代码段中都有一个入口地址，函数指针就是指向代码段中函数入口地址的指针。格式如： `返回类型 (*指针名)(参数列表);`
 
-函数指针的典型应用就是回调函数，原理是将函数指针作为参数传递给另一个函数。
-
-回调函数相当于一个中断处理函数，由系统在符合你设定的条件时自动调用。用户只要做三件事：声明+定义+设置触发条件
-
-
-
+1. 基本用法
 ```cpp
-int sum(int a, int b) {
+int add(int a, int b) {
     return a + b;
 }
-//第三个参数是函数指针，通过该函数指针调用sum函数
-int callback(int m, int n, int (*p)(int, int)) {
-    return p(m, n);
+int sub(int a, int b) {
+    return a - b;
 }
+
 int main() {
-    std::cout << callback(3, 2, sum) << std::endl;
+    //函数指针的声明
+    int (*operation)(int, int);
+    
+    //函数指针的初始化
+    operation = &add;
+    std::cout << operation(5, 3) << std::endl; //输出: 8
+    //或者直接operation = sub，因为函数名本身就代表函数的地址
+    operation = sub;
+    std::cout << operation(5, 3) << std::endl; //输出: 2
 }
 ```
 
-回调函数不关心sum具体如何实现，只需要去调用即可，假如以后代码迭代，只需要修改sum而无需动callback函数
+2. 回调函数：将函数指针作为参数传递
+```cpp
+//函数指针作为参数
+int add(int a, int b) { return a + b; }
+int sub(int a, int b) { return a - b; }
+void processNumbers(int (*func)(int, int), int a, int b) {
+    std::cout << func(a, b) << std::endl;
+}
 
-## 严禁返回局部变量的指针和引用
+int main() {
+    processNumbers(add, 5, 3); //输出: 8
+    processNumbers(sub, 5, 3); //输出: 2
+}
+```
 
-因为局部变量在函数的栈区中分配内存，当函数执行完毕，栈区内存自动回收，包括其中的局部变量。假如这时返回了局部变量的引用（或者说该局部变量在栈上的地址），该地址指向的内存区域已经被释放了，所以它是一个无效的引用，指向一片未定义的内存，有很大的安全隐患
+## 严禁返回局部变量的指针或引用
+
+局部变量在函数的栈区中分配内存，当函数执行完毕，栈区内存自动回收，包括其中的局部变量。假如这时返回了局部变量的引用（或者说该局部变量在栈上的地址），该地址指向的内存区域已经被释放了，所以它是一个无效的引用，指向一片未定义的内存，有很大的安全隐患
 
 ## new/delete 和 malloc/free
 
 - malloc需要手动计算分配空间大小，new不需要
 - malloc/free是库函数，不支持重载；new/delete是操作符，支持运算符重载
 - new是类型安全的，malloc不是
-- new分配成功返回类型指针，不需要转换；malloc分配成功返回void*，需要强制类型转换
+- new分配成功返回类型指针，不需要转换；malloc分配成功返回void*，需要类型转换
 - new分配内存失败会抛bac_alloc异常，malloc分配失败返回nullptr
 - malloc仅分配内存空间，free仅回收空间；new和delete除了分配和释放外，还能调用构造函数和析构函数
 - new底层调用 operator new 分配空间并执行构造函数，而operator new又封装了malloc。delele先运行析构函数，之后运行operator delete
 
 ### free函数只接收一个内存地址，它是如何知道要分配多大内存？
 
-malloc返回的起始地址比空间地址多了16字节，这16字节保存了内存块描述信息，其中就包括了内存块大小
-
-执行free时，free将传入的地址向左偏移16字节，进而分析出内存块大小，就知道要释放多大的内存了
+malloc返回的起始地址比空间地址多了16字节，这16字节保存了内存块描述信息，其中就包括了内存块大小。执行free时，free将传入的地址向左偏移16字节，进而分析出内存块大小，就知道要释放多大的内存了
 
 ## 堆 和 栈
 
